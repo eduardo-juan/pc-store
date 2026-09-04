@@ -1,75 +1,245 @@
-// Hooks de React para estado y carga inicial.
-import { useEffect, useState } from 'react'
-
-// Servicio que consulta los productos guardados en Supabase.
-import { obtenerProductos } from '../services/productosService'
+import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '../supabaseClient'
 
 export default function Tienda() {
-  // Lista de productos recibidos desde Supabase.
   const [productos, setProductos] = useState([])
-
-  // Controla el mensaje de carga.
+  const [categorias, setCategorias] = useState([])
+  const [busqueda, setBusqueda] = useState('')
+  const [categoriaId, setCategoriaId] = useState('')
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
 
-  // Se ejecuta una sola vez cuando la página se monta.
+
   useEffect(() => {
-    cargarProductos()
+    cargarTienda()
   }, [])
 
-  // Consulta los productos utilizando nuestro servicio.
-  const cargarProductos = async () => {
-    const resultado = await obtenerProductos()
 
-    if (resultado.success) {
-      setProductos(resultado.data)
+  const cargarTienda = async () => {
+    setCargando(true)
+    setError('')
+
+    const { data: productosData, error: productosError } =
+      await supabase
+        .from('productos')
+        .select('*, categorias(id, nombre)')
+        .eq('activo', true)
+        .order('id')
+
+    if (productosError) {
+      setError(productosError.message)
+      setCargando(false)
+      return
     }
 
+    const { data: categoriasData, error: categoriasError } =
+      await supabase
+        .from('categorias')
+        .select('id, nombre')
+        .order('nombre')
+
+    if (categoriasError) {
+      setError(categoriasError.message)
+      setCargando(false)
+      return
+    }
+
+    setProductos(productosData || [])
+    setCategorias(categoriasData || [])
     setCargando(false)
   }
 
-  // Mientras Supabase responde, mostramos un mensaje sencillo.
+
+  const productosFiltrados = useMemo(() => {
+    return productos.filter((producto) => {
+
+      const texto = busqueda.trim().toLowerCase()
+
+      const coincideTexto =
+        texto === '' ||
+        producto.nombre?.toLowerCase().includes(texto) ||
+        producto.marca?.toLowerCase().includes(texto) ||
+        producto.modelo?.toLowerCase().includes(texto)
+
+      const coincideCategoria =
+        categoriaId === '' ||
+        String(producto.categoria_id) === String(categoriaId)
+
+      return coincideTexto && coincideCategoria
+    })
+  }, [productos, busqueda, categoriaId])
+
+
   if (cargando) {
-    return <div className="p-8">Cargando...</div>
+    return (
+      <main className="pc-page">
+        <div className="pc-container">
+          Cargando productos...
+        </div>
+      </main>
+    )
   }
 
+
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4">
-      <h1 className="text-4xl font-bold mb-8">Tienda</h1>
+    <main className="pc-page">
+      <div className="pc-container">
 
-      {/* Cuadrícula de productos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {productos.map((producto) => (
-          <div
-            key={producto.id}
-            className="bg-white rounded-lg shadow p-4"
+        <div className="pc-admin-header">
+          <h1>Tienda</h1>
+          <p>
+            Encuentra componentes disponibles en PC Store.
+          </p>
+        </div>
+
+
+        <div className="pc-toolbar">
+
+          <input
+            type="search"
+            className="pc-input"
+            placeholder="Buscar por nombre, marca o modelo..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+
+          <select
+            className="pc-select"
+            value={categoriaId}
+            onChange={(e) => setCategoriaId(e.target.value)}
           >
-            {/* La imagen solo se muestra si existe una URL guardada. */}
-            {producto.imagen_principal && (
-              <img
-                src={producto.imagen_principal}
-                alt={producto.nombre}
-                className="w-full h-48 object-cover rounded mb-4"
-              />
-            )}
+            <option value="">
+              Todas las categorías
+            </option>
 
-            <h3 className="font-bold text-lg mb-2">
-              {producto.nombre}
-            </h3>
+            {categorias.map((categoria) => (
+              <option
+                key={categoria.id}
+                value={categoria.id}
+              >
+                {categoria.nombre}
+              </option>
+            ))}
+          </select>
 
-            <p className="text-gray-600 text-sm mb-4">
-              {producto.descripción?.substring(0, 100)}...
-            </p>
+        </div>
 
-            <p className="text-2xl font-bold text-blue-600 mb-4">
-              ${Number(producto.precio).toFixed(2)}
-            </p>
 
-            <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-              Agregar al carrito
-            </button>
+        {error && (
+          <div className="pc-card" style={{ padding: 18 }}>
+            Error: {error}
           </div>
-        ))}
+        )}
+
+
+        <div className="pc-product-grid">
+
+          {productosFiltrados.map((producto) => (
+
+            <article
+              key={producto.id}
+              className="pc-card pc-product-card"
+            >
+
+              <div className="pc-product-image">
+
+                {producto.imagen_principal ? (
+                  <img
+                    src={producto.imagen_principal}
+                    alt={producto.nombre}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <span>🖥️</span>
+                )}
+
+              </div>
+
+
+              <div className="pc-product-body">
+
+                <div className="pc-product-category">
+                  {producto.categorias?.nombre || 'Sin categoría'}
+                </div>
+
+                <h3 className="pc-product-name">
+                  {producto.nombre}
+                </h3>
+
+                <p className="pc-product-description">
+                  {producto.descripción?.substring(0, 90)}
+                  {producto.descripción?.length > 90 ? '...' : ''}
+                </p>
+
+
+                <div className="pc-price-row">
+
+                  {producto.precio_descuento ? (
+                    <>
+                      <span className="pc-price">
+                        L {Number(producto.precio_descuento).toFixed(2)}
+                      </span>
+
+                      <span className="pc-old-price">
+                        L {Number(producto.precio).toFixed(2)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="pc-price">
+                      L {Number(producto.precio).toFixed(2)}
+                    </span>
+                  )}
+
+                </div>
+
+
+                <div className="pc-stock">
+                  Stock disponible: {producto.stock}
+                </div>
+
+
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-primary"
+                  style={{
+                    width: '100%',
+                    marginTop: 16,
+                  }}
+                  onClick={() => {
+                    alert(
+                      'El carrito se agregará en la siguiente etapa.'
+                    )
+                  }}
+                >
+                  Agregar al carrito
+                </button>
+
+              </div>
+
+            </article>
+          ))}
+
+        </div>
+
+
+        {productosFiltrados.length === 0 && (
+          <div
+            className="pc-card"
+            style={{
+              padding: 30,
+              textAlign: 'center',
+              marginTop: 20,
+            }}
+          >
+            No encontramos productos con esos filtros.
+          </div>
+        )}
+
       </div>
-    </div>
+    </main>
   )
 }

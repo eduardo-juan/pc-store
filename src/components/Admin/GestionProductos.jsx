@@ -56,7 +56,7 @@ export default function GestionProductos() {
 
       const datosProducto = {
         nombre,
-        descripcion,
+        descripción: descripcion,
         precio: parseFloat(precio),
         stock: parseInt(stock),
         marca,

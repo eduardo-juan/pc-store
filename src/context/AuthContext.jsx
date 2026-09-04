@@ -4,25 +4,44 @@ import { supabase } from '../supabaseClient'
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-  // Usuario autenticado actualmente. Si no hay sesión, su valor es null.
   const [usuario, setUsuario] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Verificar si hay usuario autenticado
     const verificarUsuario = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      setUsuario(session?.user || null)
+
+      if (session?.user) {
+        const { data: perfil } = await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        setUsuario({ ...session.user, ...perfil })
+      } else {
+        setUsuario(null)
+      }
+
       setCargando(false)
     }
 
     verificarUsuario()
 
-    // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUsuario(session?.user || null)
+      async (event, session) => {
+        if (session?.user) {
+          const { data: perfil } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+
+          setUsuario({ ...session.user, ...perfil })
+        } else {
+          setUsuario(null)
+        }
       }
     )
 
@@ -32,9 +51,8 @@ export const AuthProvider = ({ children }) => {
   const registro = async (email, password, nombre, apellido) => {
     try {
       setError(null)
-      
-      // 1. Crear usuario en autenticación
-      const { data: { user }, error: authError } = 
+
+      const { data: { user }, error: authError } =
         await supabase.auth.signUp({
           email,
           password,
@@ -42,7 +60,6 @@ export const AuthProvider = ({ children }) => {
 
       if (authError) throw authError
 
-      // 2. Crear perfil en tabla usuarios
       const { error: perfilError } = await supabase
         .from('usuarios')
         .insert([{
@@ -65,7 +82,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null)
-      const { data: { user }, error } = 
+      const { data: { user }, error } =
         await supabase.auth.signInWithPassword({
           email,
           password,

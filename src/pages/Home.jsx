@@ -1,30 +1,109 @@
-// Link permite ir a la tienda sin recargar la página.
 import { Link } from 'react-router-dom'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-24 text-center">
+    <>
+      <section className="pc-hero">
+        <div className="pc-container pc-hero-grid">
 
-        {/* Título principal */}
-        <h1 className="text-5xl font-bold mb-4">
-          🖥️ Bienvenido a PC Store
-        </h1>
+          <div>
+            <span className="pc-eyebrow">
+              Tecnología para construir tu próxima PC
+            </span>
 
-        {/* Descripción */}
-        <p className="text-xl mb-8">
-          Configuradores de PC y componentes de alta calidad
-        </p>
+            <h1>
+              Componentes, rendimiento y control en un solo lugar.
+            </h1>
 
-        {/* Botón que lleva a la tienda */}
-        <Link
-          to="/tienda"
-          className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100"
-        >
-          Ver Tienda
-        </Link>
+            <p>
+              Explora procesadores, tarjetas gráficas,
+              memoria, almacenamiento y periféricos.
+            </p>
 
-      </div>
-    </div>
+            <div className="pc-hero-actions">
+
+              <Link
+                to="/tienda"
+                className="pc-btn pc-btn-primary"
+              >
+                Explorar productos
+              </Link>
+
+              <Link
+                to="/registro"
+                className="pc-btn pc-btn-light"
+              >
+                Crear cuenta
+              </Link>
+
+            </div>
+          </div>
+
+          <div className="pc-hero-panel">
+
+            <div className="pc-stat">
+              <strong>PC Store</strong>
+              <span>Catálogo por categorías</span>
+            </div>
+
+            <div className="pc-stat">
+              <strong>Stock</strong>
+              <span>Inventario administrado desde Supabase</span>
+            </div>
+
+            <div className="pc-stat">
+              <strong>Admin</strong>
+              <span>Panel para gestionar la tienda</span>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <section className="pc-section">
+        <div className="pc-container">
+
+          <h2 className="pc-section-title">
+            ¿Qué encontrarás en PC Store?
+          </h2>
+
+          <p className="pc-section-subtitle">
+            Una tienda preparada para crecer hacia un sistema
+            completo de comercio electrónico.
+          </p>
+
+          <div className="pc-feature-grid">
+
+            <article className="pc-card pc-feature-card">
+              <div className="pc-feature-icon">⚡</div>
+              <h3>Hardware</h3>
+              <p>
+                Componentes organizados por categoría,
+                marca, modelo y precio.
+              </p>
+            </article>
+
+            <article className="pc-card pc-feature-card">
+              <div className="pc-feature-icon">📦</div>
+              <h3>Inventario</h3>
+              <p>
+                Control de existencias y movimientos.
+              </p>
+            </article>
+
+            <article className="pc-card pc-feature-card">
+              <div className="pc-feature-icon">🔐</div>
+              <h3>Usuarios y roles</h3>
+              <p>
+                Accesos separados para clientes y administradores.
+              </p>
+            </article>
+
+          </div>
+        </div>
+      </section>
+    </>
   )
 }
