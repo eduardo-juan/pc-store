@@ -1,78 +1,119 @@
-// Link permite navegar entre páginas sin recargar completamente el navegador.
 import { Link } from 'react-router-dom'
-
-// Nuestro hook personalizado devuelve usuario, logout y si tiene rol admin.
 import { useAuth } from '../../hooks/useAuth'
+import { useCarrito } from '../../context/CarritoContext'
 
 export default function Navbar() {
-  // Datos y funciones disponibles desde el sistema de autenticación.
-  const { usuario, logout, esAdmin } = useAuth()
 
-  // Cierra la sesión y vuelve a la página principal.
+  const {
+    usuario,
+    logout,
+    esAdmin,
+  } = useAuth()
+
+  const {
+    cantidadTotal,
+  } = useCarrito()
+
+
   const handleLogout = async () => {
     await logout()
     window.location.href = '/'
   }
 
-  return (
-    <nav className="bg-gray-900 text-white shadow">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
 
-        {/* LOGO / ENLACE AL INICIO */}
-        <Link to="/" className="text-2xl font-bold">
-          🖥️ PC Store
+  return (
+    <nav className="pc-navbar">
+
+      <div className="pc-container pc-navbar-inner">
+
+        <Link
+          to="/"
+          className="pc-brand"
+        >
+          <span className="pc-brand-badge">
+            🖥️
+          </span>
+
+          <span>PC Store</span>
         </Link>
 
-        {/* ENLACES PRINCIPALES */}
-        <div className="flex gap-6">
-          <Link to="/" className="hover:text-blue-400">
-            Inicio
-          </Link>
 
-          <Link to="/tienda" className="hover:text-blue-400">
+        <div className="pc-nav-links">
+
+          <Link to="/">Inicio</Link>
+
+          <Link to="/tienda">
             Tienda
           </Link>
 
-          {/* El enlace Admin solo aparece si el perfil tiene rol admin. */}
-          {esAdmin && (
-            <Link to="/admin" className="hover:text-blue-400">
-              Admin
+          {usuario && (
+            <Link to="/mis-ordenes">
+              Mis órdenes
             </Link>
           )}
+
+          {esAdmin && (
+            <Link to="/admin">
+              Administración
+            </Link>
+          )}
+
         </div>
 
-        {/* ZONA DE AUTENTICACIÓN */}
-        <div className="flex gap-4 items-center">
+
+        <div className="pc-nav-actions">
+
+          <Link
+            to="/carrito"
+            className="pc-cart-button"
+          >
+            🛒
+            <span>Carrito</span>
+
+            {cantidadTotal > 0 && (
+              <b>{cantidadTotal}</b>
+            )}
+          </Link>
+
+
           {usuario ? (
             <>
-              {/* Si existe usuario, mostramos su correo y el botón de salir. */}
-              <span className="text-sm">Hola, {usuario.email}</span>
+              <Link
+                to="/perfil"
+                className="pc-user-link"
+              >
+                👤
+              </Link>
 
               <button
+                className="pc-btn pc-btn-danger"
                 onClick={handleLogout}
-                className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
               >
-                Logout
+                Salir
               </button>
             </>
           ) : (
             <>
-              {/* Si no hay sesión, ofrecemos Login y Registro. */}
-              <Link to="/login" className="hover:text-blue-400">
-                Login
+              <Link
+                to="/login"
+                className="pc-btn pc-btn-light"
+              >
+                Entrar
               </Link>
 
               <Link
                 to="/registro"
-                className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+                className="pc-btn pc-btn-primary"
               >
-                Registro
+                Crear cuenta
               </Link>
             </>
           )}
+
         </div>
 
       </div>
+
     </nav>
   )
 }
