@@ -1,6 +1,8 @@
 import { supabase } from '../supabaseClient'
 
-// Obtener todos los productos
+// ==========================================
+// OBTENER TODOS LOS PRODUCTOS
+// ==========================================
 export const obtenerProductos = async (filtros = {}) => {
   try {
     let query = supabase
@@ -8,27 +10,45 @@ export const obtenerProductos = async (filtros = {}) => {
       .select('*, categorias(nombre)')
       .eq('activo', true)
 
-    // Aplicar filtros
+    // Filtrar por categoría
     if (filtros.categoria_id) {
       query = query.eq('categoria_id', filtros.categoria_id)
     }
+
+    // Filtrar por marca
     if (filtros.marca) {
       query = query.eq('marca', filtros.marca)
     }
+
+    // Buscar por nombre
     if (filtros.busqueda) {
-      query = query.ilike('nombre', `%${filtros.busqueda}%`)
+      query = query.ilike(
+        'nombre',
+        `%${filtros.busqueda}%`
+      )
     }
 
     const { data, error } = await query
 
     if (error) throw error
-    return { success: true, data }
+
+    return {
+      success: true,
+      data: data || []
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
-// Obtener un producto
+
+// ==========================================
+// OBTENER UN PRODUCTO
+// ==========================================
 export const obtenerProducto = async (id) => {
   try {
     const { data, error } = await supabase
@@ -38,13 +58,24 @@ export const obtenerProducto = async (id) => {
       .single()
 
     if (error) throw error
-    return { success: true, data }
+
+    return {
+      success: true,
+      data
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
-// Crear producto (SOLO ADMIN)
+
+// ==========================================
+// CREAR PRODUCTO - SOLO ADMIN
+// ==========================================
 export const crearProducto = async (producto) => {
   try {
     const { data, error } = await supabase
@@ -53,13 +84,24 @@ export const crearProducto = async (producto) => {
       .select()
 
     if (error) throw error
-    return { success: true, data: data[0] }
+
+    return {
+      success: true,
+      data: data?.[0] || null
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
-// Actualizar producto (SOLO ADMIN)
+
+// ==========================================
+// ACTUALIZAR PRODUCTO - SOLO ADMIN
+// ==========================================
 export const actualizarProducto = async (id, cambios) => {
   try {
     const { data, error } = await supabase
@@ -69,13 +111,24 @@ export const actualizarProducto = async (id, cambios) => {
       .select()
 
     if (error) throw error
-    return { success: true, data: data[0] }
+
+    return {
+      success: true,
+      data: data?.[0] || null
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
-// Eliminar producto (SOLO ADMIN)
+
+// ==========================================
+// ELIMINAR PRODUCTO - SOLO ADMIN
+// ==========================================
 export const eliminarProducto = async (id) => {
   try {
     const { error } = await supabase
@@ -84,22 +137,41 @@ export const eliminarProducto = async (id) => {
       .eq('id', id)
 
     if (error) throw error
-    return { success: true }
+
+    return {
+      success: true
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
-// Obtener categorías
+
+// ==========================================
+// OBTENER CATEGORÍAS
+// ==========================================
 export const obtenerCategorias = async () => {
   try {
     const { data, error } = await supabase
       .from('categorias')
       .select('*')
+      .order('nombre')
 
     if (error) throw error
-    return { success: true, data }
+
+    return {
+      success: true,
+      data: data || []
+    }
+
   } catch (error) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }

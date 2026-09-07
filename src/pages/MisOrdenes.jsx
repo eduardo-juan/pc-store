@@ -118,6 +118,32 @@ export default function MisOrdenes() {
 
               </div>
 
+              <div
+                className="pc-order-shipping"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                  margin: '8px 0',
+                  fontSize: '14px',
+                  color: '#555',
+                }}
+              >
+
+                <strong>
+                  {orden.nombre_cliente} {orden.apellido_cliente}
+                </strong>
+
+                <span>
+                  {orden.dirección_envío}, {orden.ciudad_envío}
+                </span>
+
+                <span>
+                  Tel: {orden.teléfono_contacto}
+                </span>
+
+              </div>
+
               <div className="pc-order-items">
 
                 {(orden.items || []).map(

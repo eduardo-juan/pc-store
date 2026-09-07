@@ -1,8 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
 import { useAuth } from '../hooks/useAuth'
+
+const formatearTelefono = (valor = '') => {
+  const numeros = String(valor)
+    .replace(/\D/g, '')
+    .slice(0, 8)
+
+  if (numeros.length <= 4) {
+    return numeros
+  }
+
+  return `${numeros.slice(0, 4)}-${numeros.slice(4)}`
+}
 
 export default function Checkout() {
 
@@ -17,20 +29,32 @@ export default function Checkout() {
   } = useCarrito()
 
 
-  const [nombre, setNombre] =
-    useState(perfil?.nombre || '')
+  const [nombre, setNombre] = useState('')
+  const [apellido, setApellido] = useState('')
+  const [telefono, setTelefono] = useState('')
+  const [direccion, setDireccion] = useState('')
+  const [ciudad, setCiudad] = useState('')
 
-  const [apellido, setApellido] =
-    useState(perfil?.apellido || '')
 
-  const [telefono, setTelefono] =
-    useState(perfil?.teléfono || '')
+  useEffect(() => {
 
-  const [direccion, setDireccion] =
-    useState(perfil?.dirección || '')
+    if (perfil) {
 
-  const [ciudad, setCiudad] =
-    useState(perfil?.ciudad || '')
+      setNombre(perfil.nombre || '')
+
+      setApellido(perfil.apellido || '')
+
+      setTelefono(
+        formatearTelefono(perfil.teléfono || '')
+      )
+
+      setDireccion(perfil.dirección || '')
+
+      setCiudad(perfil.ciudad || '')
+    }
+
+  }, [perfil])
+
 
   const [metodoPago, setMetodoPago] =
     useState('transferencia')
@@ -52,6 +76,7 @@ export default function Checkout() {
 
     e.preventDefault()
 
+
     if (!usuario) {
       setError(
         'Debes iniciar sesión para continuar.'
@@ -62,6 +87,14 @@ export default function Checkout() {
 
     if (items.length === 0) {
       setError('Tu carrito está vacío.')
+      return
+    }
+
+
+    if (!/^[0-9]{4}-[0-9]{4}$/.test(telefono)) {
+      setError(
+        'El teléfono debe tener el formato 9439-4343.'
+      )
       return
     }
 
@@ -103,6 +136,7 @@ export default function Checkout() {
 
     vaciarCarrito()
 
+
     navigate(
       `/orden-confirmada/${data}`
     )
@@ -111,18 +145,27 @@ export default function Checkout() {
 
   return (
     <main className="pc-page">
+
       <div className="pc-container">
 
         <div className="pc-page-heading">
+
           <div>
+
             <span className="pc-kicker">
               Último paso
             </span>
-            <h1>Checkout</h1>
+
+            <h1>
+              Checkout
+            </h1>
+
             <p>
               Completa tus datos para generar la orden.
             </p>
+
           </div>
+
         </div>
 
 
@@ -133,12 +176,16 @@ export default function Checkout() {
 
           <section className="pc-card pc-checkout-form">
 
-            <h2>Datos del cliente</h2>
+            <h2>
+              Datos del cliente
+            </h2>
+
 
             <div className="pc-form-grid">
 
               <label>
                 Nombre
+
                 <input
                   className="pc-input"
                   value={nombre}
@@ -149,8 +196,10 @@ export default function Checkout() {
                 />
               </label>
 
+
               <label>
                 Apellido
+
                 <input
                   className="pc-input"
                   value={apellido}
@@ -161,20 +210,30 @@ export default function Checkout() {
                 />
               </label>
 
+
               <label>
                 Teléfono
+
                 <input
                   className="pc-input"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={9}
+                  placeholder="9439-4343"
                   value={telefono}
                   onChange={(e) =>
-                    setTelefono(e.target.value)
+                    setTelefono(
+                      formatearTelefono(e.target.value)
+                    )
                   }
                   required
                 />
               </label>
 
+
               <label>
                 Ciudad
+
                 <input
                   className="pc-input"
                   value={ciudad}
@@ -190,6 +249,7 @@ export default function Checkout() {
 
             <label>
               Dirección
+
               <textarea
                 className="pc-textarea"
                 rows="3"
@@ -199,10 +259,14 @@ export default function Checkout() {
                 }
                 required
               />
+
             </label>
 
 
-            <h2>Método de pago</h2>
+            <h2>
+              Método de pago
+            </h2>
+
 
             <select
               className="pc-select"
@@ -211,6 +275,7 @@ export default function Checkout() {
                 setMetodoPago(e.target.value)
               }
             >
+
               <option value="transferencia">
                 Transferencia bancaria
               </option>
@@ -218,12 +283,15 @@ export default function Checkout() {
               <option value="contra_entrega">
                 Pago contra entrega
               </option>
+
             </select>
 
 
             {metodoPago === 'transferencia' && (
+
               <label>
                 Referencia de transferencia
+
                 <input
                   className="pc-input"
                   placeholder="Opcional al crear la orden"
@@ -232,12 +300,15 @@ export default function Checkout() {
                     setReferencia(e.target.value)
                   }
                 />
+
               </label>
+
             )}
 
 
             <label>
               Notas
+
               <textarea
                 className="pc-textarea"
                 rows="3"
@@ -247,6 +318,7 @@ export default function Checkout() {
                 }
                 placeholder="Indicaciones adicionales"
               />
+
             </label>
 
 
@@ -261,13 +333,18 @@ export default function Checkout() {
 
           <aside className="pc-card pc-summary">
 
-            <h2>Tu compra</h2>
+            <h2>
+              Tu compra
+            </h2>
+
 
             {items.map((item) => (
+
               <div
                 className="pc-summary-product"
                 key={item.producto_id}
               >
+
                 <span>
                   {item.cantidad} × {item.nombre}
                 </span>
@@ -275,15 +352,22 @@ export default function Checkout() {
                 <strong>
                   L {(item.precio * item.cantidad).toFixed(2)}
                 </strong>
+
               </div>
+
             ))}
 
 
             <div className="pc-summary-total">
-              <span>Subtotal</span>
+
+              <span>
+                Subtotal
+              </span>
+
               <strong>
                 L {subtotal.toFixed(2)}
               </strong>
+
             </div>
 
 
@@ -292,10 +376,13 @@ export default function Checkout() {
               disabled={procesando}
               className="pc-btn pc-btn-primary pc-btn-block"
             >
+
               {procesando
                 ? 'Procesando...'
                 : 'Confirmar orden'}
+
             </button>
+
 
             <small className="pc-muted">
               El servidor volverá a validar precios y stock
@@ -307,6 +394,7 @@ export default function Checkout() {
         </form>
 
       </div>
+
     </main>
   )
 }

@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 
+const formatearTelefono = (valor = '') => {
+  const numeros = String(valor)
+    .replace(/\D/g, '')
+    .slice(0, 8)
+
+  if (numeros.length <= 4) {
+    return numeros
+  }
+
+  return `${numeros.slice(0, 4)}-${numeros.slice(4)}`
+}
+
 export default function Perfil() {
 
   const { usuario } = useAuth()
@@ -28,18 +40,22 @@ export default function Perfil() {
 
     if (!usuario) return
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('usuarios')
       .select('*')
       .eq('id', usuario.id)
       .single()
 
+    if (error) {
+      setMensaje(error.message)
+      return
+    }
 
     if (data) {
       setForm({
         nombre: data.nombre || '',
         apellido: data.apellido || '',
-        teléfono: data.teléfono || '',
+        teléfono: formatearTelefono(data.teléfono || ''),
         dirección: data.dirección || '',
         ciudad: data.ciudad || '',
         país: data.país || 'Honduras',
@@ -59,6 +75,21 @@ export default function Perfil() {
   const guardar = async (e) => {
 
     e.preventDefault()
+
+    if (!usuario) {
+      setMensaje('Debes iniciar sesión para guardar tu perfil.')
+      return
+    }
+
+    if (
+      form.teléfono &&
+      !/^[0-9]{4}-[0-9]{4}$/.test(form.teléfono)
+    ) {
+      setMensaje(
+        'El teléfono debe tener el formato 9439-4343.'
+      )
+      return
+    }
 
     setGuardando(true)
     setMensaje('')
@@ -146,9 +177,16 @@ export default function Perfil() {
               Teléfono
               <input
                 className="pc-input"
+                type="tel"
+                inputMode="numeric"
+                maxLength={9}
+                placeholder="9439-4343"
                 value={form.teléfono}
                 onChange={(e) =>
-                  cambiar('teléfono', e.target.value)
+                  cambiar(
+                    'teléfono',
+                    formatearTelefono(e.target.value)
+                  )
                 }
               />
             </label>
@@ -199,6 +237,7 @@ export default function Perfil() {
 
 
           <button
+            type="submit"
             disabled={guardando}
             className="pc-btn pc-btn-primary"
           >
