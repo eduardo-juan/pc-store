@@ -1,0 +1,40 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  text-decoration: none;
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.navbar-nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.navbar-nav a:hover {
+  color: #0066cc;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    gap: 12px;
+  }
+}
