@@ -444,98 +444,102 @@ export default function GestionProductos() {
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
 
-        <table className="w-full">
+        <div className="overflow-x-auto">
 
-          <thead className="bg-gray-100 border-b">
+          <table className="w-full min-w-[700px]">
 
-            <tr>
+            <thead className="bg-gray-100 border-b">
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Nombre
-              </th>
+              <tr>
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Categoría
-              </th>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Nombre
+                </th>
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Marca
-              </th>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Categoría
+                </th>
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Precio
-              </th>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Marca
+                </th>
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Stock
-              </th>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Precio
+                </th>
 
-              <th className="px-6 py-3 text-left text-sm font-bold">
-                Acciones
-              </th>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Stock
+                </th>
 
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {productos.map((producto) => (
-
-              <tr
-                key={producto.id}
-                className="border-b hover:bg-gray-50"
-              >
-
-                <td className="px-6 py-4">
-                  {producto.nombre}
-                </td>
-
-                <td className="px-6 py-4">
-                  {producto.categorias?.nombre || 'Sin categoría'}
-                </td>
-
-                <td className="px-6 py-4">
-                  {producto.marca}
-                </td>
-
-                <td className="px-6 py-4">
-                  ${Number(producto.precio).toFixed(2)}
-                </td>
-
-                <td className="px-6 py-4">
-                  {producto.stock}
-                </td>
-
-                <td className="px-6 py-4 space-x-2">
-
-                  <button
-                    onClick={() =>
-                      handleEditar(producto)
-                    }
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      handleEliminar(producto.id)
-                    }
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                  >
-                    Eliminar
-                  </button>
-
-                </td>
+                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
+                  Acciones
+                </th>
 
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {productos.map((producto) => (
+
+                <tr
+                  key={producto.id}
+                  className="border-b hover:bg-gray-50"
+                >
+
+                  <td className="px-6 py-4">
+                    {producto.nombre}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {producto.categorias?.nombre || 'Sin categoría'}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {producto.marca}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    ${Number(producto.precio).toFixed(2)}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    {producto.stock}
+                  </td>
+
+                  <td className="px-6 py-4 space-x-2 whitespace-nowrap">
+
+                    <button
+                      onClick={() =>
+                        handleEditar(producto)
+                      }
+                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleEliminar(producto.id)
+                      }
+                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    >
+                      Eliminar
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
