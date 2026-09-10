@@ -5,18 +5,19 @@ export default function GestionOrdenes() {
   const [ordenes, setOrdenes] = useState([])
   const [error, setError] = useState('')
 
-
   useEffect(() => {
     cargarOrdenes()
   }, [])
 
-
   const cargarOrdenes = async () => {
+    setError('')
 
     const { data, error } = await supabase
       .from('ordenes')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('created_at', {
+        ascending: false,
+      })
 
     if (error) {
       setError(error.message)
@@ -26,8 +27,33 @@ export default function GestionOrdenes() {
     setOrdenes(data || [])
   }
 
-
   const cambiarEstado = async (id, estado) => {
+    setError('')
+
+    if (estado === 'cancelada') {
+      const confirmar = window.confirm(
+        '¿Estás seguro de que deseas cancelar esta orden? El stock de los productos será restaurado.'
+      )
+
+      if (!confirmar) {
+        return
+      }
+
+      const { error } = await supabase.rpc(
+        'cancelar_orden_pc_store',
+        {
+          p_orden_id: id,
+        }
+      )
+
+      if (error) {
+        setError(error.message)
+        return
+      }
+
+      await cargarOrdenes()
+      return
+    }
 
     const { error } = await supabase
       .from('ordenes')
@@ -42,148 +68,294 @@ export default function GestionOrdenes() {
     await cargarOrdenes()
   }
 
-
   return (
     <main className="pc-page">
+
       <div className="pc-container">
 
         <div className="pc-admin-header">
-          <h1>Gestión de Órdenes</h1>
-          <p>
-            Aquí aparecerán las compras realizadas por clientes.
-          </p>
-        </div>
 
+          <h1>
+            Gestión de Órdenes
+          </h1>
+
+          <p>
+            Administra las compras y consulta
+            los datos de entrega.
+          </p>
+
+        </div>
 
         {error && (
           <div
             className="pc-card"
-            style={{ padding: 16, marginBottom: 20 }}
+            style={{
+              padding: 16,
+              marginBottom: 20,
+            }}
           >
             {error}
           </div>
         )}
-
 
         <div className="pc-card pc-table-wrapper">
 
           <table className="pc-table">
 
             <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Dirección</th>
-                <th>Teléfono</th>
-                <th>Productos</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
 
+              <tr>
+
+                <th>ID</th>
+
+                <th>Cliente</th>
+
+                <th>Datos de entrega</th>
+
+                <th>Productos</th>
+
+                <th>Subtotal</th>
+
+                <th>Envío</th>
+
+                <th>Total</th>
+
+                <th>Estado</th>
+
+                <th>Fecha</th>
+
+              </tr>
+
+            </thead>
 
             <tbody>
 
-              {ordenes.map((orden) => (
+              {ordenes.map((orden) => {
 
-                <tr key={orden.id}>
+                const subtotal =
+                  Number(
+                    orden.subtotal || 0
+                  )
 
-                  <td>#{orden.id}</td>
+                const envio =
+                  Number(
+                    orden.envío || 0
+                  )
 
-                  <td>
-                    <div>
-                      <strong>
-                        {orden.nombre_cliente} {orden.apellido_cliente}
-                      </strong>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {orden.email}
-                      </div>
-                    </div>
-                  </td>
+                const total =
+                  Number(
+                    orden.total || 0
+                  )
 
-                  <td>
-                    {orden.dirección_envío}
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      {orden.ciudad_envío}
-                    </div>
-                  </td>
+                return (
 
-                  <td>
-                    {orden.teléfono_contacto}
-                  </td>
+                  <tr key={orden.id}>
 
-                  <td>
-                    <div style={{ fontSize: '12px' }}>
-                      {(orden.items || []).map((item, idx) => (
-                        <div key={idx}>
-                          {item.cantidad}× {item.nombre}
+                    <td>
+                      #{orden.id}
+                    </td>
+
+                    <td>
+
+                      <div>
+
+                        <strong>
+                          {orden.nombre_cliente}{' '}
+                          {orden.apellido_cliente}
+                        </strong>
+
+                        <div
+                          style={{
+                            fontSize: '12px',
+                            color: '#666',
+                          }}
+                        >
+                          {orden.email}
                         </div>
-                      ))}
-                    </div>
-                  </td>
 
-                  <td>
-                    L {Number(orden.total || 0).toFixed(2)}
-                  </td>
+                      </div>
 
-                  <td>
+                    </td>
 
-                    <select
-                      className="pc-select"
-                      value={orden.estado || 'pendiente'}
-                      onChange={(e) =>
-                        cambiarEstado(
-                          orden.id,
-                          e.target.value
-                        )
-                      }
-                    >
+                    <td>
 
-                      <option value="pendiente">
-                        Pendiente
-                      </option>
+                      <div
+                        style={{
+                          minWidth: '220px',
+                          fontSize: '13px',
+                        }}
+                      >
 
-                      <option value="pagada">
-                        Pagada
-                      </option>
+                        <strong>
+                          Receptor:
+                        </strong>{' '}
 
-                      <option value="enviada">
-                        Enviada
-                      </option>
+                        {orden.nombre_cliente}{' '}
+                        {orden.apellido_cliente}
 
-                      <option value="entregada">
-                        Entregada
-                      </option>
+                        <br />
 
-                      <option value="cancelada">
-                        Cancelada
-                      </option>
+                        <strong>
+                          Tel:
+                        </strong>{' '}
 
-                    </select>
+                        {orden.teléfono_contacto ||
+                          '-'}
 
-                  </td>
+                        <br />
 
+                        <strong>
+                          Dirección:
+                        </strong>{' '}
 
-                  <td>
-                    {orden.created_at
-                      ? new Date(
-                          orden.created_at
-                        ).toLocaleString()
-                      : '-'}
-                  </td>
+                        {orden.dirección_envío ||
+                          '-'}
 
-                </tr>
+                        <br />
 
-              ))}
+                        <strong>
+                          Ciudad:
+                        </strong>{' '}
 
+                        {orden.ciudad_envío ||
+                          '-'}
+
+                        {orden.referencia && (
+                          <>
+                            <br />
+
+                            <strong>
+                              Referencia:
+                            </strong>{' '}
+
+                            {orden.referencia}
+                          </>
+                        )}
+
+                        {orden.notas && (
+                          <>
+                            <br />
+
+                            <strong>
+                              Notas:
+                            </strong>{' '}
+
+                            {orden.notas}
+                          </>
+                        )}
+
+                      </div>
+
+                    </td>
+
+                    <td>
+
+                      <div
+                        style={{
+                          fontSize: '12px',
+                        }}
+                      >
+
+                        {(orden.items || []).map(
+                          (item, idx) => (
+
+                            <div
+                              key={`${orden.id}-${item.producto_id || idx}`}
+                            >
+                              {item.cantidad}×{' '}
+                              {item.nombre}
+                            </div>
+
+                          )
+                        )}
+
+                      </div>
+
+                    </td>
+
+                    <td>
+                      <strong>
+                        L {subtotal.toFixed(2)}
+                      </strong>
+                    </td>
+
+                    <td>
+                      <strong>
+                        L {envio.toFixed(2)}
+                      </strong>
+                    </td>
+
+                    <td>
+                      <strong>
+                        L {total.toFixed(2)}
+                      </strong>
+                    </td>
+
+                    <td>
+
+                      <select
+                        className="pc-select"
+                        value={
+                          orden.estado ||
+                          'pendiente'
+                        }
+                        onChange={(e) =>
+                          cambiarEstado(
+                            orden.id,
+                            e.target.value
+                          )
+                        }
+                      >
+
+                        <option value="pendiente">
+                          Pendiente
+                        </option>
+
+                        <option value="pagada">
+                          Pagada
+                        </option>
+
+                        <option value="enviada">
+                          Enviada
+                        </option>
+
+                        <option value="entregada">
+                          Entregada
+                        </option>
+
+                        <option value="cancelada">
+                          Cancelada
+                        </option>
+
+                      </select>
+
+                    </td>
+
+                    <td>
+
+                      {orden.created_at
+                        ? new Date(
+                            orden.created_at
+                          ).toLocaleString()
+                        : '-'}
+
+                    </td>
+
+                  </tr>
+
+                )
+              })}
 
               {ordenes.length === 0 && (
+
                 <tr>
-                  <td colSpan="8">
+
+                  <td colSpan="9">
                     Todavía no existen órdenes.
                   </td>
+
                 </tr>
+
               )}
 
             </tbody>
@@ -193,6 +365,7 @@ export default function GestionOrdenes() {
         </div>
 
       </div>
+
     </main>
   )
 }

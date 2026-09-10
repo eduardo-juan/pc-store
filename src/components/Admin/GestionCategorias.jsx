@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../supabaseClient'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+} from 'lucide-react'
 
 export default function GestionCategorias() {
   const [categorias, setCategorias] = useState([])
@@ -8,14 +14,11 @@ export default function GestionCategorias() {
   const [editandoId, setEditandoId] = useState(null)
   const [error, setError] = useState('')
 
-
   useEffect(() => {
     cargarCategorias()
   }, [])
 
-
   const cargarCategorias = async () => {
-
     const { data, error } = await supabase
       .from('categorias')
       .select('*')
@@ -29,7 +32,6 @@ export default function GestionCategorias() {
     setCategorias(data || [])
   }
 
-
   const guardarCategoria = async (e) => {
     e.preventDefault()
     setError('')
@@ -42,20 +44,15 @@ export default function GestionCategorias() {
     let resultado
 
     if (editandoId) {
-
       resultado = await supabase
         .from('categorias')
         .update(datos)
         .eq('id', editandoId)
-
     } else {
-
       resultado = await supabase
         .from('categorias')
         .insert([datos])
-
     }
-
 
     if (resultado.error) {
       setError(resultado.error.message)
@@ -66,16 +63,13 @@ export default function GestionCategorias() {
     await cargarCategorias()
   }
 
-
   const editarCategoria = (categoria) => {
     setEditandoId(categoria.id)
     setNombre(categoria.nombre || '')
     setDescripcion(categoria.descripción || '')
   }
 
-
   const eliminarCategoria = async (id) => {
-
     const confirmar = window.confirm(
       '¿Deseas eliminar esta categoría?'
     )
@@ -95,13 +89,11 @@ export default function GestionCategorias() {
     await cargarCategorias()
   }
 
-
   const limpiarFormulario = () => {
     setNombre('')
     setDescripcion('')
     setEditandoId(null)
   }
-
 
   return (
     <main className="pc-page">
@@ -109,9 +101,10 @@ export default function GestionCategorias() {
 
         <div className="pc-admin-header">
           <h1>Gestión de Categorías</h1>
-          <p>Crea y organiza las categorías del catálogo.</p>
+          <p>
+            Crea y organiza las categorías del catálogo.
+          </p>
         </div>
-
 
         <div
           className="pc-card"
@@ -120,17 +113,17 @@ export default function GestionCategorias() {
             marginBottom: 24,
           }}
         >
-
           <form
             className="pc-form-grid"
             onSubmit={guardarCategoria}
           >
-
             <input
               className="pc-input"
               placeholder="Nombre de categoría"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) =>
+                setNombre(e.target.value)
+              }
               required
             />
 
@@ -138,35 +131,50 @@ export default function GestionCategorias() {
               className="pc-input"
               placeholder="Descripción"
               value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
+              onChange={(e) =>
+                setDescripcion(e.target.value)
+              }
             />
 
-
-            <div style={{ display: 'flex', gap: 10 }}>
-
+            <div
+              style={{
+                display: 'flex',
+                gap: 10,
+              }}
+            >
               <button
                 className="pc-btn pc-btn-primary"
                 type="submit"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
               >
-                {editandoId ? 'Actualizar' : 'Crear categoría'}
+                <Plus size={17} />
+                {editandoId
+                  ? 'Actualizar'
+                  : 'Crear categoría'}
               </button>
-
 
               {editandoId && (
                 <button
                   className="pc-btn pc-btn-light"
                   type="button"
                   onClick={limpiarFormulario}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
                 >
+                  <X size={17} />
                   Cancelar
                 </button>
               )}
-
             </div>
-
           </form>
         </div>
-
 
         {error && (
           <div
@@ -180,11 +188,8 @@ export default function GestionCategorias() {
           </div>
         )}
 
-
         <div className="pc-card pc-table-wrapper">
-
           <table className="pc-table">
-
             <thead>
               <tr>
                 <th>ID</th>
@@ -194,23 +199,26 @@ export default function GestionCategorias() {
               </tr>
             </thead>
 
-
             <tbody>
-
               {categorias.map((categoria) => (
-
                 <tr key={categoria.id}>
-
                   <td>{categoria.id}</td>
                   <td>{categoria.nombre}</td>
                   <td>{categoria.descripción}</td>
 
                   <td>
-
                     <button
                       className="pc-btn pc-btn-light"
-                      onClick={() => editarCategoria(categoria)}
+                      onClick={() =>
+                        editarCategoria(categoria)
+                      }
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
                     >
+                      <Pencil size={16} />
                       Editar
                     </button>
 
@@ -218,21 +226,23 @@ export default function GestionCategorias() {
 
                     <button
                       className="pc-btn pc-btn-danger"
-                      onClick={() => eliminarCategoria(categoria.id)}
+                      onClick={() =>
+                        eliminarCategoria(categoria.id)
+                      }
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
                     >
+                      <Trash2 size={16} />
                       Eliminar
                     </button>
-
                   </td>
-
                 </tr>
-
               ))}
-
             </tbody>
-
           </table>
-
         </div>
 
       </div>

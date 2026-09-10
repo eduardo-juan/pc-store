@@ -32,6 +32,7 @@ import GestionInventario from './components/Admin/GestionInventario'
 import GestionCategorias from './components/Admin/GestionCategorias'
 import GestionOrdenes from './components/Admin/GestionOrdenes'
 import GestionUsuarios from './components/Admin/GestionUsuarios'
+import HistorialVentas from './components/Admin/HistorialVentas'
 
 
 export default function App() {
@@ -170,6 +171,15 @@ export default function App() {
                   element={
                     <ProtectedRoute requiereAdmin>
                       <GestionUsuarios />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/admin/ventas"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <HistorialVentas />
                     </ProtectedRoute>
                   }
                 />

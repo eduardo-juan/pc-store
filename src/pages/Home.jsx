@@ -1,11 +1,37 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Monitor } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../supabaseClient'
 
 export default function Home() {
+  const { usuario } = useAuth()
+
+  const [productos, setProductos] = useState([])
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    cargarVistazo()
+  }, [])
+
+  const cargarVistazo = async () => {
+    const { data } = await supabase
+      .from('productos')
+      .select(
+        'id, nombre, precio, precio_descuento, imagen_principal, categorias(nombre)'
+      )
+      .eq('activo', true)
+      .order('id', { ascending: false })
+      .limit(4)
+
+    setProductos(data || [])
+    setCargando(false)
+  }
+
   return (
     <>
       <section className="pc-hero">
         <div className="pc-container pc-hero-grid">
-
           <div>
             <span className="pc-eyebrow">
               Tecnología para construir tu próxima PC
@@ -21,7 +47,6 @@ export default function Home() {
             </p>
 
             <div className="pc-hero-actions">
-
               <Link
                 to="/tienda"
                 className="pc-btn pc-btn-primary"
@@ -29,78 +54,120 @@ export default function Home() {
                 Explorar productos
               </Link>
 
-              <Link
-                to="/registro"
-                className="pc-btn pc-btn-light"
-              >
-                Crear cuenta
-              </Link>
+              {!usuario && (
+                <>
+                  <Link
+                    to="/login"
+                    className="pc-btn pc-btn-light"
+                  >
+                    Entrar
+                  </Link>
 
+                  <Link
+                    to="/registro"
+                    className="pc-btn pc-btn-light"
+                  >
+                    Crear cuenta
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-
-          <div className="pc-hero-panel">
-
-            <div className="pc-stat">
-              <strong>PC Store</strong>
-              <span>Catálogo por categorías</span>
-            </div>
-
-            <div className="pc-stat">
-              <strong>Stock</strong>
-              <span>Inventario administrado desde Supabase</span>
-            </div>
-
-            <div className="pc-stat">
-              <strong>Admin</strong>
-              <span>Panel para gestionar la tienda</span>
-            </div>
-
-          </div>
-
         </div>
       </section>
 
-
       <section className="pc-section">
         <div className="pc-container">
-
           <h2 className="pc-section-title">
-            ¿Qué encontrarás en PC Store?
+            Algunos de nuestros productos
           </h2>
 
           <p className="pc-section-subtitle">
-            Una tienda preparada para crecer hacia un sistema
-            completo de comercio electrónico.
+            Un vistazo rápido al catálogo. Para agregar
+            al carrito visita la tienda completa.
           </p>
 
-          <div className="pc-feature-grid">
+          {cargando ? (
+            <div style={{ padding: 20 }}>
+              Cargando productos...
+            </div>
+          ) : (
+            <div className="pc-product-grid">
+              {productos.map((producto) => (
+                <article
+                  key={producto.id}
+                  className="pc-card pc-product-card"
+                >
+                  <div className="pc-product-image">
+                    {producto.imagen_principal ? (
+                      <img
+                        src={producto.imagen_principal}
+                        alt={producto.nombre}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      <Monitor size={48} strokeWidth={1.5} />
+                    )}
+                  </div>
 
-            <article className="pc-card pc-feature-card">
-              <div className="pc-feature-icon">⚡</div>
-              <h3>Hardware</h3>
-              <p>
-                Componentes organizados por categoría,
-                marca, modelo y precio.
-              </p>
-            </article>
+                  <div className="pc-product-body">
+                    <div className="pc-product-category">
+                      {producto.categorias?.nombre ||
+                        'Sin categoría'}
+                    </div>
 
-            <article className="pc-card pc-feature-card">
-              <div className="pc-feature-icon">📦</div>
-              <h3>Inventario</h3>
-              <p>
-                Control de existencias y movimientos.
-              </p>
-            </article>
+                    <h3 className="pc-product-name">
+                      {producto.nombre}
+                    </h3>
 
-            <article className="pc-card pc-feature-card">
-              <div className="pc-feature-icon">🔐</div>
-              <h3>Usuarios y roles</h3>
-              <p>
-                Accesos separados para clientes y administradores.
-              </p>
-            </article>
+                    <div className="pc-price-row">
+                      {producto.precio_descuento ? (
+                        <>
+                          <span className="pc-price">
+                            L{' '}
+                            {Number(
+                              producto.precio_descuento
+                            ).toFixed(2)}
+                          </span>
 
+                          <span className="pc-old-price">
+                            L{' '}
+                            {Number(
+                              producto.precio
+                            ).toFixed(2)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="pc-price">
+                          L{' '}
+                          {Number(
+                            producto.precio
+                          ).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 24,
+            }}
+          >
+            <Link
+              to="/tienda"
+              className="pc-btn pc-btn-primary"
+            >
+              Ver toda la tienda
+            </Link>
           </div>
         </div>
       </section>

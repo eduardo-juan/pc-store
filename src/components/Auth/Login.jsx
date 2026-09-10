@@ -1,82 +1,337 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [mostrarPassword, setMostrarPassword] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
+
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     setError('')
     setCargando(true)
 
-    const resultado = await login(email, password)
+    try {
+      const resultado = await login(
+        email.trim(),
+        password
+      )
 
-    if (resultado.success) {
-      navigate('/tienda')
-    } else {
-      setError(resultado.error)
+      if (resultado.success) {
+        navigate('/tienda')
+      } else {
+        setError(
+          resultado.error ||
+            'No se pudo iniciar sesión.'
+        )
+      }
+    } catch (err) {
+      setError(
+        err.message ||
+          'Ocurrió un error al iniciar sesión.'
+      )
+    } finally {
+      setCargando(false)
     }
-
-    setCargando(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">
-          Iniciar Sesión
-        </h2>
+    <main className="pc-page">
+      <div className="pc-container">
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        {/* ENCABEZADO */}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div
+          className="pc-admin-header"
+          style={{
+            textAlign: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <h1>PC Store</h1>
 
-          {/* Password */}
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <p>
+            Inicia sesión para acceder a tu cuenta.
+          </p>
+        </div>
 
-          {/* Botón */}
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 font-bold"
+        {/* TARJETA */}
+
+        <div
+          className="pc-card"
+          style={{
+            maxWidth: 480,
+            margin: '0 auto',
+            padding: 28,
+          }}
+        >
+
+          {/* ICONO Y TÍTULO */}
+
+          <div
+            style={{
+              textAlign: 'center',
+              marginBottom: 24,
+            }}
           >
-            {cargando ? 'Iniciando...' : 'Iniciar Sesión'}
-          </button>
-        </form>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                margin: '0 auto 16px',
+                borderRadius: 16,
+                background: '#eef4ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Lock
+                size={30}
+                strokeWidth={1.8}
+              />
+            </div>
 
-        <p className="mt-4 text-center text-gray-600">
-          ¿No tienes cuenta?{' '}
-          <a href="/registro" className="text-blue-600 hover:underline">
-            Regístrate aquí
-          </a>
-        </p>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 24,
+                fontWeight: 700,
+              }}
+            >
+              Iniciar sesión
+            </h2>
+
+            <p
+              style={{
+                marginTop: 8,
+                color: '#64748b',
+              }}
+            >
+              Ingresa tus datos para continuar.
+            </p>
+          </div>
+
+          {/* ERROR */}
+
+          {error && (
+            <div
+              className="pc-card"
+              style={{
+                padding: 14,
+                marginBottom: 20,
+                border: '1px solid #fecaca',
+                background: '#fef2f2',
+                color: '#b91c1c',
+              }}
+            >
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          {/* FORMULARIO */}
+
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 18,
+            }}
+          >
+
+            {/* EMAIL */}
+
+            <div>
+              <label
+                htmlFor="login-email"
+                style={{
+                  display: 'block',
+                  marginBottom: 7,
+                  fontWeight: 600,
+                }}
+              >
+                Correo electrónico
+              </label>
+
+              <input
+                id="login-email"
+                className="pc-input"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                required
+                autoComplete="email"
+              />
+            </div>
+
+            {/* CONTRASEÑA */}
+
+            <div>
+              <label
+                htmlFor="login-password"
+                style={{
+                  display: 'block',
+                  marginBottom: 7,
+                  fontWeight: 600,
+                }}
+              >
+                Contraseña
+              </label>
+
+              <div
+                style={{
+                  position: 'relative',
+                }}
+              >
+                <input
+                  id="login-password"
+                  className="pc-input"
+                  type={
+                    mostrarPassword
+                      ? 'text'
+                      : 'password'
+                  }
+                  placeholder="Ingresa tu contraseña"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                  required
+                  autoComplete="current-password"
+                  style={{
+                    paddingRight: 50,
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMostrarPassword(
+                      !mostrarPassword
+                    )
+                  }
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform:
+                      'translateY(-50%)',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 6,
+                  }}
+                  title={
+                    mostrarPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
+                  aria-label={
+                    mostrarPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
+                >
+                  {mostrarPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* BOTÓN */}
+
+            <button
+              className="pc-btn pc-btn-primary"
+              type="submit"
+              disabled={cargando}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontWeight: 700,
+              }}
+            >
+              {cargando
+                ? 'Iniciando sesión...'
+                : 'Iniciar sesión'}
+            </button>
+
+          </form>
+
+          {/* REGISTRO */}
+
+          <div
+            style={{
+              marginTop: 24,
+              paddingTop: 20,
+              borderTop: '1px solid #e5e7eb',
+              textAlign: 'center',
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                color: '#64748b',
+              }}
+            >
+              ¿No tienes una cuenta?
+            </p>
+
+            <Link
+              to="/registro"
+              className="pc-btn pc-btn-light"
+              style={{
+                display: 'inline-block',
+                marginTop: 10,
+                textDecoration: 'none',
+              }}
+            >
+              Crear cuenta
+            </Link>
+          </div>
+
+          {/* VOLVER */}
+
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 18,
+            }}
+          >
+            <button
+              type="button"
+              className="pc-btn pc-btn-light"
+              onClick={() => navigate('/')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <ArrowLeft size={17} />
+              Volver al inicio
+            </button>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </main>
   )
 }

@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../supabaseClient'
+import {
+  UserCog,
+  ShieldCheck,
+  UserRound,
+} from 'lucide-react'
 
 export default function GestionUsuarios() {
   const [usuarios, setUsuarios] = useState([])
   const [error, setError] = useState('')
 
-
   useEffect(() => {
     cargarUsuarios()
   }, [])
 
-
   const cargarUsuarios = async () => {
-
     const { data, error } = await supabase
       .from('usuarios')
       .select('*')
@@ -26,15 +28,12 @@ export default function GestionUsuarios() {
     setUsuarios(data || [])
   }
 
-
   const cambiarRol = async (id, nuevoRol) => {
-
     const confirmar = window.confirm(
       `¿Cambiar el rol de este usuario a ${nuevoRol}?`
     )
 
     if (!confirmar) return
-
 
     const { error } = await supabase
       .from('usuarios')
@@ -44,7 +43,6 @@ export default function GestionUsuarios() {
       })
       .eq('id', id)
 
-
     if (error) {
       setError(error.message)
       return
@@ -53,36 +51,32 @@ export default function GestionUsuarios() {
     await cargarUsuarios()
   }
 
-
   return (
     <main className="pc-page">
       <div className="pc-container">
 
         <div className="pc-admin-header">
-
           <h1>Gestión de Usuarios</h1>
 
           <p>
             Consulta usuarios y administra sus roles.
           </p>
-
         </div>
-
 
         {error && (
           <div
             className="pc-card"
-            style={{ padding: 16, marginBottom: 20 }}
+            style={{
+              padding: 16,
+              marginBottom: 20,
+            }}
           >
             {error}
           </div>
         )}
 
-
         <div className="pc-card pc-table-wrapper">
-
           <table className="pc-table">
-
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -93,13 +87,9 @@ export default function GestionUsuarios() {
               </tr>
             </thead>
 
-
             <tbody>
-
               {usuarios.map((usuario) => (
-
                 <tr key={usuario.id}>
-
                   <td>
                     {usuario.nombre || ''}
                     {' '}
@@ -112,43 +102,49 @@ export default function GestionUsuarios() {
 
                   <td>{usuario.ciudad || '-'}</td>
 
-
                   <td>
-
                     {usuario.rol === 'admin' ? (
-
                       <button
                         className="pc-btn pc-btn-light"
                         onClick={() =>
-                          cambiarRol(usuario.id, 'user')
+                          cambiarRol(
+                            usuario.id,
+                            'user'
+                          )
                         }
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 7,
+                        }}
                       >
+                        <UserRound size={16} />
                         Convertir en usuario
                       </button>
-
                     ) : (
-
                       <button
                         className="pc-btn pc-btn-primary"
                         onClick={() =>
-                          cambiarRol(usuario.id, 'admin')
+                          cambiarRol(
+                            usuario.id,
+                            'admin'
+                          )
                         }
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 7,
+                        }}
                       >
+                        <ShieldCheck size={16} />
                         Convertir en admin
                       </button>
-
                     )}
-
                   </td>
-
                 </tr>
-
               ))}
-
             </tbody>
-
           </table>
-
         </div>
 
       </div>

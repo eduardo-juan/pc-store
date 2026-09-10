@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import {
+  ShoppingCart,
+  RotateCcw,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  RefreshCw,
+} from 'lucide-react'
 
 export default function GestionInventario() {
   const [productos, setProductos] = useState([])
@@ -17,7 +24,6 @@ export default function GestionInventario() {
   const cargarDatos = async () => {
     setCargando(true)
 
-    // Cargar productos
     const { data: productosData, error: productosError } =
       await supabase
         .from('productos')
@@ -37,7 +43,6 @@ export default function GestionInventario() {
 
     setProductos(productosData || [])
 
-    // Cargar historial
     const { data: historialData, error: historialError } =
       await supabase
         .from('inventario_historial')
@@ -86,17 +91,13 @@ export default function GestionInventario() {
       return
     }
 
-    // Determinar si la operación suma o resta
     let nuevoStock
 
     if (razon === 'venta') {
-      // Una venta siempre resta
       nuevoStock = producto.stock - cantidadNum
     } else if (razon === 'devolución') {
-      // Una devolución siempre suma
       nuevoStock = producto.stock + cantidadNum
     } else {
-      // Ajuste: depende de Entrada o Salida
       if (operacion === 'entrada') {
         nuevoStock = producto.stock + cantidadNum
       } else {
@@ -111,7 +112,6 @@ export default function GestionInventario() {
       return
     }
 
-    // Registrar en historial
     const { error: historialError } =
       await supabase
         .from('inventario_historial')
@@ -137,7 +137,6 @@ export default function GestionInventario() {
       return
     }
 
-    // Actualizar stock
     const { error: updateError } =
       await supabase
         .from('productos')
@@ -176,207 +175,282 @@ export default function GestionInventario() {
   }
 
   if (cargando) {
-    return <div>Cargando...</div>
+    return (
+      <main className="pc-page">
+        <div className="pc-container">
+          Cargando...
+        </div>
+      </main>
+    )
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <main className="pc-page">
+      <div className="pc-container">
 
-      <h1 className="text-3xl font-bold mb-8">
-        Gestión de Inventario
-      </h1>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* FORMULARIO */}
-        <div className="bg-white rounded-lg shadow p-6">
-
-          <h2 className="text-2xl font-bold mb-6">
-            Ajustar Stock
-          </h2>
-
-          <form
-            onSubmit={handleAjustarInventario}
-            className="space-y-4"
-          >
-
-            {/* Producto */}
-            <select
-              value={productoSeleccionado}
-              onChange={(e) =>
-                setProductoSeleccionado(e.target.value)
-              }
-              required
-              className="w-full px-4 py-2 border rounded"
-            >
-              <option value="">
-                Seleccionar producto
-              </option>
-
-              {productos.map((p) => (
-                <option
-                  key={p.id}
-                  value={p.id}
-                >
-                  {p.nombre} (Stock: {p.stock})
-                </option>
-              ))}
-            </select>
-
-            {/* Cantidad */}
-            <input
-              type="number"
-              min="1"
-              placeholder="Cantidad"
-              value={cantidad}
-              onChange={(e) =>
-                setCantidad(e.target.value)
-              }
-              required
-              className="w-full px-4 py-2 border rounded"
-            />
-
-            {/* Razón */}
-            <select
-              value={razon}
-              onChange={(e) =>
-                setRazon(e.target.value)
-              }
-              className="w-full px-4 py-2 border rounded"
-            >
-              <option value="venta">
-                Venta
-              </option>
-
-              <option value="ajuste">
-                Ajuste
-              </option>
-
-              <option value="devolución">
-                Devolución
-              </option>
-            </select>
-
-            {/* Tipo de operación */}
-            {razon === 'ajuste' && (
-              <select
-                value={operacion}
-                onChange={(e) =>
-                  setOperacion(e.target.value)
-                }
-                className="w-full px-4 py-2 border rounded"
-              >
-                <option value="entrada">
-                  Entrada (+) — Agregar stock
-                </option>
-
-                <option value="salida">
-                  Salida (-) — Reducir stock
-                </option>
-              </select>
-            )}
-
-            {/* Información de la operación */}
-            <div className="bg-gray-50 border rounded p-3 text-sm">
-
-              {razon === 'venta' && (
-                <p>
-                  🛒 La venta reducirá el stock en{' '}
-                  <strong>{cantidad || 0}</strong>.
-                </p>
-              )}
-
-              {razon === 'devolución' && (
-                <p>
-                  ↩️ La devolución aumentará el stock en{' '}
-                  <strong>{cantidad || 0}</strong>.
-                </p>
-              )}
-
-              {razon === 'ajuste' &&
-                operacion === 'entrada' && (
-                  <p>
-                    📥 La entrada aumentará el stock en{' '}
-                    <strong>{cantidad || 0}</strong>.
-                  </p>
-                )}
-
-              {razon === 'ajuste' &&
-                operacion === 'salida' && (
-                  <p>
-                    📤 La salida reducirá el stock en{' '}
-                    <strong>{cantidad || 0}</strong>.
-                  </p>
-                )}
-
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 font-bold"
-            >
-              Actualizar
-            </button>
-
-          </form>
-
+        <div className="pc-admin-header">
+          <h1>Gestión de Inventario</h1>
+          <p>
+            Ajusta el stock y revisa el historial de movimientos.
+          </p>
         </div>
 
-        {/* HISTORIAL */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 2fr',
+            gap: 24,
+            alignItems: 'start',
+          }}
+        >
 
-          <h2 className="text-2xl font-bold mb-6">
-            Historial de Cambios
-          </h2>
+          <div
+            className="pc-card"
+            style={{ padding: 22 }}
+          >
+            <h2 style={{ marginBottom: 16 }}>
+              Ajustar Stock
+            </h2>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+            <form
+              onSubmit={handleAjustarInventario}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+              }}
+            >
+              <select
+                className="pc-select"
+                value={productoSeleccionado}
+                onChange={(e) =>
+                  setProductoSeleccionado(e.target.value)
+                }
+                required
+              >
+                <option value="">
+                  Seleccionar producto
+                </option>
 
-            {historial.length === 0 && (
-              <p className="text-gray-500">
-                No hay movimientos registrados.
-              </p>
-            )}
+                {productos.map((p) => (
+                  <option
+                    key={p.id}
+                    value={p.id}
+                  >
+                    {p.nombre} (Stock: {p.stock})
+                  </option>
+                ))}
+              </select>
 
-            {historial.map((item) => (
+              <input
+                type="number"
+                min="1"
+                placeholder="Cantidad"
+                className="pc-input"
+                value={cantidad}
+                onChange={(e) =>
+                  setCantidad(e.target.value)
+                }
+                required
+              />
+
+              <select
+                className="pc-select"
+                value={razon}
+                onChange={(e) =>
+                  setRazon(e.target.value)
+                }
+              >
+                <option value="venta">
+                  Venta
+                </option>
+
+                <option value="ajuste">
+                  Ajuste
+                </option>
+
+                <option value="devolución">
+                  Devolución
+                </option>
+              </select>
+
+              {razon === 'ajuste' && (
+                <select
+                  className="pc-select"
+                  value={operacion}
+                  onChange={(e) =>
+                    setOperacion(e.target.value)
+                  }
+                >
+                  <option value="entrada">
+                    Entrada (+) — Agregar stock
+                  </option>
+
+                  <option value="salida">
+                    Salida (-) — Reducir stock
+                  </option>
+                </select>
+              )}
 
               <div
-                key={item.id}
-                className="p-3 bg-gray-50 rounded border-l-4 border-blue-600"
+                className="pc-card"
+                style={{
+                  padding: 12,
+                  fontSize: 13,
+                  background: 'rgba(0,0,0,0.03)',
+                }}
               >
+                {razon === 'venta' && (
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <ShoppingCart size={17} />
+                    La venta reducirá el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
+                )}
 
-                <p className="font-bold">
-                  {item.productos?.nombre ||
-                    'Producto desconocido'}
-                </p>
+                {razon === 'devolución' && (
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <RotateCcw size={17} />
+                    La devolución aumentará el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
+                )}
 
-                <p className="text-sm text-gray-600">
+                {razon === 'ajuste' &&
+                  operacion === 'entrada' && (
+                    <p
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <ArrowDownToLine size={17} />
+                      La entrada aumentará el stock en{' '}
+                      <strong>{cantidad || 0}</strong>.
+                    </p>
+                  )}
 
-                  {item.cantidad_anterior}
-                  {' → '}
-                  {item.cantidad_nueva}
-
-                  <span className="ml-2 text-blue-600 font-bold">
-                    ({item.razón})
-                  </span>
-
-                </p>
-
-                <p className="text-xs text-gray-400">
-                  {new Date(
-                    item.created_at
-                  ).toLocaleDateString()}
-                </p>
-
+                {razon === 'ajuste' &&
+                  operacion === 'salida' && (
+                    <p
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <ArrowUpFromLine size={17} />
+                      La salida reducirá el stock en{' '}
+                      <strong>{cantidad || 0}</strong>.
+                    </p>
+                  )}
               </div>
 
-            ))}
+              <button
+                type="submit"
+                className="pc-btn pc-btn-primary"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                <RefreshCw size={17} />
+                Actualizar
+              </button>
+            </form>
+          </div>
 
+          <div
+            className="pc-card"
+            style={{ padding: 22 }}
+          >
+            <h2 style={{ marginBottom: 16 }}>
+              Historial de Cambios
+            </h2>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                maxHeight: 420,
+                overflowY: 'auto',
+              }}
+            >
+              {historial.length === 0 && (
+                <p style={{ opacity: 0.6 }}>
+                  No hay movimientos registrados.
+                </p>
+              )}
+
+              {historial.map((item) => (
+                <div
+                  key={item.id}
+                  className="pc-card"
+                  style={{
+                    padding: 12,
+                    borderLeft: '4px solid #1e3a8a',
+                  }}
+                >
+                  <p style={{ fontWeight: 700 }}>
+                    {item.productos?.nombre ||
+                      'Producto desconocido'}
+                  </p>
+
+                  <p
+                    style={{
+                      fontSize: 13,
+                      opacity: 0.75,
+                    }}
+                  >
+                    {item.cantidad_anterior}
+                    {' → '}
+                    {item.cantidad_nueva}
+
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: '#1e3a8a',
+                        fontWeight: 700,
+                      }}
+                    >
+                      ({item.razón})
+                    </span>
+                  </p>
+
+                  <p
+                    style={{
+                      fontSize: 11,
+                      opacity: 0.5,
+                    }}
+                  >
+                    {new Date(
+                      item.created_at
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
-
       </div>
-
-    </div>
+    </main>
   )
 }

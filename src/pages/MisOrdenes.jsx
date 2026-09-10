@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react'
+import { Package } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 
 export default function MisOrdenes() {
-
   const { usuario } = useAuth()
 
   const [ordenes, setOrdenes] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [cancelandoId, setCancelandoId] = useState(null)
+
+  const ESTADOS_CANCELABLES = [
+    'pendiente',
+    'pagada',
+  ]
 
   useEffect(() => {
     if (usuario) {
       cargarOrdenes()
+    } else {
+      setCargando(false)
     }
   }, [usuario])
 
   const cargarOrdenes = async () => {
+    if (!usuario) return
 
     setCargando(true)
     setError('')
@@ -39,6 +48,33 @@ export default function MisOrdenes() {
     setCargando(false)
   }
 
+  const cancelarOrden = async (ordenId) => {
+    const confirmar = window.confirm(
+      '¿Seguro que deseas cancelar esta orden? Esta acción no se puede deshacer y el stock será restaurado.'
+    )
+
+    if (!confirmar) return
+
+    setCancelandoId(ordenId)
+    setError('')
+
+    const { error } = await supabase.rpc(
+      'cancelar_orden_pc_store',
+      {
+        p_orden_id: ordenId,
+      }
+    )
+
+    setCancelandoId(null)
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    await cargarOrdenes()
+  }
+
   if (cargando) {
     return (
       <main className="pc-page">
@@ -51,7 +87,6 @@ export default function MisOrdenes() {
 
   return (
     <main className="pc-page">
-
       <div className="pc-container">
 
         <div className="pc-page-heading">
@@ -60,10 +95,13 @@ export default function MisOrdenes() {
               Mi cuenta
             </span>
 
-            <h1>Mis órdenes</h1>
+            <h1>
+              Mis órdenes
+            </h1>
 
             <p>
-              Consulta tus compras y su estado.
+              Consulta tus compras, datos de entrega,
+              costos y estado.
             </p>
           </div>
         </div>
@@ -76,105 +114,242 @@ export default function MisOrdenes() {
 
         <div className="pc-order-list">
 
-          {ordenes.map((orden) => (
+          {ordenes.map((orden) => {
+            const subtotal =
+              Number(orden.subtotal || 0)
 
-            <article
-              className="pc-card pc-order-card"
-              key={orden.id}
-            >
+            const envio =
+              Number(orden.envío || 0)
 
-              <div className="pc-order-head">
+            const total =
+              Number(orden.total || 0)
 
-                <div>
-                  <span className="pc-kicker">
-                    {orden.numero_orden ||
-                      `Orden #${orden.id}`}
-                  </span>
-
-                  <h3>
-                    L {Number(orden.total).toFixed(2)}
-                  </h3>
-                </div>
-
-                <span
-                  className={`pc-status pc-status-${orden.estado}`}
-                >
-                  {orden.estado}
-                </span>
-
-              </div>
-
-              <div className="pc-order-meta">
-
-                <span>
-                  {new Date(
-                    orden.created_at
-                  ).toLocaleString()}
-                </span>
-
-                <span>
-                  Pago: {orden.método_pago}
-                </span>
-
-              </div>
-
-              <div
-                className="pc-order-shipping"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                  margin: '8px 0',
-                  fontSize: '14px',
-                  color: '#555',
-                }}
+            return (
+              <article
+                className="pc-card pc-order-card"
+                key={orden.id}
               >
 
-                <strong>
-                  {orden.nombre_cliente} {orden.apellido_cliente}
-                </strong>
+                <div className="pc-order-head">
+                  <div>
+                    <span className="pc-kicker">
+                      {orden.numero_orden ||
+                        `Orden #${orden.id}`}
+                    </span>
 
-                <span>
-                  {orden.dirección_envío}, {orden.ciudad_envío}
-                </span>
+                    <h3>
+                      L {total.toFixed(2)}
+                    </h3>
+                  </div>
 
-                <span>
-                  Tel: {orden.teléfono_contacto}
-                </span>
+                  <span
+                    className={`pc-status pc-status-${orden.estado}`}
+                  >
+                    {orden.estado}
+                  </span>
+                </div>
 
-              </div>
+                <div className="pc-order-meta">
+                  <span>
+                    {orden.created_at
+                      ? new Date(
+                          orden.created_at
+                        ).toLocaleString()
+                      : '-'}
+                  </span>
 
-              <div className="pc-order-items">
+                  <span>
+                    Pago:{' '}
+                    {orden.método_pago || '-'}
+                  </span>
+                </div>
 
-                {(orden.items || []).map(
-                  (item, index) => (
+                <div
+                  className="pc-order-shipping"
+                  style={{
+                    marginTop: '14px',
+                    padding: '14px',
+                    borderRadius: '10px',
+                    background:
+                      'rgba(0,0,0,0.03)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '5px',
+                    fontSize: '14px',
+                  }}
+                >
+                  <strong>
+                    Datos de entrega
+                  </strong>
 
-                    <div key={index}>
+                  <span>
+                    Receptor:{' '}
+                    {orden.nombre_cliente || '-'}{' '}
+                    {orden.apellido_cliente || ''}
+                  </span>
 
-                      <span>
-                        {item.cantidad} × {item.nombre}
-                      </span>
+                  <span>
+                    Teléfono:{' '}
+                    {orden.teléfono_contacto || '-'}
+                  </span>
 
-                      <strong>
-                        L {Number(item.subtotal).toFixed(2)}
-                      </strong>
+                  <span>
+                    Dirección:{' '}
+                    {orden.dirección_envío || '-'}
+                  </span>
 
-                    </div>
+                  <span>
+                    Ciudad:{' '}
+                    {orden.ciudad_envío || '-'}
+                  </span>
 
-                  )
+                  {orden.referencia && (
+                    <span>
+                      Referencia:{' '}
+                      {orden.referencia}
+                    </span>
+                  )}
+
+                  {orden.notas && (
+                    <span>
+                      Notas:{' '}
+                      {orden.notas}
+                    </span>
+                  )}
+                </div>
+
+                <div className="pc-order-items">
+                  {(orden.items || []).map(
+                    (item, index) => (
+                      <div
+                        key={`${orden.id}-${item.producto_id || index}`}
+                      >
+                        <span>
+                          {item.cantidad} ×{' '}
+                          {item.nombre}
+                        </span>
+
+                        <strong>
+                          L{' '}
+                          {Number(
+                            item.subtotal || 0
+                          ).toFixed(2)}
+                        </strong>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '16px',
+                    paddingTop: '14px',
+                    borderTop:
+                      '1px solid #e5e5e5',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '7px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent:
+                        'space-between',
+                      fontSize: '14px',
+                      color: '#555',
+                    }}
+                  >
+                    <span>
+                      Subtotal
+                    </span>
+
+                    <strong>
+                      L {subtotal.toFixed(2)}
+                    </strong>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent:
+                        'space-between',
+                      fontSize: '14px',
+                      color: '#555',
+                    }}
+                  >
+                    <span>
+                      Envío
+                    </span>
+
+                    <strong>
+                      L {envio.toFixed(2)}
+                    </strong>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent:
+                        'space-between',
+                      marginTop: '4px',
+                      paddingTop: '9px',
+                      borderTop:
+                        '1px solid #e5e5e5',
+                      fontSize: '17px',
+                    }}
+                  >
+                    <strong>
+                      Total
+                    </strong>
+
+                    <strong>
+                      L {total.toFixed(2)}
+                    </strong>
+                  </div>
+                </div>
+
+                {ESTADOS_CANCELABLES.includes(
+                  orden.estado
+                ) && (
+                  <div
+                    style={{
+                      marginTop: 16,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="pc-btn pc-btn-danger"
+                      disabled={
+                        cancelandoId ===
+                        orden.id
+                      }
+                      onClick={() =>
+                        cancelarOrden(
+                          orden.id
+                        )
+                      }
+                    >
+                      {cancelandoId ===
+                      orden.id
+                        ? 'Cancelando...'
+                        : 'Cancelar orden'}
+                    </button>
+                  </div>
                 )}
 
-              </div>
-
-            </article>
-
-          ))}
+              </article>
+            )
+          })}
 
           {ordenes.length === 0 && (
             <div className="pc-empty">
 
               <div className="pc-empty-icon">
-                📦
+                <Package
+                  size={48}
+                  strokeWidth={1.5}
+                />
               </div>
 
               <h2>
@@ -185,9 +360,7 @@ export default function MisOrdenes() {
           )}
 
         </div>
-
       </div>
-
     </main>
   )
 }

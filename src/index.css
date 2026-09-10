@@ -1,23 +1,39 @@
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #111827;
-  background: #f5f7fb;
+  color: #171717;
+  background: #f3f3f3;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  --pc-primary: #2563eb;
-  --pc-primary-dark: #1d4ed8;
-  --pc-dark: #0f172a;
-  --pc-text: #111827;
-  --pc-muted: #64748b;
-  --pc-border: #e2e8f0;
+  /* ============================================================
+     PC STORE - PALETA DORADO / NEGRO / GRIS / BLANCO
+     ============================================================ */
+
+  --pc-primary: #d4af37;
+  --pc-primary-dark: #a67c00;
+  --pc-gold-light: #f7e7a9;
+  --pc-gold-soft: #fbf4d6;
+
+  --pc-dark: #0b0b0b;
+  --pc-dark-soft: #1a1a1a;
+  --pc-dark-gray: #2b2b2b;
+
+  --pc-text: #171717;
+  --pc-muted: #6b6b6b;
+  --pc-border: #e0e0e0;
   --pc-card: #ffffff;
-  --pc-bg: #f5f7fb;
+  --pc-bg: #f3f3f3;
+
   --pc-success: #15803d;
   --pc-danger: #dc2626;
+
   --pc-radius: 18px;
-  --pc-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+  --pc-shadow: 0 12px 35px rgba(0, 0, 0, 0.09);
 }
+
+/* ============================================================
+   RESET
+   ============================================================ */
 
 * {
   box-sizing: border-box;
@@ -32,6 +48,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: var(--pc-bg);
+  color: var(--pc-text);
 }
 
 button,
@@ -45,6 +62,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -54,6 +75,10 @@ img {
   display: block;
   max-width: 100%;
 }
+
+/* ============================================================
+   CONTENEDOR / PÁGINA
+   ============================================================ */
 
 .pc-container {
   width: min(1180px, calc(100% - 32px));
@@ -65,19 +90,44 @@ img {
   padding: 42px 0 64px;
 }
 
+/* ============================================================
+   CARDS
+   ============================================================ */
+
 .pc-card {
-  background: white;
+  background: var(--pc-card);
   border: 1px solid var(--pc-border);
   border-radius: var(--pc-radius);
   box-shadow: var(--pc-shadow);
 }
 
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
 .pc-btn {
   border: 0;
   border-radius: 12px;
-  padding: 11px 18px;
+  padding: 11px 14px;
+  min-width: 0;
+  max-width: 100%;
   font-weight: 700;
-  transition: 0.2s;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  text-align: center;
+  white-space: normal;
+  overflow: hidden;
+
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .pc-btn:hover {
@@ -86,31 +136,50 @@ img {
 
 .pc-btn-primary {
   background: var(--pc-primary);
-  color: white;
+  color: #0b0b0b;
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.22);
 }
 
 .pc-btn-primary:hover {
   background: var(--pc-primary-dark);
+  color: #ffffff;
+}
+
+.pc-btn-primary:disabled {
+  background: #cfcfcf;
+  color: #666666;
+  box-shadow: none;
+  transform: none;
 }
 
 .pc-btn-light {
-  background: white;
-  color: var(--pc-text);
+  background: #ffffff;
+  color: #171717;
   border: 1px solid var(--pc-border);
+}
+
+.pc-btn-light:hover {
+  border-color: var(--pc-primary);
+  color: #171717;
 }
 
 .pc-btn-danger {
   background: var(--pc-danger);
-  color: white;
+  color: #ffffff;
 }
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
 
 .pc-navbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #0f172a;
-  color: white;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.16);
+  background: var(--pc-dark);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
 }
 
 .pc-navbar-inner {
@@ -136,16 +205,22 @@ img {
   height: 38px;
   border-radius: 12px;
   background: var(--pc-primary);
+  color: #0b0b0b;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
 }
 
 .pc-nav-links {
   display: flex;
   gap: 22px;
-  color: #cbd5e1;
+  color: #c7c7c7;
+}
+
+.pc-nav-links a {
+  transition: color 0.2s;
 }
 
 .pc-nav-links a:hover {
-  color: white;
+  color: var(--pc-primary);
 }
 
 .pc-nav-actions {
@@ -155,14 +230,30 @@ img {
 }
 
 .pc-user-email {
-  color: #cbd5e1;
+  color: #c7c7c7;
   font-size: 0.9rem;
 }
 
+/* ============================================================
+   HERO
+   ============================================================ */
+
 .pc-hero {
   padding: 86px 0;
-  color: white;
-  background: linear-gradient(120deg, #0f172a, #1e40af);
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(212, 175, 55, 0.15),
+      transparent 30%
+    ),
+    linear-gradient(
+      120deg,
+      #0b0b0b 0%,
+      #171717 65%,
+      #2b2410 100%
+    );
 }
 
 .pc-hero-grid {
@@ -175,7 +266,7 @@ img {
 .pc-eyebrow {
   display: inline-block;
   margin-bottom: 18px;
-  color: #bfdbfe;
+  color: var(--pc-primary);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -192,7 +283,7 @@ img {
 .pc-hero p {
   max-width: 700px;
   margin: 0 0 30px;
-  color: #dbeafe;
+  color: #d4d4d4;
   font-size: 1.1rem;
   line-height: 1.7;
 }
@@ -206,13 +297,14 @@ img {
 .pc-hero-panel {
   padding: 28px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
 }
 
 .pc-stat {
   padding: 18px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .pc-stat:last-child {
@@ -222,7 +314,12 @@ img {
 .pc-stat strong {
   display: block;
   font-size: 1.6rem;
+  color: var(--pc-primary);
 }
+
+/* ============================================================
+   SECCIONES
+   ============================================================ */
 
 .pc-section {
   padding: 64px 0;
@@ -231,12 +328,17 @@ img {
 .pc-section-title {
   margin: 0 0 10px;
   font-size: 2rem;
+  color: #171717;
 }
 
 .pc-section-subtitle {
   margin: 0 0 30px;
-  color: var(--pc-muted);
+  color: #171717;
 }
+
+/* ============================================================
+   FEATURES
+   ============================================================ */
 
 .pc-feature-grid {
   display: grid;
@@ -250,17 +352,23 @@ img {
 
 .pc-feature-icon {
   font-size: 2rem;
+  color: var(--pc-primary);
 }
 
 .pc-feature-card h3 {
   margin: 14px 0 8px;
+  color: #171717;
 }
 
 .pc-feature-card p {
   margin: 0;
-  color: var(--pc-muted);
+  color: #171717;
   line-height: 1.6;
 }
+
+/* ============================================================
+   TOOLBAR / INPUTS
+   ============================================================ */
 
 .pc-toolbar {
   display: grid;
@@ -277,57 +385,81 @@ img {
   border: 1px solid var(--pc-border);
   border-radius: 12px;
   outline: none;
-  background: white;
+  background: #ffffff;
+  color: #171717;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.pc-input::placeholder {
+  color: #777777;
 }
 
 .pc-input:focus,
 .pc-select:focus,
 .pc-textarea:focus {
   border-color: var(--pc-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
 }
+
+/* ============================================================
+   PRODUCTOS
+   ============================================================ */
 
 .pc-product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
 }
 
 .pc-product-card {
   overflow: hidden;
-  transition: 0.2s;
+  min-width: 0;
+
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .pc-product-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
 }
 
 .pc-product-image {
   height: 190px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+  background: linear-gradient(135deg, #e4e4e4, #f8f8f8);
   font-size: 3.5rem;
+  overflow: hidden;
 }
 
 .pc-product-body {
   padding: 18px;
+  min-width: 0;
 }
 
 .pc-product-category {
-  color: var(--pc-primary);
+  color: var(--pc-primary-dark);
   font-weight: 800;
   font-size: 0.8rem;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .pc-product-name {
   margin: 8px 0;
+  color: #171717;
+  overflow-wrap: anywhere;
 }
 
 .pc-product-description {
   min-height: 44px;
-  color: var(--pc-muted);
+  margin: 0;
+  color: #171717;
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -336,19 +468,23 @@ img {
   display: flex;
   gap: 8px;
   align-items: baseline;
+  flex-wrap: wrap;
   margin: 16px 0;
 }
 
 .pc-price {
   font-size: 1.35rem;
   font-weight: 900;
+  color: var(--pc-primary-dark);
 }
 
 .pc-old-price {
-  color: #94a3b8;
+  color: #777777;
   text-decoration: line-through;
   font-size: 0.88rem;
 }
+
+/* STOCK SIEMPRE VERDE */
 
 .pc-stock {
   color: var(--pc-success);
@@ -356,8 +492,20 @@ img {
   font-size: 0.85rem;
 }
 
+/* ============================================================
+   ADMIN DASHBOARD
+   ============================================================ */
+
 .pc-admin-header {
   margin-bottom: 28px;
+  color: #171717;
+}
+
+.pc-admin-header h1,
+.pc-admin-header h2,
+.pc-admin-header h3,
+.pc-admin-header p {
+  color: #171717;
 }
 
 .pc-admin-header h1 {
@@ -366,7 +514,6 @@ img {
 
 .pc-admin-header p {
   margin: 0;
-  color: var(--pc-muted);
 }
 
 .pc-admin-grid {
@@ -377,15 +524,30 @@ img {
 
 .pc-admin-option {
   padding: 24px;
-  transition: 0.2s;
+  color: #171717;
+
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .pc-admin-option:hover {
   transform: translateY(-3px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.11);
 }
 
 .pc-admin-option-icon {
   font-size: 2rem;
+  color: var(--pc-primary-dark);
+}
+
+.pc-admin-option h1,
+.pc-admin-option h2,
+.pc-admin-option h3,
+.pc-admin-option p,
+.pc-admin-option span,
+.pc-admin-option strong {
+  color: #171717;
 }
 
 .pc-admin-option h3 {
@@ -394,8 +556,19 @@ img {
 
 .pc-admin-option p {
   margin: 0;
-  color: var(--pc-muted);
 }
+
+.pc-admin-option a {
+  color: #171717;
+}
+
+.pc-admin-option a:hover {
+  color: var(--pc-primary-dark);
+}
+
+/* ============================================================
+   TABLAS
+   ============================================================ */
 
 .pc-table-wrapper {
   overflow-x: auto;
@@ -404,6 +577,7 @@ img {
 .pc-table {
   width: 100%;
   border-collapse: collapse;
+  color: #171717;
 }
 
 .pc-table th,
@@ -411,12 +585,21 @@ img {
   padding: 13px 14px;
   border-bottom: 1px solid var(--pc-border);
   text-align: left;
+  color: #171717;
 }
 
 .pc-table th {
-  background: #f8fafc;
-  color: #475569;
+  background: #eeeeee;
+  font-weight: 800;
 }
+
+.pc-table tbody tr:hover {
+  background: #faf8ef;
+}
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
 
 .pc-form-grid {
   display: grid;
@@ -424,46 +607,12 @@ img {
   gap: 14px;
 }
 
-@media (max-width: 950px) {
-  .pc-hero-grid,
-  .pc-toolbar {
-    grid-template-columns: 1fr;
-  }
-
-  .pc-product-grid,
-  .pc-feature-grid,
-  .pc-admin-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 680px) {
-  .pc-navbar-inner {
-    flex-wrap: wrap;
-    padding: 12px 0;
-  }
-
-  .pc-nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .pc-product-grid,
-  .pc-feature-grid,
-  .pc-admin-grid,
-  .pc-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pc-user-email {
-    display: none;
-  }
+.pc-form-grid label {
+  color: #171717;
 }
 
 /* ============================================================
-   PC STORE - MANUAL 3
-   COMPONENTES FINALES
+   APP
    ============================================================ */
 
 .pc-app {
@@ -476,6 +625,10 @@ img {
   flex: 1;
 }
 
+/* ============================================================
+   ENCABEZADOS
+   ============================================================ */
+
 .pc-page-heading {
   display: flex;
   align-items: end;
@@ -487,23 +640,24 @@ img {
 .pc-page-heading h1 {
   margin: 4px 0 8px;
   font-size: clamp(2rem, 5vw, 3rem);
+  color: #171717;
 }
 
 .pc-page-heading p {
   margin: 0;
-  color: var(--pc-muted);
+  color: #171717;
 }
 
 .pc-kicker {
-  color: var(--pc-primary);
+  color: var(--pc-primary-dark);
   text-transform: uppercase;
-  letter-spacing: .09em;
-  font-size: .78rem;
+  letter-spacing: 0.09em;
+  font-size: 0.78rem;
   font-weight: 900;
 }
 
 .pc-muted {
-  color: var(--pc-muted);
+  color: #171717;
 }
 
 .pc-btn-block {
@@ -512,11 +666,23 @@ img {
   text-align: center;
 }
 
+/* ============================================================
+   ACCIONES PRODUCTO
+   ============================================================ */
+
 .pc-product-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
   margin-top: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.pc-product-actions .pc-btn {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .pc-cart-button {
@@ -525,8 +691,17 @@ img {
   align-items: center;
   gap: 7px;
   padding: 9px 12px;
-  border: 1px solid rgba(255,255,255,.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 12px;
+
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.pc-cart-button:hover {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: var(--pc-primary);
 }
 
 .pc-cart-button b {
@@ -536,8 +711,9 @@ img {
   height: 21px;
   padding: 0 5px;
   background: var(--pc-primary);
+  color: #0b0b0b;
   border-radius: 999px;
-  font-size: .72rem;
+  font-size: 0.72rem;
 }
 
 .pc-user-link {
@@ -545,9 +721,26 @@ img {
   place-items: center;
   width: 40px;
   height: 40px;
-  background: rgba(255,255,255,.10);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(212, 175, 55, 0.18);
   border-radius: 50%;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
 }
+
+.pc-user-link:hover {
+  background: var(--pc-primary);
+  color: #0b0b0b;
+  border-color: var(--pc-primary);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
 
 .pc-empty {
   min-height: 440px;
@@ -560,6 +753,7 @@ img {
 
 .pc-empty-icon {
   font-size: 4rem;
+  color: var(--pc-primary-dark);
 }
 
 .pc-empty h1,
@@ -569,14 +763,18 @@ img {
 }
 
 .pc-empty p {
-  color: var(--pc-muted);
+  color: #171717;
 }
 
 .pc-empty-small {
   padding: 24px;
-  color: var(--pc-muted);
+  color: #171717;
   text-align: center;
 }
+
+/* ============================================================
+   CARRITO / CHECKOUT
+   ============================================================ */
 
 .pc-cart-layout,
 .pc-checkout-layout {
@@ -609,7 +807,7 @@ img {
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #f1f5f9;
+  background: #ededed;
   border-radius: 14px;
   font-size: 2rem;
 }
@@ -623,11 +821,12 @@ img {
 .pc-cart-info h3,
 .pc-cart-info p {
   margin: 0 0 6px;
+  color: #171717;
 }
 
 .pc-cart-info span {
-  color: var(--pc-muted);
-  font-size: .85rem;
+  color: #171717;
+  font-size: 0.85rem;
 }
 
 .pc-cart-actions {
@@ -656,6 +855,7 @@ img {
 
 .pc-summary h2 {
   margin-top: 0;
+  color: #171717;
 }
 
 .pc-summary-line,
@@ -665,6 +865,7 @@ img {
   justify-content: space-between;
   gap: 20px;
   padding: 12px 0;
+  color: #171717;
 }
 
 .pc-summary-line,
@@ -676,6 +877,14 @@ img {
   margin-top: 6px;
   font-size: 1.08rem;
 }
+
+.pc-summary-total strong {
+  color: var(--pc-primary-dark);
+}
+
+/* ============================================================
+   DETALLE DEL PRODUCTO
+   ============================================================ */
 
 .pc-product-detail {
   display: grid;
@@ -689,7 +898,7 @@ img {
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg,#e2e8f0,#f8fafc);
+  background: linear-gradient(135deg, #e2e2e2, #fafafa);
   border-radius: 28px;
   font-size: 7rem;
 }
@@ -702,21 +911,24 @@ img {
 
 .pc-product-detail h1 {
   margin: 8px 0;
-  font-size: clamp(2rem,4vw,3.6rem);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  color: #171717;
 }
 
 .pc-detail-brand {
-  color: var(--pc-muted);
+  color: #171717;
   font-weight: 700;
 }
 
 .pc-detail-description {
-  color: #475569;
+  color: #171717;
   line-height: 1.8;
 }
 
 .pc-price-large {
   font-size: 2.1rem;
+  color: var(--pc-primary-dark);
+  font-weight: 900;
 }
 
 .pc-buy-row {
@@ -729,9 +941,14 @@ img {
   margin-top: 16px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--pc-gold-soft);
+  color: #705500;
+  border: 1px solid #ead58a;
 }
+
+/* ============================================================
+   RESEÑAS
+   ============================================================ */
 
 .pc-review-form {
   display: grid;
@@ -751,12 +968,17 @@ img {
 
 .pc-review p {
   line-height: 1.6;
+  color: #171717;
 }
 
 .pc-review span {
-  color: var(--pc-muted);
-  font-size: .82rem;
+  color: #171717;
+  font-size: 0.82rem;
 }
+
+/* ============================================================
+   CHECKOUT
+   ============================================================ */
 
 .pc-checkout-form {
   display: grid;
@@ -769,6 +991,7 @@ img {
   display: grid;
   gap: 7px;
   font-weight: 700;
+  color: #171717;
 }
 
 .pc-alert {
@@ -782,6 +1005,10 @@ img {
   border: 1px solid #fecaca;
 }
 
+/* ============================================================
+   PÁGINA DE ÉXITO
+   ============================================================ */
+
 .pc-success-page {
   min-height: 520px;
   display: grid;
@@ -794,6 +1021,7 @@ img {
 .pc-success-page h1,
 .pc-success-page p {
   margin: 0;
+  color: #171717;
 }
 
 .pc-success-icon {
@@ -801,12 +1029,17 @@ img {
   height: 90px;
   display: grid;
   place-items: center;
-  background: #dcfce7;
-  color: #15803d;
+  background: var(--pc-gold-soft);
+  color: var(--pc-primary-dark);
+  border: 2px solid var(--pc-primary);
   border-radius: 50%;
   font-size: 3rem;
   font-weight: 900;
 }
+
+/* ============================================================
+   ÓRDENES
+   ============================================================ */
 
 .pc-order-list {
   display: grid;
@@ -828,13 +1061,14 @@ img {
 
 .pc-order-head h3 {
   margin: 6px 0 0;
+  color: #171717;
 }
 
 .pc-order-meta {
   padding: 14px 0;
-  color: var(--pc-muted);
+  color: #171717;
   border-bottom: 1px solid var(--pc-border);
-  font-size: .88rem;
+  font-size: 0.88rem;
 }
 
 .pc-order-items {
@@ -843,30 +1077,36 @@ img {
 
 .pc-order-items > div {
   padding: 7px 0;
+  color: #171717;
 }
+
+/* ============================================================
+   ESTADOS DE ORDEN
+   ============================================================ */
 
 .pc-status {
   display: inline-flex;
   padding: 7px 11px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: .78rem;
+  font-size: 0.78rem;
   text-transform: capitalize;
 }
 
 .pc-status-pendiente {
-  background: #fef3c7;
-  color: #92400e;
+  background: #f4e7b5;
+  color: #705500;
 }
 
 .pc-status-pagada {
-  background: #dbeafe;
-  color: #1e40af;
+  background: var(--pc-gold-soft);
+  color: #705500;
+  border: 1px solid #e5cd72;
 }
 
 .pc-status-enviada {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: #e5e5e5;
+  color: #3f3f3f;
 }
 
 .pc-status-entregada {
@@ -878,6 +1118,10 @@ img {
   background: #fee2e2;
   color: #991b1b;
 }
+
+/* ============================================================
+   PERFIL
+   ============================================================ */
 
 .pc-profile-wrap {
   display: grid;
@@ -897,11 +1141,18 @@ img {
   display: grid;
   place-items: center;
   margin: 0 auto 18px;
-  background: linear-gradient(135deg,#2563eb,#1e3a8a);
-  color: white;
+
+  background: linear-gradient(
+    135deg,
+    var(--pc-primary),
+    var(--pc-primary-dark)
+  );
+
+  color: #0b0b0b;
   border-radius: 28px;
   font-size: 2.7rem;
   font-weight: 900;
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.2);
 }
 
 .pc-profile-form {
@@ -910,9 +1161,13 @@ img {
   padding: 28px;
 }
 
+/* ============================================================
+   MÉTRICAS
+   ============================================================ */
+
 .pc-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(5,1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
   margin-bottom: 36px;
 }
@@ -923,19 +1178,25 @@ img {
 
 .pc-metric span {
   display: block;
-  color: var(--pc-muted);
-  font-size: .84rem;
+  color: #171717;
+  font-size: 0.84rem;
   margin-bottom: 8px;
 }
 
 .pc-metric strong {
   font-size: 1.55rem;
+  color: var(--pc-primary-dark);
 }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
 
 .pc-footer {
   margin-top: 60px;
-  background: #0f172a;
-  color: white;
+  background: var(--pc-dark);
+  color: #ffffff;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
 }
 
 .pc-footer-grid {
@@ -954,19 +1215,23 @@ img {
 
 .pc-footer p,
 .pc-footer a {
-  color: #94a3b8;
+  color: #999999;
 }
 
 .pc-footer a:hover {
-  color: white;
+  color: var(--pc-primary);
 }
 
 .pc-footer-bottom {
   padding: 18px;
   text-align: center;
-  color: #94a3b8;
-  border-top: 1px solid rgba(255,255,255,.08);
+  color: #888888;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* ============================================================
+   LOADING
+   ============================================================ */
 
 .pc-loading {
   min-height: 240px;
@@ -974,15 +1239,16 @@ img {
   place-items: center;
   align-content: center;
   gap: 14px;
+  color: #171717;
 }
 
 .pc-loader {
   width: 42px;
   height: 42px;
-  border: 4px solid #dbeafe;
+  border: 4px solid #e5e5e5;
   border-top-color: var(--pc-primary);
   border-radius: 50%;
-  animation: pc-spin .8s linear infinite;
+  animation: pc-spin 0.8s linear infinite;
 }
 
 @keyframes pc-spin {
@@ -991,17 +1257,27 @@ img {
   }
 }
 
+/* ============================================================
+   TOAST
+   ============================================================ */
+
 .pc-toast {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 100;
+
   padding: 14px 18px;
-  background: #0f172a;
-  color: white;
+
+  background: var(--pc-dark);
+  color: #ffffff;
+
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 14px;
-  box-shadow: 0 18px 45px rgba(15,23,42,.25);
-  animation: pc-toast-in .2s ease;
+
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+
+  animation: pc-toast-in 0.2s ease;
 }
 
 @keyframes pc-toast-in {
@@ -1009,18 +1285,31 @@ img {
     opacity: 0;
     transform: translateY(12px);
   }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+/* ============================================================
+   ERROR 404
+   ============================================================ */
+
 .pc-404 {
-  font-size: clamp(6rem,18vw,12rem);
-  line-height: .8;
+  font-size: clamp(6rem, 18vw, 12rem);
+  line-height: 0.8;
   font-weight: 950;
-  color: #dbeafe;
+  color: var(--pc-gold-light);
 }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 
 @media (max-width: 1050px) {
   .pc-metrics-grid {
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .pc-cart-layout,
@@ -1030,6 +1319,19 @@ img {
 
   .pc-summary {
     position: static;
+  }
+}
+
+@media (max-width: 950px) {
+  .pc-hero-grid,
+  .pc-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-product-grid,
+  .pc-feature-grid,
+  .pc-admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1053,6 +1355,30 @@ img {
   }
 }
 
+@media (max-width: 680px) {
+  .pc-navbar-inner {
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  .pc-nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pc-product-grid,
+  .pc-feature-grid,
+  .pc-admin-grid,
+  .pc-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-user-email {
+    display: none;
+  }
+}
+
 @media (max-width: 620px) {
   .pc-metrics-grid {
     grid-template-columns: 1fr 1fr;
@@ -1070,4 +1396,162 @@ img {
   .pc-product-actions {
     grid-template-columns: 1fr;
   }
+
+  .pc-hero {
+    padding: 64px 0;
+  }
+
+  .pc-section {
+    padding: 48px 0;
+  }
+
+  .pc-cart-list {
+    padding: 8px 16px;
+  }
+
+  .pc-cart-item {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pc-container {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .pc-page {
+    padding-top: 30px;
+  }
+
+  .pc-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-buy-row {
+    flex-direction: column;
+  }
+
+  .pc-buy-row .pc-btn {
+    width: 100%;
+  }
+
+  .pc-toast {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+  }
+}
+/* ============================================================
+   ADMIN PANEL
+   ============================================================ */
+
+.pc-admin-layout {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  width: 100%;
+  background: var(--pc-bg);
+  color: #171717;
+}
+
+.pc-admin-content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  color: #171717;
+}
+
+/* Todo el contenido del panel administrativo en negro */
+
+.pc-admin-content,
+.pc-admin-content h1,
+.pc-admin-content h2,
+.pc-admin-content h3,
+.pc-admin-content h4,
+.pc-admin-content h5,
+.pc-admin-content h6,
+.pc-admin-content p,
+.pc-admin-content span,
+.pc-admin-content label,
+.pc-admin-content td,
+.pc-admin-content th,
+.pc-admin-content div {
+  color: #171717;
+}
+
+/* Mantener botones con sus colores */
+
+.pc-admin-content .pc-btn-primary {
+  background: var(--pc-primary);
+  color: #0b0b0b;
+}
+
+.pc-admin-content .pc-btn-primary:hover {
+  background: var(--pc-primary-dark);
+  color: #ffffff;
+}
+
+.pc-admin-content .pc-btn-danger {
+  background: var(--pc-danger);
+  color: #ffffff;
+}
+
+/* Mantener estados */
+
+.pc-admin-content .pc-stock {
+  color: var(--pc-success);
+}
+
+.pc-admin-content .pc-status-pendiente {
+  color: #705500;
+}
+
+.pc-admin-content .pc-status-pagada {
+  color: #705500;
+}
+
+.pc-admin-content .pc-status-enviada {
+  color: #3f3f3f;
+}
+
+.pc-admin-content .pc-status-entregada {
+  color: #166534;
+}
+
+.pc-admin-content .pc-status-cancelada {
+  color: #991b1b;
+}
+
+/* Iconos del administrador */
+
+.pc-admin-content svg {
+  color: var(--pc-primary-dark);
+}
+
+/* Responsive */
+
+@media (max-width: 820px) {
+  .pc-admin-content {
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pc-admin-content {
+    padding: 20px 12px;
+  }
+}
+.pc-admin-content .pc-metric span,
+.pc-admin-content .pc-metric strong {
+  color: #171717 !important;
+}
+/* ADMIN PANEL - TODO EL RESUMEN EN NEGRO */
+.pc-admin-content .pc-admin-header,
+.pc-admin-content .pc-admin-header h1,
+.pc-admin-content .pc-admin-header h2,
+.pc-admin-content .pc-admin-header h3,
+.pc-admin-content .pc-admin-header p,
+.pc-admin-content .pc-metric,
+.pc-admin-content .pc-metric span,
+.pc-admin-content .pc-metric strong {
+  color: #171717 !important;
 }

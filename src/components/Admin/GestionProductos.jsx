@@ -4,9 +4,16 @@ import {
   crearProducto,
   actualizarProducto,
   eliminarProducto,
-  obtenerCategorias
+  obtenerCategorias,
 } from '../../services/productosService'
 import { subirImagen } from '../../services/storageService'
+import {
+  Plus,
+  Save,
+  X,
+  Pencil,
+  Trash2,
+} from 'lucide-react'
 
 export default function GestionProductos() {
   const [productos, setProductos] = useState([])
@@ -15,10 +22,6 @@ export default function GestionProductos() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
-
-  // ==============================
-  // ESTADO DEL FORMULARIO
-  // ==============================
 
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -30,10 +33,6 @@ export default function GestionProductos() {
   const [imagen, setImagen] = useState(null)
 
   const [editandoId, setEditandoId] = useState(null)
-
-  // ==============================
-  // CARGAR DATOS
-  // ==============================
 
   useEffect(() => {
     cargarProductos()
@@ -64,10 +63,6 @@ export default function GestionProductos() {
     }
   }
 
-  // ==============================
-  // GUARDAR PRODUCTO
-  // ==============================
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -75,7 +70,6 @@ export default function GestionProductos() {
     setError('')
 
     try {
-      // Verificar categoría
       if (!categoriaId) {
         setError('Debes seleccionar una categoría')
         setCargando(false)
@@ -83,10 +77,6 @@ export default function GestionProductos() {
       }
 
       let imagenUrl = null
-
-      // ==============================
-      // SUBIR IMAGEN
-      // ==============================
 
       if (imagen) {
         const resultSubida = await subirImagen(
@@ -102,10 +92,6 @@ export default function GestionProductos() {
         imagenUrl = resultSubida.url
       }
 
-      // ==============================
-      // DATOS DEL PRODUCTO
-      // ==============================
-
       const datosProducto = {
         nombre,
         descripción: descripcion,
@@ -115,13 +101,9 @@ export default function GestionProductos() {
         modelo,
         categoria_id: Number(categoriaId),
         ...(imagenUrl && {
-          imagen_principal: imagenUrl
-        })
+          imagen_principal: imagenUrl,
+        }),
       }
-
-      // ==============================
-      // CREAR / ACTUALIZAR
-      // ==============================
 
       let resultado
 
@@ -133,13 +115,9 @@ export default function GestionProductos() {
       } else {
         resultado = await crearProducto({
           ...datosProducto,
-          activo: true
+          activo: true,
         })
       }
-
-      // ==============================
-      // RESULTADO
-      // ==============================
 
       if (resultado.success) {
         alert(
@@ -153,17 +131,12 @@ export default function GestionProductos() {
       } else {
         setError(resultado.error)
       }
-
     } catch (err) {
       setError(err.message)
     }
 
     setCargando(false)
   }
-
-  // ==============================
-  // LIMPIAR FORMULARIO
-  // ==============================
 
   const resetFormulario = () => {
     setNombre('')
@@ -178,10 +151,6 @@ export default function GestionProductos() {
     setMostrarFormulario(false)
   }
 
-  // ==============================
-  // EDITAR PRODUCTO
-  // ==============================
-
   const handleEditar = (producto) => {
     setEditandoId(producto.id)
 
@@ -194,13 +163,8 @@ export default function GestionProductos() {
     setCategoriaId(producto.categoria_id || '')
 
     setImagen(null)
-
     setMostrarFormulario(true)
   }
-
-  // ==============================
-  // ELIMINAR PRODUCTO
-  // ==============================
 
   const handleEliminar = async (id) => {
     if (
@@ -221,328 +185,292 @@ export default function GestionProductos() {
     }
   }
 
-  // ==============================
-  // CARGANDO
-  // ==============================
-
   if (cargando && !mostrarFormulario) {
-    return <div>Cargando...</div>
+    return (
+      <main className="pc-page">
+        <div className="pc-container">
+          Cargando...
+        </div>
+      </main>
+    )
   }
 
-  // ==============================
-  // INTERFAZ
-  // ==============================
-
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <main className="pc-page">
+      <div className="pc-container">
 
-      {/* ==============================
-          CABECERA
-      ============================== */}
-
-      <div className="flex justify-between items-center mb-8">
-
-        <h1 className="text-3xl font-bold">
-          Gestión de Productos
-        </h1>
-
-        <button
-          onClick={() => {
-            resetFormulario()
-            setMostrarFormulario(true)
+        <div
+          className="pc-admin-header"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
         >
-          + Nuevo Producto
-        </button>
+          <div>
+            <h1>Gestión de Productos</h1>
+            <p>Administra el catálogo de componentes.</p>
+          </div>
 
-      </div>
-
-      {/* ==============================
-          ERROR
-      ============================== */}
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* ==============================
-          FORMULARIO
-      ============================== */}
-
-      {mostrarFormulario && (
-
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-
-          <h2 className="text-2xl font-bold mb-6">
-            {editandoId
-              ? 'Editar Producto'
-              : 'Nuevo Producto'}
-          </h2>
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-4"
+          <button
+            className="pc-btn pc-btn-primary"
+            onClick={() => {
+              resetFormulario()
+              setMostrarFormulario(true)
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
           >
+            <Plus size={18} />
+            Nuevo Producto
+          </button>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {error && (
+          <div
+            className="pc-card"
+            style={{
+              padding: 16,
+              marginBottom: 20,
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-              {/* NOMBRE */}
+        {mostrarFormulario && (
+          <div
+            className="pc-card"
+            style={{
+              padding: 22,
+              marginBottom: 24,
+            }}
+          >
+            <h2 style={{ marginBottom: 16 }}>
+              {editandoId
+                ? 'Editar Producto'
+                : 'Nuevo Producto'}
+            </h2>
 
-              <input
-                type="text"
-                placeholder="Nombre del producto"
-                value={nombre}
-                onChange={(e) =>
-                  setNombre(e.target.value)
-                }
-                required
-                className="px-4 py-2 border rounded"
-              />
+            <form onSubmit={handleSubmit}>
+              <div className="pc-form-grid">
 
-              {/* MARCA */}
+                <input
+                  type="text"
+                  placeholder="Nombre del producto"
+                  className="pc-input"
+                  value={nombre}
+                  onChange={(e) =>
+                    setNombre(e.target.value)
+                  }
+                  required
+                />
 
-              <input
-                type="text"
-                placeholder="Marca"
-                value={marca}
-                onChange={(e) =>
-                  setMarca(e.target.value)
-                }
-                className="px-4 py-2 border rounded"
-              />
+                <input
+                  type="text"
+                  placeholder="Marca"
+                  className="pc-input"
+                  value={marca}
+                  onChange={(e) =>
+                    setMarca(e.target.value)
+                  }
+                />
 
-              {/* MODELO */}
+                <input
+                  type="text"
+                  placeholder="Modelo"
+                  className="pc-input"
+                  value={modelo}
+                  onChange={(e) =>
+                    setModelo(e.target.value)
+                  }
+                />
 
-              <input
-                type="text"
-                placeholder="Modelo"
-                value={modelo}
-                onChange={(e) =>
-                  setModelo(e.target.value)
-                }
-                className="px-4 py-2 border rounded"
-              />
-
-              {/* CATEGORIA */}
-
-              <select
-                value={categoriaId}
-                onChange={(e) =>
-                  setCategoriaId(e.target.value)
-                }
-                required
-                className="px-4 py-2 border rounded"
-              >
-
-                <option value="">
-                  Selecciona una categoría
-                </option>
-
-                {categorias.map((categoria) => (
-
-                  <option
-                    key={categoria.id}
-                    value={categoria.id}
-                  >
-                    {categoria.nombre}
+                <select
+                  className="pc-select"
+                  value={categoriaId}
+                  onChange={(e) =>
+                    setCategoriaId(e.target.value)
+                  }
+                  required
+                >
+                  <option value="">
+                    Selecciona una categoría
                   </option>
 
-                ))}
+                  {categorias.map((categoria) => (
+                    <option
+                      key={categoria.id}
+                      value={categoria.id}
+                    >
+                      {categoria.nombre}
+                    </option>
+                  ))}
+                </select>
 
-              </select>
+                <input
+                  type="number"
+                  placeholder="Precio (Lps)"
+                  step="0.01"
+                  min="0"
+                  className="pc-input"
+                  value={precio}
+                  onChange={(e) =>
+                    setPrecio(e.target.value)
+                  }
+                  required
+                />
 
-              {/* PRECIO */}
+                <input
+                  type="number"
+                  placeholder="Stock"
+                  min="0"
+                  className="pc-input"
+                  value={stock}
+                  onChange={(e) =>
+                    setStock(e.target.value)
+                  }
+                  required
+                />
 
-              <input
-                type="number"
-                placeholder="Precio (USD)"
-                step="0.01"
-                min="0"
-                value={precio}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="pc-input"
+                  onChange={(e) =>
+                    setImagen(e.target.files[0])
+                  }
+                />
+              </div>
+
+              <textarea
+                placeholder="Descripción del producto"
+                className="pc-textarea"
+                rows={4}
+                style={{
+                  marginTop: 14,
+                  width: '100%',
+                }}
+                value={descripcion}
                 onChange={(e) =>
-                  setPrecio(e.target.value)
+                  setDescripcion(e.target.value)
                 }
                 required
-                className="px-4 py-2 border rounded"
               />
 
-              {/* STOCK */}
-
-              <input
-                type="number"
-                placeholder="Stock"
-                min="0"
-                value={stock}
-                onChange={(e) =>
-                  setStock(e.target.value)
-                }
-                required
-                className="px-4 py-2 border rounded"
-              />
-
-              {/* IMAGEN */}
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setImagen(e.target.files[0])
-                }
-                className="px-4 py-2 border rounded"
-              />
-
-            </div>
-
-            {/* DESCRIPCIÓN */}
-
-            <textarea
-              placeholder="Descripción del producto"
-              value={descripcion}
-              onChange={(e) =>
-                setDescripcion(e.target.value)
-              }
-              required
-              rows={4}
-              className="w-full px-4 py-2 border rounded"
-            />
-
-            {/* BOTONES */}
-
-            <div className="flex gap-2">
-
-              <button
-                type="submit"
-                disabled={cargando}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 10,
+                  marginTop: 16,
+                }}
               >
-                {cargando
-                  ? 'Guardando...'
-                  : 'Guardar'}
-              </button>
+                <button
+                  type="submit"
+                  disabled={cargando}
+                  className="pc-btn pc-btn-primary"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <Save size={17} />
+                  {cargando ? 'Guardando...' : 'Guardar'}
+                </button>
 
-              <button
-                type="button"
-                onClick={resetFormulario}
-                className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500"
-              >
-                Cancelar
-              </button>
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-light"
+                  onClick={resetFormulario}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <X size={17} />
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-            </div>
-
-          </form>
-
-        </div>
-      )}
-
-      {/* ==============================
-          TABLA DE PRODUCTOS
-      ============================== */}
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-
-        <div className="overflow-x-auto">
-
-          <table className="w-full min-w-[700px]">
-
-            <thead className="bg-gray-100 border-b">
-
+        <div className="pc-card pc-table-wrapper">
+          <table className="pc-table">
+            <thead>
               <tr>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Nombre
-                </th>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Categoría
-                </th>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Marca
-                </th>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Precio
-                </th>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Stock
-                </th>
-
-                <th className="px-6 py-3 text-left text-sm font-bold whitespace-nowrap">
-                  Acciones
-                </th>
-
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Marca</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
               </tr>
-
             </thead>
 
             <tbody>
-
               {productos.map((producto) => (
+                <tr key={producto.id}>
+                  <td>{producto.nombre}</td>
 
-                <tr
-                  key={producto.id}
-                  className="border-b hover:bg-gray-50"
-                >
-
-                  <td className="px-6 py-4">
-                    {producto.nombre}
+                  <td>
+                    {producto.categorias?.nombre ||
+                      'Sin categoría'}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {producto.categorias?.nombre || 'Sin categoría'}
+                  <td>{producto.marca}</td>
+
+                  <td>
+                    L {Number(producto.precio).toFixed(2)}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {producto.marca}
-                  </td>
+                  <td>{producto.stock}</td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    ${Number(producto.precio).toFixed(2)}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    {producto.stock}
-                  </td>
-
-                  <td className="px-6 py-4 space-x-2 whitespace-nowrap">
-
+                  <td>
                     <button
+                      className="pc-btn pc-btn-light"
                       onClick={() =>
                         handleEditar(producto)
                       }
-                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
                     >
+                      <Pencil size={16} />
                       Editar
                     </button>
 
+                    {' '}
+
                     <button
+                      className="pc-btn pc-btn-danger"
                       onClick={() =>
                         handleEliminar(producto.id)
                       }
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
                     >
+                      <Trash2 size={16} />
                       Eliminar
                     </button>
-
                   </td>
-
                 </tr>
-
               ))}
-
             </tbody>
-
           </table>
-
         </div>
 
       </div>
-
-    </div>
+    </main>
   )
 }

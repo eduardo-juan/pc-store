@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { User, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Registro() {
@@ -7,8 +8,10 @@ export default function Registro() {
   const [password, setPassword] = useState('')
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
+  const [mostrarPassword, setMostrarPassword] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
+
   const { registro } = useAuth()
   const navigate = useNavigate()
 
@@ -17,90 +20,379 @@ export default function Registro() {
     setError('')
     setCargando(true)
 
-    const resultado = await registro(email, password, nombre, apellido)
+    try {
+      const resultado = await registro(
+        email.trim(),
+        password,
+        nombre.trim(),
+        apellido.trim()
+      )
 
-    if (resultado.success) {
-      alert('¡Registro exitoso! Verifica tu email para confirmar.')
-      navigate('/login')
-    } else {
-      setError(resultado.error)
+      if (resultado.success) {
+        alert(
+          '¡Registro exitoso! Verifica tu email para confirmar tu cuenta.'
+        )
+
+        navigate('/login')
+      } else {
+        setError(
+          resultado.error ||
+            'No se pudo crear la cuenta.'
+        )
+      }
+    } catch (err) {
+      setError(
+        err.message ||
+          'Ocurrió un error al crear la cuenta.'
+      )
+    } finally {
+      setCargando(false)
     }
-
-    setCargando(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">
-          Crear Cuenta
-        </h2>
+    <main className="pc-page">
+      <div className="pc-container">
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        <div
+          className="pc-admin-header"
+          style={{
+            textAlign: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <h1>PC Store</h1>
+          <p>
+            Crea tu cuenta para comenzar a comprar.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nombre */}
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div
+          className="pc-card"
+          style={{
+            maxWidth: 560,
+            margin: '0 auto',
+            padding: 28,
+          }}
+        >
 
-          {/* Apellido */}
-          <input
-            type="text"
-            placeholder="Apellido"
-            value={apellido}
-            onChange={(e) => setApellido(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          {/* Email */}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          {/* Password */}
-          <input
-            type="password"
-            placeholder="Contraseña (mín. 6 caracteres)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          {/* Botón */}
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 font-bold"
+          <div
+            style={{
+              textAlign: 'center',
+              marginBottom: 24,
+            }}
           >
-            {cargando ? 'Registrando...' : 'Crear Cuenta'}
-          </button>
-        </form>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                margin: '0 auto 16px',
+                borderRadius: 16,
+                background: '#eef4ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <User
+                size={30}
+                strokeWidth={1.8}
+              />
+            </div>
 
-        <p className="mt-4 text-center text-gray-600">
-          ¿Ya tienes cuenta?{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
-            Inicia sesión
-          </a>
-        </p>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 24,
+                fontWeight: 700,
+              }}
+            >
+              Crear cuenta
+            </h2>
+
+            <p
+              style={{
+                marginTop: 8,
+                color: '#64748b',
+              }}
+            >
+              Completa tus datos para registrarte.
+            </p>
+          </div>
+
+          {error && (
+            <div
+              className="pc-card"
+              style={{
+                padding: 14,
+                marginBottom: 20,
+                border: '1px solid #fecaca',
+                background: '#fef2f2',
+                color: '#b91c1c',
+              }}
+            >
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 18,
+            }}
+          >
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns:
+                  'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: 16,
+              }}
+            >
+
+              <div>
+                <label
+                  htmlFor="registro-nombre"
+                  style={{
+                    display: 'block',
+                    marginBottom: 7,
+                    fontWeight: 600,
+                  }}
+                >
+                  Nombre
+                </label>
+
+                <input
+                  id="registro-nombre"
+                  className="pc-input"
+                  type="text"
+                  placeholder="Nombre"
+                  value={nombre}
+                  onChange={(e) =>
+                    setNombre(e.target.value)
+                  }
+                  required
+                  autoComplete="given-name"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="registro-apellido"
+                  style={{
+                    display: 'block',
+                    marginBottom: 7,
+                    fontWeight: 600,
+                  }}
+                >
+                  Apellido
+                </label>
+
+                <input
+                  id="registro-apellido"
+                  className="pc-input"
+                  type="text"
+                  placeholder="Apellido"
+                  value={apellido}
+                  onChange={(e) =>
+                    setApellido(e.target.value)
+                  }
+                  required
+                  autoComplete="family-name"
+                />
+              </div>
+
+            </div>
+
+            <div>
+              <label
+                htmlFor="registro-email"
+                style={{
+                  display: 'block',
+                  marginBottom: 7,
+                  fontWeight: 600,
+                }}
+              >
+                Correo electrónico
+              </label>
+
+              <input
+                id="registro-email"
+                className="pc-input"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                required
+                autoComplete="email"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="registro-password"
+                style={{
+                  display: 'block',
+                  marginBottom: 7,
+                  fontWeight: 600,
+                }}
+              >
+                Contraseña
+              </label>
+
+              <div
+                style={{
+                  position: 'relative',
+                }}
+              >
+                <input
+                  id="registro-password"
+                  className="pc-input"
+                  type={
+                    mostrarPassword
+                      ? 'text'
+                      : 'password'
+                  }
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  style={{
+                    paddingRight: 50,
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMostrarPassword(
+                      !mostrarPassword
+                    )
+                  }
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform:
+                      'translateY(-50%)',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 6,
+                  }}
+                  title={
+                    mostrarPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
+                  aria-label={
+                    mostrarPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
+                >
+                  {mostrarPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+
+              <small
+                style={{
+                  display: 'block',
+                  marginTop: 7,
+                  color: '#64748b',
+                }}
+              >
+                La contraseña debe tener al menos 6
+                caracteres.
+              </small>
+            </div>
+
+            <button
+              className="pc-btn pc-btn-primary"
+              type="submit"
+              disabled={cargando}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontWeight: 700,
+              }}
+            >
+              {cargando
+                ? 'Creando cuenta...'
+                : 'Crear cuenta'}
+            </button>
+
+          </form>
+
+          <div
+            style={{
+              marginTop: 24,
+              paddingTop: 20,
+              borderTop: '1px solid #e5e7eb',
+              textAlign: 'center',
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                color: '#64748b',
+              }}
+            >
+              ¿Ya tienes una cuenta?
+            </p>
+
+            <Link
+              to="/login"
+              className="pc-btn pc-btn-light"
+              style={{
+                display: 'inline-block',
+                marginTop: 10,
+                textDecoration: 'none',
+              }}
+            >
+              Iniciar sesión
+            </Link>
+          </div>
+
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 18,
+            }}
+          >
+            <button
+              type="button"
+              className="pc-btn pc-btn-light"
+              onClick={() => navigate('/')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <ArrowLeft size={17} />
+              Volver al inicio
+            </button>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </main>
   )
 }
