@@ -6,8 +6,12 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
+import BotonAtras from '../../components/BotonAtras'
 
 export default function GestionCategorias() {
+  const { esAdmin } = useAuth()
+
   const [categorias, setCategorias] = useState([])
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -19,6 +23,8 @@ export default function GestionCategorias() {
   }, [])
 
   const cargarCategorias = async () => {
+    setError('')
+
     const { data, error } = await supabase
       .from('categorias')
       .select('*')
@@ -36,9 +42,17 @@ export default function GestionCategorias() {
     e.preventDefault()
     setError('')
 
+    const nombreLimpio = nombre.trim()
+    const descripcionLimpia = descripcion.trim()
+
+    if (!nombreLimpio) {
+      setError('Debes ingresar un nombre para la categoría.')
+      return
+    }
+
     const datos = {
-      nombre: nombre.trim(),
-      descripción: descripcion.trim(),
+      nombre: nombreLimpio,
+      descripción: descripcionLimpia,
     }
 
     let resultado
@@ -67,14 +81,26 @@ export default function GestionCategorias() {
     setEditandoId(categoria.id)
     setNombre(categoria.nombre || '')
     setDescripcion(categoria.descripción || '')
+    setError('')
   }
 
   const eliminarCategoria = async (id) => {
+    if (!esAdmin) {
+      setError(
+        'No tienes permiso para eliminar categorías.'
+      )
+      return
+    }
+
     const confirmar = window.confirm(
       '¿Deseas eliminar esta categoría?'
     )
 
-    if (!confirmar) return
+    if (!confirmar) {
+      return
+    }
+
+    setError('')
 
     const { error } = await supabase
       .from('categorias')
@@ -98,9 +124,11 @@ export default function GestionCategorias() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+        <BotonAtras />
 
         <div className="pc-admin-header">
           <h1>Gestión de Categorías</h1>
+
           <p>
             Crea y organiza las categorías del catálogo.
           </p>
@@ -117,6 +145,7 @@ export default function GestionCategorias() {
             className="pc-form-grid"
             onSubmit={guardarCategoria}
           >
+
             <input
               className="pc-input"
               placeholder="Nombre de categoría"
@@ -142,6 +171,7 @@ export default function GestionCategorias() {
                 gap: 10,
               }}
             >
+
               <button
                 className="pc-btn pc-btn-primary"
                 type="submit"
@@ -152,6 +182,7 @@ export default function GestionCategorias() {
                 }}
               >
                 <Plus size={17} />
+
                 {editandoId
                   ? 'Actualizar'
                   : 'Crear categoría'}
@@ -172,7 +203,9 @@ export default function GestionCategorias() {
                   Cancelar
                 </button>
               )}
+
             </div>
+
           </form>
         </div>
 
@@ -182,6 +215,7 @@ export default function GestionCategorias() {
             style={{
               padding: 16,
               marginBottom: 20,
+              color: '#dc2626',
             }}
           >
             {error}
@@ -189,7 +223,9 @@ export default function GestionCategorias() {
         )}
 
         <div className="pc-card pc-table-wrapper">
+
           <table className="pc-table">
+
             <thead>
               <tr>
                 <th>ID</th>
@@ -200,13 +236,24 @@ export default function GestionCategorias() {
             </thead>
 
             <tbody>
+
               {categorias.map((categoria) => (
                 <tr key={categoria.id}>
-                  <td>{categoria.id}</td>
-                  <td>{categoria.nombre}</td>
-                  <td>{categoria.descripción}</td>
 
                   <td>
+                    {categoria.id}
+                  </td>
+
+                  <td>
+                    {categoria.nombre}
+                  </td>
+
+                  <td>
+                    {categoria.descripción}
+                  </td>
+
+                  <td>
+
                     <button
                       className="pc-btn pc-btn-light"
                       onClick={() =>
@@ -222,27 +269,46 @@ export default function GestionCategorias() {
                       Editar
                     </button>
 
-                    {' '}
+                    {esAdmin && (
+                      <>
+                        {' '}
 
-                    <button
-                      className="pc-btn pc-btn-danger"
-                      onClick={() =>
-                        eliminarCategoria(categoria.id)
-                      }
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <Trash2 size={16} />
-                      Eliminar
-                    </button>
+                        <button
+                          className="pc-btn pc-btn-danger"
+                          onClick={() =>
+                            eliminarCategoria(
+                              categoria.id
+                            )
+                          }
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <Trash2 size={16} />
+                          Eliminar
+                        </button>
+                      </>
+                    )}
+
                   </td>
+
                 </tr>
               ))}
+
+              {categorias.length === 0 && (
+                <tr>
+                  <td colSpan="4">
+                    No existen categorías.
+                  </td>
+                </tr>
+              )}
+
             </tbody>
+
           </table>
+
         </div>
 
       </div>

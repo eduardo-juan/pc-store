@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Package } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import BotonAtras from '../components/BotonAtras'
+
+const ORDENES_POR_PAGINA = 10
 
 export default function MisOrdenes() {
   const { usuario } = useAuth()
@@ -10,11 +13,10 @@ export default function MisOrdenes() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [cancelandoId, setCancelandoId] = useState(null)
+  const [filtro, setFiltro] = useState('todas')
+  const [pagina, setPagina] = useState(1)
 
-  const ESTADOS_CANCELABLES = [
-    'pendiente',
-    'pagada',
-  ]
+  const ESTADOS_CANCELABLES = ['pendiente']
 
   useEffect(() => {
     if (usuario) {
@@ -24,31 +26,100 @@ export default function MisOrdenes() {
     }
   }, [usuario])
 
+  useEffect(() => {
+    setPagina(1)
+  }, [filtro])
+
   const cargarOrdenes = async () => {
     if (!usuario) return
 
     setCargando(true)
     setError('')
 
-    const { data, error } = await supabase
-      .from('ordenes')
-      .select('*')
-      .eq('usuario_id', usuario.id)
-      .order('created_at', {
-        ascending: false,
-      })
+    try {
+      const { data: ordenesData, error: ordenesError } =
+        await supabase
+          .from('ordenes')
+          .select('*')
+          .eq('usuario_id', usuario.id)
+          .order('created_at', {
+            ascending: false,
+          })
 
-    if (error) {
-      setError(error.message)
+      if (ordenesError) {
+        throw ordenesError
+      }
+
+      const listaOrdenes = ordenesData || []
+
+      const empleadosIds = [
+        ...new Set(
+          listaOrdenes
+            .map((orden) => orden.empleado_id)
+            .filter(Boolean)
+        ),
+      ]
+
+      let empleados = []
+
+      if (empleadosIds.length > 0) {
+        const {
+          data: empleadosData,
+          error: empleadosError,
+        } = await supabase
+          .from('usuarios')
+          .select('id, nombre, apellido, teléfono')
+          .in('id', empleadosIds)
+
+        if (empleadosError) {
+          console.warn(
+            '[MIS ORDENES] No se pudieron cargar los empleados:',
+            empleadosError
+          )
+        } else {
+          empleados = empleadosData || []
+        }
+      }
+
+      const empleadosMap = new Map(
+        empleados.map((empleado) => [
+          empleado.id,
+          empleado,
+        ])
+      )
+
+      const ordenesConEmpleado = listaOrdenes.map((orden) => ({
+        ...orden,
+        empleado: orden.empleado_id
+          ? empleadosMap.get(orden.empleado_id) || null
+          : null,
+      }))
+
+      setOrdenes(ordenesConEmpleado)
+    } catch (err) {
+      console.error('[MIS ORDENES] Error:', err)
+
+      setError(
+        err?.message ||
+          'No se pudieron cargar tus órdenes.'
+      )
+
+      setOrdenes([])
+    } finally {
       setCargando(false)
-      return
     }
-
-    setOrdenes(data || [])
-    setCargando(false)
   }
 
   const cancelarOrden = async (ordenId) => {
+    const orden = ordenes.find(
+      (item) => item.id === ordenId
+    )
+
+    if (!orden || orden.estado !== 'pendiente') {
+      setError('Esta orden ya no puede ser cancelada.')
+      return
+    }
+
     const confirmar = window.confirm(
       '¿Seguro que deseas cancelar esta orden? Esta acción no se puede deshacer y el stock será restaurado.'
     )
@@ -58,22 +129,69 @@ export default function MisOrdenes() {
     setCancelandoId(ordenId)
     setError('')
 
-    const { error } = await supabase.rpc(
-      'cancelar_orden_pc_store',
-      {
-        p_orden_id: ordenId,
-      }
-    )
+    const { error: cancelacionError } =
+      await supabase.rpc(
+        'cancelar_orden_pc_store',
+        {
+          p_orden_id: ordenId,
+        }
+      )
 
     setCancelandoId(null)
 
-    if (error) {
-      setError(error.message)
+    if (cancelacionError) {
+      setError(cancelacionError.message)
       return
     }
 
     await cargarOrdenes()
   }
+
+  const ordenesFiltradas = ordenes.filter((orden) => {
+    if (filtro === 'todas') {
+      return true
+    }
+
+    if (filtro === 'activas') {
+      return ['pendiente', 'enviada'].includes(
+        orden.estado
+      )
+    }
+
+    if (filtro === 'completadas') {
+      return ['pagada', 'entregada'].includes(
+        orden.estado
+      )
+    }
+
+    if (filtro === 'canceladas') {
+      return orden.estado === 'cancelada'
+    }
+
+    return true
+  })
+
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(
+      ordenesFiltradas.length /
+        ORDENES_POR_PAGINA
+    )
+  )
+
+  const paginaActual = Math.min(
+    pagina,
+    totalPaginas
+  )
+
+  const inicio =
+    (paginaActual - 1) *
+    ORDENES_POR_PAGINA
+
+  const ordenesPagina = ordenesFiltradas.slice(
+    inicio,
+    inicio + ORDENES_POR_PAGINA
+  )
 
   if (cargando) {
     return (
@@ -89,15 +207,15 @@ export default function MisOrdenes() {
     <main className="pc-page">
       <div className="pc-container">
 
+        <BotonAtras />
+
         <div className="pc-page-heading">
           <div>
             <span className="pc-kicker">
               Mi cuenta
             </span>
 
-            <h1>
-              Mis órdenes
-            </h1>
+            <h1>Mis órdenes</h1>
 
             <p>
               Consulta tus compras, datos de entrega,
@@ -112,17 +230,84 @@ export default function MisOrdenes() {
           </div>
         )}
 
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            marginBottom: '20px',
+          }}
+        >
+          <button
+            type="button"
+            className={
+              filtro === 'todas'
+                ? 'pc-btn pc-btn-primary'
+                : 'pc-btn pc-btn-light'
+            }
+            onClick={() => setFiltro('todas')}
+          >
+            Todas
+          </button>
+
+          <button
+            type="button"
+            className={
+              filtro === 'activas'
+                ? 'pc-btn pc-btn-primary'
+                : 'pc-btn pc-btn-light'
+            }
+            onClick={() => setFiltro('activas')}
+          >
+            Activas
+          </button>
+
+          <button
+            type="button"
+            className={
+              filtro === 'completadas'
+                ? 'pc-btn pc-btn-primary'
+                : 'pc-btn pc-btn-light'
+            }
+            onClick={() => setFiltro('completadas')}
+          >
+            Completadas
+          </button>
+
+          <button
+            type="button"
+            className={
+              filtro === 'canceladas'
+                ? 'pc-btn pc-btn-primary'
+                : 'pc-btn pc-btn-light'
+            }
+            onClick={() => setFiltro('canceladas')}
+          >
+            Canceladas
+          </button>
+        </div>
+
         <div className="pc-order-list">
 
-          {ordenes.map((orden) => {
-            const subtotal =
-              Number(orden.subtotal || 0)
+          {ordenesPagina.map((orden) => {
+            const subtotal = Number(
+              orden.subtotal || 0
+            )
 
-            const envio =
-              Number(orden.envío || 0)
+            const envio = Number(
+              orden.envío || 0
+            )
 
-            const total =
-              Number(orden.total || 0)
+            const total = Number(
+              orden.total || 0
+            )
+
+            const puedeCancelar =
+              ESTADOS_CANCELABLES.includes(
+                orden.estado
+              )
+
+            const empleado = orden.empleado
 
             return (
               <article
@@ -181,6 +366,37 @@ export default function MisOrdenes() {
                   <strong>
                     Datos de entrega
                   </strong>
+
+                  {empleado ? (
+                    <>
+                      <span
+                        style={{
+                          marginTop: '3px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Empleado encargado:{' '}
+                        {empleado.nombre || ''}{' '}
+                        {empleado.apellido || ''}
+                      </span>
+
+                      {empleado.teléfono && (
+                        <span>
+                          Teléfono del empleado:{' '}
+                          {empleado.teléfono}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span
+                      style={{
+                        color: '#777',
+                      }}
+                    >
+                      Empleado encargado: Pendiente de
+                      asignación
+                    </span>
+                  )}
 
                   <span>
                     Receptor:{' '}
@@ -260,9 +476,7 @@ export default function MisOrdenes() {
                       color: '#555',
                     }}
                   >
-                    <span>
-                      Subtotal
-                    </span>
+                    <span>Subtotal</span>
 
                     <strong>
                       L {subtotal.toFixed(2)}
@@ -278,9 +492,7 @@ export default function MisOrdenes() {
                       color: '#555',
                     }}
                   >
-                    <span>
-                      Envío
-                    </span>
+                    <span>Envío</span>
 
                     <strong>
                       L {envio.toFixed(2)}
@@ -299,9 +511,7 @@ export default function MisOrdenes() {
                       fontSize: '17px',
                     }}
                   >
-                    <strong>
-                      Total
-                    </strong>
+                    <strong>Total</strong>
 
                     <strong>
                       L {total.toFixed(2)}
@@ -309,9 +519,7 @@ export default function MisOrdenes() {
                   </div>
                 </div>
 
-                {ESTADOS_CANCELABLES.includes(
-                  orden.estado
-                ) && (
+                {puedeCancelar && (
                   <div
                     style={{
                       marginTop: 16,
@@ -321,17 +529,13 @@ export default function MisOrdenes() {
                       type="button"
                       className="pc-btn pc-btn-danger"
                       disabled={
-                        cancelandoId ===
-                        orden.id
+                        cancelandoId === orden.id
                       }
                       onClick={() =>
-                        cancelarOrden(
-                          orden.id
-                        )
+                        cancelarOrden(orden.id)
                       }
                     >
-                      {cancelandoId ===
-                      orden.id
+                      {cancelandoId === orden.id
                         ? 'Cancelando...'
                         : 'Cancelar orden'}
                     </button>
@@ -342,9 +546,8 @@ export default function MisOrdenes() {
             )
           })}
 
-          {ordenes.length === 0 && (
+          {ordenesFiltradas.length === 0 && (
             <div className="pc-empty">
-
               <div className="pc-empty-icon">
                 <Package
                   size={48}
@@ -353,13 +556,68 @@ export default function MisOrdenes() {
               </div>
 
               <h2>
-                Todavía no tienes órdenes
+                {filtro === 'todas'
+                  ? 'Todavía no tienes órdenes'
+                  : 'No hay órdenes en esta categoría'}
               </h2>
-
             </div>
           )}
 
         </div>
+
+        {ordenesFiltradas.length > 0 &&
+          totalPaginas > 1 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '12px',
+                marginTop: '28px',
+              }}
+            >
+              <button
+                type="button"
+                className="pc-btn pc-btn-light"
+                disabled={paginaActual === 1}
+                onClick={() =>
+                  setPagina((valor) =>
+                    Math.max(1, valor - 1)
+                  )
+                }
+              >
+                Anterior
+              </button>
+
+              <span
+                style={{
+                  fontWeight: 600,
+                }}
+              >
+                Página {paginaActual} de{' '}
+                {totalPaginas}
+              </span>
+
+              <button
+                type="button"
+                className="pc-btn pc-btn-light"
+                disabled={
+                  paginaActual === totalPaginas
+                }
+                onClick={() =>
+                  setPagina((valor) =>
+                    Math.min(
+                      totalPaginas,
+                      valor + 1
+                    )
+                  )
+                }
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+
       </div>
     </main>
   )

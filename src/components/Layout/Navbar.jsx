@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCarrito } from '../../context/CarritoContext'
 
 export default function Navbar() {
-  const { usuario, esAdmin } = useAuth()
+  const { usuario, esStaff } = useAuth()
   const { cantidadTotal } = useCarrito()
 
   const avatarUrl = usuario?.avatar_url
@@ -33,7 +33,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          {esAdmin && (
+          {esStaff && (
             <Link to="/admin">
               Administración
             </Link>

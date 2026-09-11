@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import BotonAtras from '../../components/BotonAtras'
 import {
   ShoppingCart,
   RotateCcw,
@@ -31,10 +32,7 @@ export default function GestionInventario() {
         .order('nombre')
 
     if (productosError) {
-      console.error(
-        'Error cargando productos:',
-        productosError
-      )
+      console.error('Error cargando productos:', productosError)
 
       alert(
         `Error al cargar los productos: ${productosError.message}`
@@ -178,6 +176,7 @@ export default function GestionInventario() {
     return (
       <main className="pc-page">
         <div className="pc-container">
+          <BotonAtras />
           Cargando...
         </div>
       </main>
@@ -187,6 +186,7 @@ export default function GestionInventario() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+        <BotonAtras />
 
         <div className="pc-admin-header">
           <h1>Gestión de Inventario</h1>
@@ -203,7 +203,6 @@ export default function GestionInventario() {
             alignItems: 'start',
           }}
         >
-
           <div
             className="pc-card"
             style={{ padding: 22 }}
@@ -448,7 +447,6 @@ export default function GestionInventario() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </main>

@@ -1,6 +1,15 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { User, Eye, EyeOff, ArrowLeft } from 'lucide-react'
+import {
+  Link,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom'
+import {
+  User,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+} from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Registro() {
@@ -14,9 +23,14 @@ export default function Registro() {
 
   const { registro } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Página que el usuario quería visitar antes de registrarse
+  const paginaOrigen = location.state?.from || '/tienda'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     setError('')
     setCargando(true)
 
@@ -33,7 +47,13 @@ export default function Registro() {
           '¡Registro exitoso! Verifica tu email para confirmar tu cuenta.'
         )
 
-        navigate('/login')
+        // Mantener la página de origen al pasar al login
+        navigate('/login', {
+          replace: true,
+          state: {
+            from: paginaOrigen,
+          },
+        })
       } else {
         setError(
           resultado.error ||
@@ -54,6 +74,8 @@ export default function Registro() {
     <main className="pc-page">
       <div className="pc-container">
 
+        {/* ENCABEZADO */}
+
         <div
           className="pc-admin-header"
           style={{
@@ -62,10 +84,13 @@ export default function Registro() {
           }}
         >
           <h1>PC Store</h1>
+
           <p>
             Crea tu cuenta para comenzar a comprar.
           </p>
         </div>
+
+        {/* TARJETA */}
 
         <div
           className="pc-card"
@@ -75,6 +100,8 @@ export default function Registro() {
             padding: 28,
           }}
         >
+
+          {/* ICONO Y TÍTULO */}
 
           <div
             style={{
@@ -88,7 +115,7 @@ export default function Registro() {
                 height: 64,
                 margin: '0 auto 16px',
                 borderRadius: 16,
-                background: '#eef4ff',
+                background: '#f4f4f4',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -120,6 +147,8 @@ export default function Registro() {
             </p>
           </div>
 
+          {/* ERROR */}
+
           {error && (
             <div
               className="pc-card"
@@ -135,6 +164,8 @@ export default function Registro() {
             </div>
           )}
 
+          {/* FORMULARIO */}
+
           <form
             onSubmit={handleSubmit}
             style={{
@@ -143,6 +174,8 @@ export default function Registro() {
               gap: 18,
             }}
           >
+
+            {/* NOMBRE Y APELLIDO */}
 
             <div
               style={{
@@ -207,6 +240,8 @@ export default function Registro() {
 
             </div>
 
+            {/* EMAIL */}
+
             <div>
               <label
                 htmlFor="registro-email"
@@ -232,6 +267,8 @@ export default function Registro() {
                 autoComplete="email"
               />
             </div>
+
+            {/* CONTRASEÑA */}
 
             <div>
               <label
@@ -323,6 +360,8 @@ export default function Registro() {
               </small>
             </div>
 
+            {/* BOTÓN */}
+
             <button
               className="pc-btn pc-btn-primary"
               type="submit"
@@ -339,6 +378,8 @@ export default function Registro() {
             </button>
 
           </form>
+
+          {/* LOGIN */}
 
           <div
             style={{
@@ -359,6 +400,7 @@ export default function Registro() {
 
             <Link
               to="/login"
+              state={{ from: paginaOrigen }}
               className="pc-btn pc-btn-light"
               style={{
                 display: 'inline-block',
@@ -369,6 +411,8 @@ export default function Registro() {
               Iniciar sesión
             </Link>
           </div>
+
+          {/* VOLVER */}
 
           <div
             style={{

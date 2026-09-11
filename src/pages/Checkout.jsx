@@ -1,34 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
 import { useAuth } from '../hooks/useAuth'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, UserRound } from 'lucide-react'
+import BotonAtras from '../components/BotonAtras'
 
 const COSTO_ENVIO = 100
 
 const formatearTelefono = (valor = '') => {
-  const numeros = String(valor)
-    .replace(/\D/g, '')
-    .slice(0, 8)
+  const numeros = String(valor).replace(/\D/g, '').slice(0, 8)
 
-  if (numeros.length <= 4) {
-    return numeros
-  }
-
-  return `${numeros.slice(0, 4)}-${numeros.slice(4)}`
+  return numeros.length <= 4
+    ? numeros
+    : `${numeros.slice(0, 4)}-${numeros.slice(4)}`
 }
 
 export default function Checkout() {
   const navigate = useNavigate()
-
   const { usuario } = useAuth()
-
-  const {
-    items,
-    subtotal,
-    vaciarCarrito,
-  } = useCarrito()
+  const { items, subtotal, vaciarCarrito } = useCarrito()
 
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -37,85 +28,92 @@ export default function Checkout() {
   const [ciudad, setCiudad] = useState('')
   const [referencia, setReferencia] = useState('')
   const [notas, setNotas] = useState('')
+  const [metodoPago, setMetodoPago] = useState('transferencia')
 
-  const [metodoPago, setMetodoPago] =
-    useState('transferencia')
-
+  const [empleados, setEmpleados] = useState([])
+  const [empleadoId, setEmpleadoId] = useState('')
+  const [cargandoEmpleados, setCargandoEmpleados] = useState(true)
   const [procesando, setProcesando] = useState(false)
   const [error, setError] = useState('')
 
-  const subtotalNumerico =
-    Number(subtotal) || 0
+  const subtotalNumerico = Number(subtotal) || 0
+  const total = subtotalNumerico + COSTO_ENVIO
 
-  const total =
-    subtotalNumerico + COSTO_ENVIO
+  useEffect(() => {
+    cargarEmpleados()
+  }, [])
+
+  const cargarEmpleados = async () => {
+    setCargandoEmpleados(true)
+    setError('')
+
+    const { data, error: empleadosError } = await supabase.rpc(
+      'obtener_empleados_disponibles'
+    )
+
+    if (empleadosError) {
+      console.error('Error cargando empleados:', empleadosError)
+      setError('No se pudieron cargar los empleados disponibles.')
+      setEmpleados([])
+    } else {
+      setEmpleados(data || [])
+    }
+
+    setCargandoEmpleados(false)
+  }
 
   const finalizarCompra = async (e) => {
     e.preventDefault()
+    setError('')
 
     if (!usuario) {
-      setError(
-        'Debes iniciar sesión para continuar.'
-      )
+      setError('Debes iniciar sesión para continuar.')
       return
     }
 
     if (items.length === 0) {
-      setError(
-        'Tu carrito está vacío.'
-      )
+      setError('Tu carrito está vacío.')
+      return
+    }
+
+    if (!empleadoId) {
+      setError('Selecciona el empleado que realizará la entrega.')
       return
     }
 
     if (!nombre.trim()) {
-      setError(
-        'Ingresa el nombre de la persona que recibirá el pedido.'
-      )
+      setError('Ingresa el nombre de la persona que recibirá el pedido.')
       return
     }
 
     if (!apellido.trim()) {
-      setError(
-        'Ingresa el apellido de la persona que recibirá el pedido.'
-      )
+      setError('Ingresa el apellido de la persona que recibirá el pedido.')
       return
     }
 
-    if (
-      !/^[0-9]{4}-[0-9]{4}$/.test(telefono)
-    ) {
-      setError(
-        'El teléfono debe tener el formato 9439-4343.'
-      )
+    if (!/^[0-9]{4}-[0-9]{4}$/.test(telefono)) {
+      setError('El teléfono debe tener el formato 9439-4343.')
       return
     }
 
     if (!direccion.trim()) {
-      setError(
-        'Ingresa la dirección de entrega.'
-      )
+      setError('Ingresa la dirección de entrega.')
       return
     }
 
     if (!ciudad.trim()) {
-      setError(
-        'Ingresa la ciudad de entrega.'
-      )
+      setError('Ingresa la ciudad de entrega.')
       return
     }
 
     setProcesando(true)
-    setError('')
 
     const itemsRpc = items.map((item) => ({
       producto_id: item.producto_id,
-      cantidad: item.cantidad,
+      cantidad: Number(item.cantidad),
     }))
 
-    const {
-      data,
-      error: rpcError,
-    } = await supabase.rpc(
+    const { data, error: rpcError } = await supabase.rpc(
       'crear_orden_pc_store',
       {
         p_items: itemsRpc,
@@ -127,48 +125,33 @@ export default function Checkout() {
         p_metodo_pago: metodoPago,
         p_notas: notas.trim() || null,
         p_referencia: referencia.trim() || null,
+        p_empleado_id: empleadoId,
       }
     )
 
     if (rpcError) {
-      console.error(
-        'Error creando orden:',
-        rpcError
-      )
-
-      setError(
-        rpcError.message ||
-        'No se pudo crear la orden.'
-      )
-
+      console.error('Error creando orden:', rpcError)
+      setError(rpcError.message || 'No se pudo crear la orden.')
       setProcesando(false)
       return
     }
 
     vaciarCarrito()
-
-    navigate(
-      `/orden-confirmada/${data}`
-    )
+    navigate(`/orden-confirmada/${data}`)
   }
 
   return (
     <main className="pc-page">
       <div className="pc-container">
 
+        <BotonAtras />
+
         <div className="pc-page-heading">
           <div>
-            <span className="pc-kicker">
-              Último paso
-            </span>
-
-            <h1>
-              Checkout
-            </h1>
-
+            <span className="pc-kicker">Último paso</span>
+            <h1>Checkout</h1>
             <p>
-              Completa los datos de entrega
-              para generar tu orden.
+              Completa los datos de entrega para generar tu orden.
             </p>
           </div>
         </div>
@@ -177,16 +160,13 @@ export default function Checkout() {
           className="pc-checkout-layout"
           onSubmit={finalizarCompra}
         >
-
           <section className="pc-card pc-checkout-form">
 
-            <h2>
-              Datos de entrega
-            </h2>
+            <h2>Datos de entrega</h2>
 
             <p className="pc-muted">
-              Estos datos corresponden a la persona
-              y dirección donde se entregará este pedido.
+              Estos datos corresponden a la persona y dirección donde se
+              entregará este pedido.
             </p>
 
             <div className="pc-form-grid">
@@ -198,9 +178,7 @@ export default function Checkout() {
                   className="pc-input"
                   type="text"
                   value={nombre}
-                  onChange={(e) =>
-                    setNombre(e.target.value)
-                  }
+                  onChange={(e) => setNombre(e.target.value)}
                   placeholder="Nombre"
                   required
                 />
@@ -213,9 +191,7 @@ export default function Checkout() {
                   className="pc-input"
                   type="text"
                   value={apellido}
-                  onChange={(e) =>
-                    setApellido(e.target.value)
-                  }
+                  onChange={(e) => setApellido(e.target.value)}
                   placeholder="Apellido"
                   required
                 />
@@ -232,11 +208,7 @@ export default function Checkout() {
                   placeholder="9439-4343"
                   value={telefono}
                   onChange={(e) =>
-                    setTelefono(
-                      formatearTelefono(
-                        e.target.value
-                      )
-                    )
+                    setTelefono(formatearTelefono(e.target.value))
                   }
                   required
                 />
@@ -249,9 +221,7 @@ export default function Checkout() {
                   className="pc-input"
                   type="text"
                   value={ciudad}
-                  onChange={(e) =>
-                    setCiudad(e.target.value)
-                  }
+                  onChange={(e) => setCiudad(e.target.value)}
                   placeholder="Ciudad"
                   required
                 />
@@ -266,9 +236,7 @@ export default function Checkout() {
                 className="pc-textarea"
                 rows="3"
                 value={direccion}
-                onChange={(e) =>
-                  setDireccion(e.target.value)
-                }
+                onChange={(e) => setDireccion(e.target.value)}
                 placeholder="Colonia, calle, casa, número, etc."
                 required
               />
@@ -281,9 +249,7 @@ export default function Checkout() {
                 className="pc-input"
                 type="text"
                 value={referencia}
-                onChange={(e) =>
-                  setReferencia(e.target.value)
-                }
+                onChange={(e) => setReferencia(e.target.value)}
                 placeholder="Ej. Casa con portón negro"
               />
             </label>
@@ -295,16 +261,70 @@ export default function Checkout() {
                 className="pc-textarea"
                 rows="3"
                 value={notas}
-                onChange={(e) =>
-                  setNotas(e.target.value)
-                }
+                onChange={(e) => setNotas(e.target.value)}
                 placeholder="Indicaciones adicionales para la entrega"
               />
             </label>
 
-            <h2>
-              Envío
-            </h2>
+            <h2>Empleado responsable</h2>
+
+            <div
+              className="pc-card"
+              style={{
+                padding: '16px',
+                marginBottom: '20px',
+              }}
+            >
+              <label>
+
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <UserRound size={18} />
+                  <strong>Selecciona el empleado</strong>
+                </span>
+
+                <select
+                  className="pc-select"
+                  value={empleadoId}
+                  onChange={(e) => setEmpleadoId(e.target.value)}
+                  disabled={cargandoEmpleados || procesando}
+                  required
+                >
+                  <option value="">
+                    {cargandoEmpleados
+                      ? 'Cargando empleados...'
+                      : 'Selecciona un empleado'}
+                  </option>
+
+                  {empleados.map((empleado) => (
+                    <option
+                      key={empleado.id}
+                      value={empleado.id}
+                    >
+                      {empleado.nombre} {empleado.apellido || ''}
+                    </option>
+                  ))}
+                </select>
+
+              </label>
+
+              {!cargandoEmpleados && empleados.length === 0 && (
+                <p
+                  className="pc-muted"
+                  style={{ margin: '10px 0 0' }}
+                >
+                  No hay empleados disponibles para realizar entregas.
+                </p>
+              )}
+            </div>
+
+            <h2>Envío</h2>
 
             <div
               className="pc-card"
@@ -322,15 +342,11 @@ export default function Checkout() {
                 }}
               >
                 <div>
-                  <strong>
-                    Envío a domicilio
-                  </strong>
+                  <strong>Envío a domicilio</strong>
 
                   <p
                     className="pc-muted"
-                    style={{
-                      margin: '4px 0 0',
-                    }}
+                    style={{ margin: '4px 0 0' }}
                   >
                     Costo fijo de envío
                   </p>
@@ -342,16 +358,12 @@ export default function Checkout() {
               </div>
             </div>
 
-            <h2>
-              Método de pago
-            </h2>
+            <h2>Método de pago</h2>
 
             <select
               className="pc-select"
               value={metodoPago}
-              onChange={(e) =>
-                setMetodoPago(e.target.value)
-              }
+              onChange={(e) => setMetodoPago(e.target.value)}
             >
               <option value="transferencia">
                 Transferencia bancaria
@@ -388,9 +400,7 @@ export default function Checkout() {
 
           <aside className="pc-card pc-summary">
 
-            <h2>
-              Tu compra
-            </h2>
+            <h2>Tu compra</h2>
 
             {items.map((item) => (
               <div
@@ -412,9 +422,7 @@ export default function Checkout() {
             ))}
 
             <div className="pc-summary-total">
-              <span>
-                Subtotal
-              </span>
+              <span>Subtotal</span>
 
               <strong>
                 L {subtotalNumerico.toFixed(2)}
@@ -424,15 +432,12 @@ export default function Checkout() {
             <div
               className="pc-summary-total"
               style={{
-                borderTop:
-                  '1px solid rgba(0,0,0,0.08)',
+                borderTop: '1px solid rgba(0,0,0,0.08)',
                 paddingTop: '12px',
                 marginTop: '8px',
               }}
             >
-              <span>
-                Envío
-              </span>
+              <span>Envío</span>
 
               <strong>
                 L {COSTO_ENVIO.toFixed(2)}
@@ -446,9 +451,7 @@ export default function Checkout() {
                 marginTop: '12px',
               }}
             >
-              <span>
-                Total
-              </span>
+              <span>Total</span>
 
               <strong>
                 L {total.toFixed(2)}
@@ -457,7 +460,11 @@ export default function Checkout() {
 
             <button
               type="submit"
-              disabled={procesando}
+              disabled={
+                procesando ||
+                cargandoEmpleados ||
+                empleados.length === 0
+              }
               className="pc-btn pc-btn-primary pc-btn-block"
               style={{
                 display: 'flex',
@@ -474,13 +481,13 @@ export default function Checkout() {
             </button>
 
             <small className="pc-muted">
-              El servidor volverá a validar
-              precios, stock y costo de envío.
+              El servidor volverá a validar precios, stock,
+              empleado y costo de envío.
             </small>
 
           </aside>
-
         </form>
+
       </div>
     </main>
   )

@@ -6,6 +6,7 @@ export const useAuth = () => {
   const auth = useAuthContext()
   const [perfil, setPerfil] = useState(null)
   const [esAdmin, setEsAdmin] = useState(false)
+  const [esEmpleado, setEsEmpleado] = useState(false)
 
   useEffect(() => {
     const cargarPerfil = async () => {
@@ -13,6 +14,7 @@ export const useAuth = () => {
       if (!auth.usuario) {
         setPerfil(null)
         setEsAdmin(false)
+        setEsEmpleado(false)
         return
       }
 
@@ -26,15 +28,19 @@ export const useAuth = () => {
         console.error('Error cargando perfil/rol:', error)
         setPerfil(null)
         setEsAdmin(false)
+        setEsEmpleado(false)
         return
       }
 
       setPerfil(data)
       setEsAdmin(data?.rol === 'admin')
+      setEsEmpleado(data?.rol === 'empleado')
     }
 
     cargarPerfil()
   }, [auth.usuario])
 
-  return { ...auth, perfil, esAdmin }
+  const esStaff = esAdmin || esEmpleado
+
+  return { ...auth, perfil, esAdmin, esEmpleado, esStaff }
 }

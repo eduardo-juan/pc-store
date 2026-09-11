@@ -5,63 +5,40 @@ import {
   BarChart3,
   Tags,
   FileText,
-  Users,
-  UserCog,
-  TrendingUp,
 } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
-export default function AdminDashboard() {
-  const { perfil } = useAuth()
+export default function EmpleadoDashboard() {
+  const { usuario, perfil } = useAuth()
 
   const [metricas, setMetricas] = useState({
-    productos: 0,
-    usuarios: 0,
     ordenes: 0,
     ventas: 0,
-    bajoStock: 0,
+    pendientes: 0,
+    pagadas: 0,
+    enviadas: 0,
+    entregadas: 0,
   })
 
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
+
   useEffect(() => {
-    cargarMetricas()
-  }, [])
+    if (usuario?.id) {
+      cargarMetricas()
+    }
+  }, [usuario?.id])
 
   const cargarMetricas = async () => {
-    const [
-      productosResult,
-      usuariosResult,
-      ordenesResult,
-      bajoStockResult,
-    ] = await Promise.all([
-      supabase
-        .from('productos')
-        .select('id', {
-          count: 'exact',
-          head: true,
-        }),
+    setCargando(true)
+    setError('')
 
-      supabase
-        .from('usuarios')
-        .select('id', {
-          count: 'exact',
-          head: true,
-        }),
-
-      supabase
-        .from('ordenes')
-        .select('id, total, estado, created_at'),
-
-      supabase
-        .from('productos')
-        .select('id', {
-          count: 'exact',
-          head: true,
-        })
-        .lte('stock', 3)
-        .eq('activo', true),
-    ])
+    if (!usuario?.id) {
+      setCargando(false)
+      return
+    }
 
     const hoy = new Date()
 
@@ -77,23 +54,37 @@ export default function AdminDashboard() {
       hoy.getDate() + 1
     )
 
-    const ordenes = ordenesResult.data || []
+    const { data, error } = await supabase
+      .from('ordenes')
+      .select(
+        'id, total, estado, empleado_id, created_at'
+      )
+      .eq('empleado_id', usuario.id)
+      .gte(
+        'created_at',
+        inicioHoy.toISOString()
+      )
+      .lt(
+        'created_at',
+        finHoy.toISOString()
+      )
+      .order('created_at', {
+        ascending: false,
+      })
+
+    if (error) {
+      setError(error.message)
+      setCargando(false)
+      return
+    }
+
+    const ordenes = data || []
 
     const ventasHoy = ordenes
-      .filter((orden) => {
-        const esPagada = orden.estado === 'pagada'
-
-        const fechaOrden = orden.created_at
-          ? new Date(orden.created_at)
-          : null
-
-        const esDeHoy =
-          fechaOrden &&
-          fechaOrden >= inicioHoy &&
-          fechaOrden < finHoy
-
-        return esPagada && esDeHoy
-      })
+      .filter(
+        (orden) =>
+          orden.estado === 'pagada'
+      )
       .reduce(
         (total, orden) =>
           total + Number(orden.total || 0),
@@ -101,12 +92,31 @@ export default function AdminDashboard() {
       )
 
     setMetricas({
-      productos: productosResult.count || 0,
-      usuarios: usuariosResult.count || 0,
       ordenes: ordenes.length,
       ventas: ventasHoy,
-      bajoStock: bajoStockResult.count || 0,
+
+      pendientes: ordenes.filter(
+        (orden) =>
+          orden.estado === 'pendiente'
+      ).length,
+
+      pagadas: ordenes.filter(
+        (orden) =>
+          orden.estado === 'pagada'
+      ).length,
+
+      enviadas: ordenes.filter(
+        (orden) =>
+          orden.estado === 'enviada'
+      ).length,
+
+      entregadas: ordenes.filter(
+        (orden) =>
+          orden.estado === 'entregada'
+      ).length,
     })
+
+    setCargando(false)
   }
 
   const opciones = [
@@ -130,22 +140,22 @@ export default function AdminDashboard() {
       titulo: 'Órdenes',
       ruta: '/admin/ordenes',
     },
-    {
-      icono: Users,
-      titulo: 'Usuarios',
-      ruta: '/admin/usuarios',
-    },
-    {
-      icono: UserCog,
-      titulo: 'Empleados',
-      ruta: '/admin/empleados',
-    },
-    {
-      icono: TrendingUp,
-      titulo: 'Historial de ventas',
-      ruta: '/admin/ventas',
-    },
   ]
+
+  if (cargando) {
+    return (
+      <main className="pc-page">
+        <div className="pc-container">
+          <BotonAtras />
+
+          <div className="pc-loading">
+            <div className="pc-loader" />
+            <p>Cargando información...</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="pc-page">
@@ -156,56 +166,39 @@ export default function AdminDashboard() {
           <div>
             <span
               className="pc-kicker"
-              style={{
-                color: '#171717',
-              }}
+              style={{ color: '#171717' }}
             >
-              Administración
+              Panel de empleado
             </span>
 
-            <h1
-              style={{
-                color: '#171717',
-              }}
-            >
+            <h1 style={{ color: '#171717' }}>
               Hola,{' '}
-              {perfil?.nombre || 'Administrador'}
+              {perfil?.nombre || 'Empleado'}
             </h1>
 
-            <p
-              style={{
-                color: '#171717',
-              }}
-            >
-              Resumen general de PC Store.
+            <p style={{ color: '#171717' }}>
+              Resumen de tu actividad de hoy.
             </p>
           </div>
         </div>
 
+        {error && (
+          <div
+            className="pc-card"
+            style={{
+              padding: 16,
+              marginBottom: 20,
+              color: '#dc2626',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
         <div className="pc-metrics-grid">
           <article className="pc-card pc-metric">
             <span style={{ color: '#171717' }}>
-              Productos
-            </span>
-
-            <strong style={{ color: '#171717' }}>
-              {metricas.productos}
-            </strong>
-          </article>
-
-          <article className="pc-card pc-metric">
-            <span style={{ color: '#171717' }}>
-              Usuarios
-            </span>
-
-            <strong style={{ color: '#171717' }}>
-              {metricas.usuarios}
-            </strong>
-          </article>
-
-          <article className="pc-card pc-metric">
-            <span style={{ color: '#171717' }}>
-              Órdenes
+              Órdenes gestionadas
             </span>
 
             <strong style={{ color: '#171717' }}>
@@ -225,20 +218,38 @@ export default function AdminDashboard() {
 
           <article className="pc-card pc-metric">
             <span style={{ color: '#171717' }}>
-              Stock bajo
+              Pendientes
             </span>
 
             <strong style={{ color: '#171717' }}>
-              {metricas.bajoStock}
+              {metricas.pendientes}
+            </strong>
+          </article>
+
+          <article className="pc-card pc-metric">
+            <span style={{ color: '#171717' }}>
+              Pagadas
+            </span>
+
+            <strong style={{ color: '#171717' }}>
+              {metricas.pagadas}
+            </strong>
+          </article>
+
+          <article className="pc-card pc-metric">
+            <span style={{ color: '#171717' }}>
+              Entregadas
+            </span>
+
+            <strong style={{ color: '#171717' }}>
+              {metricas.entregadas}
             </strong>
           </article>
         </div>
 
         <h2
           className="pc-section-title"
-          style={{
-            color: '#171717',
-          }}
+          style={{ color: '#171717' }}
         >
           Gestión
         </h2>
@@ -262,19 +273,11 @@ export default function AdminDashboard() {
                   />
                 </div>
 
-                <h3
-                  style={{
-                    color: '#171717',
-                  }}
-                >
+                <h3 style={{ color: '#171717' }}>
                   {titulo}
                 </h3>
 
-                <p
-                  style={{
-                    color: '#171717',
-                  }}
-                >
+                <p style={{ color: '#171717' }}>
                   Abrir módulo de{' '}
                   {titulo.toLowerCase()}.
                 </p>

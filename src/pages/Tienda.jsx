@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Monitor, ShoppingCart } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
+import BotonAtras from '../components/BotonAtras'
 
 export default function Tienda() {
   const [productos, setProductos] = useState([])
@@ -88,6 +89,8 @@ export default function Tienda() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+
+        <BotonAtras />
 
         <div className="pc-admin-header">
           <h1>Tienda</h1>
@@ -205,7 +208,6 @@ export default function Tienda() {
 
                 </div>
 
-                {/* Se mantiene en verde */}
                 <div className="pc-stock">
                   Stock disponible: {producto.stock}
                 </div>

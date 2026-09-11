@@ -27,16 +27,35 @@ import Carrito from './components/Productos/Carrito'
 import DetalleProducto from './components/Productos/DetalleProducto'
 
 import AdminDashboard from './components/Admin/AdminDashboard'
+import EmpleadoDashboard from './components/Admin/EmpleadoDashboard'
+
 import GestionProductos from './components/Admin/GestionProductos'
 import GestionInventario from './components/Admin/GestionInventario'
 import GestionCategorias from './components/Admin/GestionCategorias'
 import GestionOrdenes from './components/Admin/GestionOrdenes'
 import GestionUsuarios from './components/Admin/GestionUsuarios'
+import GestionEmpleados from './components/Admin/GestionEmpleados'
 import HistorialVentas from './components/Admin/HistorialVentas'
+
+import { useAuth } from './hooks/useAuth'
+
+
+function DashboardStaff() {
+  const { esAdmin, esEmpleado } = useAuth()
+
+  if (esAdmin) {
+    return <AdminDashboard />
+  }
+
+  if (esEmpleado) {
+    return <EmpleadoDashboard />
+  }
+
+  return null
+}
 
 
 export default function App() {
-
   return (
     <BrowserRouter>
 
@@ -48,30 +67,70 @@ export default function App() {
 
             <Navbar />
 
-
             <div className="pc-app-content">
 
               <Routes>
+
+                {/* =========================
+                    PÁGINA PRINCIPAL
+                    PÚBLICA
+                ========================= */}
 
                 <Route
                   path="/"
                   element={<Home />}
                 />
 
+
+                {/* =========================
+                    TIENDA
+                    REQUIERE LOGIN
+                ========================= */}
+
                 <Route
                   path="/tienda"
-                  element={<Tienda />}
+                  element={
+                    <ProtectedRoute>
+                      <Tienda />
+                    </ProtectedRoute>
+                  }
                 />
+
+
+                {/* =========================
+                    DETALLE DE PRODUCTO
+                    REQUIERE LOGIN
+                ========================= */}
 
                 <Route
                   path="/producto/:id"
-                  element={<DetalleProducto />}
+                  element={
+                    <ProtectedRoute>
+                      <DetalleProducto />
+                    </ProtectedRoute>
+                  }
                 />
+
+
+                {/* =========================
+                    CARRITO
+                    REQUIERE LOGIN
+                ========================= */}
 
                 <Route
                   path="/carrito"
-                  element={<Carrito />}
+                  element={
+                    <ProtectedRoute>
+                      <Carrito />
+                    </ProtectedRoute>
+                  }
                 />
+
+
+                {/* =========================
+                    AUTENTICACIÓN
+                    PÚBLICA
+                ========================= */}
 
                 <Route
                   path="/login"
@@ -83,6 +142,11 @@ export default function App() {
                   element={<Registro />}
                 />
 
+
+                {/* =========================
+                    PÁGINAS DE CLIENTE
+                    REQUIEREN LOGIN
+                ========================= */}
 
                 <Route
                   path="/checkout"
@@ -121,19 +185,30 @@ export default function App() {
                 />
 
 
+                {/* =========================
+                    DASHBOARD STAFF
+                    ADMIN + EMPLEADO
+                ========================= */}
+
                 <Route
                   path="/admin"
                   element={
-                    <ProtectedRoute requiereAdmin>
-                      <AdminDashboard />
+                    <ProtectedRoute requiereStaff>
+                      <DashboardStaff />
                     </ProtectedRoute>
                   }
                 />
 
+
+                {/* =========================
+                    MÓDULOS STAFF
+                    ADMIN + EMPLEADO
+                ========================= */}
+
                 <Route
                   path="/admin/productos"
                   element={
-                    <ProtectedRoute requiereAdmin>
+                    <ProtectedRoute requiereStaff>
                       <GestionProductos />
                     </ProtectedRoute>
                   }
@@ -142,7 +217,7 @@ export default function App() {
                 <Route
                   path="/admin/inventario"
                   element={
-                    <ProtectedRoute requiereAdmin>
+                    <ProtectedRoute requiereStaff>
                       <GestionInventario />
                     </ProtectedRoute>
                   }
@@ -151,7 +226,7 @@ export default function App() {
                 <Route
                   path="/admin/categorias"
                   element={
-                    <ProtectedRoute requiereAdmin>
+                    <ProtectedRoute requiereStaff>
                       <GestionCategorias />
                     </ProtectedRoute>
                   }
@@ -160,17 +235,31 @@ export default function App() {
                 <Route
                   path="/admin/ordenes"
                   element={
-                    <ProtectedRoute requiereAdmin>
+                    <ProtectedRoute requiereStaff>
                       <GestionOrdenes />
                     </ProtectedRoute>
                   }
                 />
+
+
+                {/* =========================
+                    MÓDULOS SOLO ADMIN
+                ========================= */}
 
                 <Route
                   path="/admin/usuarios"
                   element={
                     <ProtectedRoute requiereAdmin>
                       <GestionUsuarios />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/admin/empleados"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <GestionEmpleados />
                     </ProtectedRoute>
                   }
                 />
@@ -185,6 +274,10 @@ export default function App() {
                 />
 
 
+                {/* =========================
+                    404
+                ========================= */}
+
                 <Route
                   path="*"
                   element={<NotFound />}
@@ -193,7 +286,6 @@ export default function App() {
               </Routes>
 
             </div>
-
 
             <Footer />
 

@@ -1,13 +1,11 @@
 :root {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
   color: #171717;
-  background: #f3f3f3;
+  background: #080808;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-
-  /* ============================================================
-     PC STORE - PALETA DORADO / NEGRO / GRIS / BLANCO
-     ============================================================ */
 
   --pc-primary: #d4af37;
   --pc-primary-dark: #a67c00;
@@ -31,9 +29,9 @@
   --pc-shadow: 0 12px 35px rgba(0, 0, 0, 0.09);
 }
 
-/* ============================================================
+/* =========================
    RESET
-   ============================================================ */
+========================= */
 
 * {
   box-sizing: border-box;
@@ -41,14 +39,26 @@
 
 html {
   scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: #080808;
 }
 
 body {
   margin: 0;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--pc-bg);
+  background: #080808;
   color: var(--pc-text);
+}
+
+#root {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #080808;
 }
 
 button,
@@ -76,9 +86,9 @@ img {
   max-width: 100%;
 }
 
-/* ============================================================
+/* =========================
    CONTENEDOR / PÁGINA
-   ============================================================ */
+========================= */
 
 .pc-container {
   width: min(1180px, calc(100% - 32px));
@@ -88,11 +98,12 @@ img {
 .pc-page {
   min-height: calc(100vh - 72px);
   padding: 42px 0 64px;
+  background: var(--pc-bg);
 }
 
-/* ============================================================
+/* =========================
    CARDS
-   ============================================================ */
+========================= */
 
 .pc-card {
   background: var(--pc-card);
@@ -101,9 +112,9 @@ img {
   box-shadow: var(--pc-shadow);
 }
 
-/* ============================================================
+/* =========================
    BOTONES
-   ============================================================ */
+========================= */
 
 .pc-btn {
   border: 0;
@@ -112,15 +123,14 @@ img {
   min-width: 0;
   max-width: 100%;
   font-weight: 700;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
   text-align: center;
   white-space: normal;
   overflow: hidden;
+  overflow-wrap: anywhere;
 
   transition:
     transform 0.2s,
@@ -132,6 +142,10 @@ img {
 
 .pc-btn:hover {
   transform: translateY(-1px);
+}
+
+.pc-btn:disabled {
+  transform: none;
 }
 
 .pc-btn-primary {
@@ -168,9 +182,19 @@ img {
   color: #ffffff;
 }
 
-/* ============================================================
+.pc-btn-danger:hover {
+  background: #b91c1c;
+}
+
+.pc-btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* =========================
    NAVBAR
-   ============================================================ */
+========================= */
 
 .pc-navbar {
   position: sticky;
@@ -234,9 +258,9 @@ img {
   font-size: 0.9rem;
 }
 
-/* ============================================================
-   HERO
-   ============================================================ */
+/* =========================
+   HERO GENERAL
+========================= */
 
 .pc-hero {
   padding: 86px 0;
@@ -317,9 +341,9 @@ img {
   color: var(--pc-primary);
 }
 
-/* ============================================================
+/* =========================
    SECCIONES
-   ============================================================ */
+========================= */
 
 .pc-section {
   padding: 64px 0;
@@ -336,9 +360,9 @@ img {
   color: #171717;
 }
 
-/* ============================================================
+/* =========================
    FEATURES
-   ============================================================ */
+========================= */
 
 .pc-feature-grid {
   display: grid;
@@ -366,9 +390,9 @@ img {
   line-height: 1.6;
 }
 
-/* ============================================================
+/* =========================
    TOOLBAR / INPUTS
-   ============================================================ */
+========================= */
 
 .pc-toolbar {
   display: grid;
@@ -404,9 +428,9 @@ img {
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
 }
 
-/* ============================================================
+/* =========================
    PRODUCTOS
-   ============================================================ */
+========================= */
 
 .pc-product-grid {
   display: grid;
@@ -484,17 +508,15 @@ img {
   font-size: 0.88rem;
 }
 
-/* STOCK SIEMPRE VERDE */
-
 .pc-stock {
   color: var(--pc-success);
   font-weight: 700;
   font-size: 0.85rem;
 }
 
-/* ============================================================
-   ADMIN DASHBOARD
-   ============================================================ */
+/* =========================
+   ADMIN
+========================= */
 
 .pc-admin-header {
   margin-bottom: 28px;
@@ -566,9 +588,9 @@ img {
   color: var(--pc-primary-dark);
 }
 
-/* ============================================================
+/* =========================
    TABLAS
-   ============================================================ */
+========================= */
 
 .pc-table-wrapper {
   overflow-x: auto;
@@ -597,9 +619,9 @@ img {
   background: #faf8ef;
 }
 
-/* ============================================================
+/* =========================
    FORMULARIOS
-   ============================================================ */
+========================= */
 
 .pc-form-grid {
   display: grid;
@@ -611,23 +633,26 @@ img {
   color: #171717;
 }
 
-/* ============================================================
+/* =========================
    APP
-   ============================================================ */
+========================= */
 
 .pc-app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #080808;
 }
 
 .pc-app-content {
   flex: 1;
+  min-width: 0;
+  background: #080808;
 }
 
-/* ============================================================
+/* =========================
    ENCABEZADOS
-   ============================================================ */
+========================= */
 
 .pc-page-heading {
   display: flex;
@@ -660,15 +685,9 @@ img {
   color: #171717;
 }
 
-.pc-btn-block {
-  display: block;
-  width: 100%;
-  text-align: center;
-}
-
-/* ============================================================
+/* =========================
    ACCIONES PRODUCTO
-   ============================================================ */
+========================= */
 
 .pc-product-actions {
   display: grid;
@@ -681,8 +700,6 @@ img {
 
 .pc-product-actions .pc-btn {
   width: 100%;
-  min-width: 0;
-  max-width: 100%;
 }
 
 .pc-cart-button {
@@ -693,7 +710,6 @@ img {
   padding: 9px 12px;
   border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 12px;
-
   transition:
     background 0.2s,
     border-color 0.2s;
@@ -738,9 +754,9 @@ img {
   border-color: var(--pc-primary);
 }
 
-/* ============================================================
+/* =========================
    ESTADOS VACÍOS
-   ============================================================ */
+========================= */
 
 .pc-empty {
   min-height: 440px;
@@ -762,19 +778,19 @@ img {
   margin: 0;
 }
 
-.pc-empty p {
+.pc-empty p,
+.pc-empty-small {
   color: #171717;
 }
 
 .pc-empty-small {
   padding: 24px;
-  color: #171717;
   text-align: center;
 }
 
-/* ============================================================
+/* =========================
    CARRITO / CHECKOUT
-   ============================================================ */
+========================= */
 
 .pc-cart-layout,
 .pc-checkout-layout {
@@ -882,9 +898,9 @@ img {
   color: var(--pc-primary-dark);
 }
 
-/* ============================================================
-   DETALLE DEL PRODUCTO
-   ============================================================ */
+/* =========================
+   DETALLE PRODUCTO
+========================= */
 
 .pc-product-detail {
   display: grid;
@@ -915,13 +931,16 @@ img {
   color: #171717;
 }
 
-.pc-detail-brand {
+.pc-detail-brand,
+.pc-detail-description {
   color: #171717;
+}
+
+.pc-detail-brand {
   font-weight: 700;
 }
 
 .pc-detail-description {
-  color: #171717;
   line-height: 1.8;
 }
 
@@ -946,9 +965,9 @@ img {
   border: 1px solid #ead58a;
 }
 
-/* ============================================================
+/* =========================
    RESEÑAS
-   ============================================================ */
+========================= */
 
 .pc-review-form {
   display: grid;
@@ -966,19 +985,22 @@ img {
   padding: 20px;
 }
 
+.pc-review p,
+.pc-review span {
+  color: #171717;
+}
+
 .pc-review p {
   line-height: 1.6;
-  color: #171717;
 }
 
 .pc-review span {
-  color: #171717;
   font-size: 0.82rem;
 }
 
-/* ============================================================
+/* =========================
    CHECKOUT
-   ============================================================ */
+========================= */
 
 .pc-checkout-form {
   display: grid;
@@ -1005,9 +1027,9 @@ img {
   border: 1px solid #fecaca;
 }
 
-/* ============================================================
-   PÁGINA DE ÉXITO
-   ============================================================ */
+/* =========================
+   PÁGINA ÉXITO
+========================= */
 
 .pc-success-page {
   min-height: 520px;
@@ -1037,9 +1059,9 @@ img {
   font-weight: 900;
 }
 
-/* ============================================================
+/* =========================
    ÓRDENES
-   ============================================================ */
+========================= */
 
 .pc-order-list {
   display: grid;
@@ -1080,9 +1102,9 @@ img {
   color: #171717;
 }
 
-/* ============================================================
-   ESTADOS DE ORDEN
-   ============================================================ */
+/* =========================
+   ESTADOS ORDEN
+========================= */
 
 .pc-status {
   display: inline-flex;
@@ -1119,13 +1141,13 @@ img {
   color: #991b1b;
 }
 
-/* ============================================================
+/* =========================
    PERFIL
-   ============================================================ */
+========================= */
 
 .pc-profile-wrap {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -1133,6 +1155,8 @@ img {
 .pc-profile-card {
   padding: 28px;
   text-align: center;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .pc-avatar {
@@ -1141,29 +1165,181 @@ img {
   display: grid;
   place-items: center;
   margin: 0 auto 18px;
-
   background: linear-gradient(
     135deg,
     var(--pc-primary),
     var(--pc-primary-dark)
   );
-
   color: #0b0b0b;
   border-radius: 28px;
   font-size: 2.7rem;
   font-weight: 900;
   box-shadow: 0 12px 30px rgba(212, 175, 55, 0.2);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pc-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .pc-profile-form {
   display: grid;
   gap: 20px;
   padding: 28px;
+  min-width: 0;
 }
 
-/* ============================================================
+.pc-profile-photo-btn {
+  width: 100%;
+  max-width: 100%;
+}
+
+.pc-profile-account {
+  width: 100%;
+  padding: 16px 0;
+  border-top: 1px solid var(--pc-border);
+  border-bottom: 1px solid var(--pc-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.pc-profile-account span {
+  color: var(--pc-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pc-profile-account strong {
+  color: var(--pc-primary-dark);
+  font-size: 1rem;
+}
+
+.pc-profile-user {
+  width: 100%;
+  padding: 18px 0;
+  min-width: 0;
+}
+
+.pc-profile-user h2 {
+  margin: 0 0 7px;
+  color: #171717;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.pc-profile-user p {
+  margin: 0;
+  color: #6b6b6b;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.pc-profile-logout {
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--pc-border);
+}
+
+.pc-profile-logout .pc-btn {
+  width: 100%;
+}
+
+/* =========================
+   ESTADO EMPLEADO
+========================= */
+
+.pc-status-card {
+  width: 100%;
+  max-width: 360px;
+  min-width: 0;
+  margin-top: 8px;
+  padding: 18px;
+  border: 1px solid var(--pc-border);
+  border-radius: 14px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+  overflow: hidden;
+}
+
+.pc-status-info {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pc-status-title {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pc-status-title strong {
+  min-width: 0;
+  color: #171717;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.pc-status-title svg {
+  flex-shrink: 0;
+}
+
+.pc-status-icon-active {
+  color: var(--pc-success) !important;
+}
+
+.pc-status-icon-inactive {
+  color: var(--pc-danger) !important;
+}
+
+.pc-status-label {
+  display: block;
+  padding-left: 29px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pc-status-label.activo {
+  color: var(--pc-success) !important;
+}
+
+.pc-status-label.inactivo {
+  color: var(--pc-danger) !important;
+}
+
+.pc-status-button {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
    MÉTRICAS
-   ============================================================ */
+========================= */
 
 .pc-metrics-grid {
   display: grid;
@@ -1188,13 +1364,15 @@ img {
   color: var(--pc-primary-dark);
 }
 
-/* ============================================================
+/* =========================
    FOOTER
-   ============================================================ */
+========================= */
 
 .pc-footer {
-  margin-top: 60px;
-  background: var(--pc-dark);
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: 0;
+  background: #0b0b0b !important;
   color: #ffffff;
   border-top: 1px solid rgba(212, 175, 55, 0.25);
 }
@@ -1229,9 +1407,9 @@ img {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ============================================================
+/* =========================
    LOADING
-   ============================================================ */
+========================= */
 
 .pc-loading {
   min-height: 240px;
@@ -1257,26 +1435,21 @@ img {
   }
 }
 
-/* ============================================================
+/* =========================
    TOAST
-   ============================================================ */
+========================= */
 
 .pc-toast {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 100;
-
   padding: 14px 18px;
-
   background: var(--pc-dark);
   color: #ffffff;
-
   border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 14px;
-
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
-
   animation: pc-toast-in 0.2s ease;
 }
 
@@ -1292,9 +1465,9 @@ img {
   }
 }
 
-/* ============================================================
-   ERROR 404
-   ============================================================ */
+/* =========================
+   404
+========================= */
 
 .pc-404 {
   font-size: clamp(6rem, 18vw, 12rem);
@@ -1303,11 +1476,619 @@ img {
   color: var(--pc-gold-light);
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* =========================
+   BOTÓN ATRÁS
+========================= */
 
-@media (max-width: 1050px) {
+.pc-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   HOME PC STORE
+   DORADO / NEGRO / BLANCO / GRIS
+============================================================ */
+
+.pc-home {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #080808 !important;
+  color: #ffffff;
+
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.pc-home section {
+  margin: 0;
+  box-shadow: none !important;
+}
+
+.pc-home section:last-child {
+  border-bottom: 0 !important;
+}
+
+/* =========================
+   HOME HERO
+========================= */
+
+.pc-home-hero {
+  position: relative;
+  min-height: 560px;
+  margin: 0;
+  overflow: hidden;
+  background: #080808;
+}
+
+.pc-home-hero-image {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+}
+
+.pc-home-hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 8, 8, 0.98) 0%,
+      rgba(8, 8, 8, 0.92) 35%,
+      rgba(8, 8, 8, 0.58) 70%,
+      rgba(8, 8, 8, 0.82) 100%
+    );
+}
+
+.pc-home-hero-content {
+  position: relative;
+  z-index: 2;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+}
+
+.pc-home-hero-copy {
+  max-width: 650px;
+  padding: 60px 0;
+}
+
+.pc-home-eyebrow,
+.pc-home-section-label {
+  display: inline-block;
+  color: #d4af37;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.pc-home-eyebrow {
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.pc-home-hero h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.02;
+  letter-spacing: -2px;
+  font-weight: 800;
+}
+
+.pc-home-hero h1 span {
+  color: #d4af37;
+}
+
+.pc-home-hero p {
+  max-width: 560px;
+  margin: 24px 0;
+  color: #b8b8b8;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.pc-home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pc-home-main-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* =========================
+   HOME CATEGORÍAS
+========================= */
+
+.pc-home-categories {
+  margin: 0;
+  padding: 28px 0;
+  background: #101010;
+  border-top: 1px solid #252525;
+  border-bottom: 1px solid #252525;
+}
+
+.pc-home-category-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 14px;
+}
+
+.pc-home-category-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  background: #151515;
+  color: #ffffff;
+  text-decoration: none;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.pc-home-category-card:hover {
+  transform: translateY(-4px);
+  border-color: #d4af37;
+  background: #191919;
+}
+
+.pc-home-category-image {
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #d4af37;
+}
+
+.pc-home-category-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pc-home-category-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pc-home-category-info svg {
+  flex-shrink: 0;
+  color: #d4af37;
+}
+
+/* =========================
+   HOME PRODUCTOS
+========================= */
+
+.pc-home-products {
+  margin: 0;
+  background: #080808;
+}
+
+.pc-home-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 32px;
+}
+
+.pc-home-section-header .pc-section-title {
+  margin-top: 8px;
+  color: #ffffff;
+}
+
+.pc-home-section-header .pc-section-title span {
+  color: #d4af37;
+}
+
+.pc-home-section-header .pc-section-subtitle {
+  margin-bottom: 0;
+  color: #999999;
+}
+
+.pc-home-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid #d4af37;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.pc-home-outline-btn:hover {
+  background: #d4af37;
+  color: #080808;
+}
+
+.pc-home-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.pc-home-product-card {
+  overflow: hidden;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  background: #111111;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.pc-home-product-card:hover {
+  transform: translateY(-5px);
+  border-color: #d4af37;
+}
+
+.pc-home-product-image {
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(212, 175, 55, 0.09),
+      transparent 65%
+    );
+
+  color: #d4af37;
+}
+
+.pc-home-product-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.pc-home-product-card:hover .pc-home-product-image img {
+  transform: scale(1.05);
+}
+
+.pc-home-product-info {
+  padding: 18px;
+  background: #111111;
+  border-top: 1px solid #292929;
+}
+
+.pc-home-product-info span {
+  display: block;
+  margin-bottom: 7px;
+  color: #d4af37;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.pc-home-product-info h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* =========================
+   HOME BANNER
+========================= */
+
+.pc-home-banner-section {
+  margin: 0;
+  padding-top: 20px;
+  padding-bottom: 70px;
+  background: #080808;
+}
+
+.pc-home-banner {
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid #292929;
+  border-radius: 14px;
+  background: #111111;
+}
+
+.pc-home-banner-image {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.48;
+}
+
+.pc-home-banner-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 8, 8, 0.98) 0%,
+      rgba(8, 8, 8, 0.88) 45%,
+      rgba(8, 8, 8, 0.28) 100%
+    );
+}
+
+.pc-home-banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  padding: 48px;
+}
+
+.pc-home-banner h2 {
+  margin: 10px 0 14px;
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.08;
+}
+
+.pc-home-banner h2 span {
+  color: #d4af37;
+}
+
+.pc-home-banner p {
+  max-width: 500px;
+  margin-bottom: 24px;
+  color: #b8b8b8;
+  line-height: 1.6;
+}
+
+/* =========================
+   HOME BENEFICIOS
+========================= */
+
+.pc-home-benefits {
+  width: 100%;
+  margin: 0 !important;
+  padding: 42px 0;
+  background: #101010 !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.pc-home-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+.pc-home-benefit {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.pc-home-benefit svg {
+  flex-shrink: 0;
+  color: #d4af37;
+}
+
+.pc-home-benefit h3 {
+  margin: 0 0 5px;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.pc-home-benefit p {
+  margin: 0;
+  color: #929292;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pc-home-loading {
+  padding: 60px 20px;
+  color: #999999;
+  text-align: center;
+}
+
+/* =========================
+   HOME BOTONES
+========================= */
+
+.pc-home .pc-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #080808;
+}
+
+.pc-home .pc-btn-primary:hover {
+  background: #e2c45b;
+  border-color: #e2c45b;
+  color: #080808;
+}
+
+.pc-home .pc-btn-light {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #080808;
+}
+
+.pc-home .pc-btn-light:hover {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #080808;
+}
+
+/* =========================
+   ADMIN PANEL
+========================= */
+
+.pc-admin-layout {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  width: 100%;
+  background: var(--pc-bg);
+  color: #171717;
+}
+
+.pc-admin-content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  color: #171717;
+}
+
+.pc-admin-content,
+.pc-admin-content h1,
+.pc-admin-content h2,
+.pc-admin-content h3,
+.pc-admin-content h4,
+.pc-admin-content h5,
+.pc-admin-content h6,
+.pc-admin-content p,
+.pc-admin-content span,
+.pc-admin-content label,
+.pc-admin-content td,
+.pc-admin-content th,
+.pc-admin-content div {
+  color: #171717;
+}
+
+.pc-admin-content .pc-btn-primary {
+  background: var(--pc-primary);
+  color: #0b0b0b;
+}
+
+.pc-admin-content .pc-btn-primary:hover {
+  background: var(--pc-primary-dark);
+  color: #ffffff;
+}
+
+.pc-admin-content .pc-btn-danger {
+  background: var(--pc-danger);
+  color: #ffffff;
+}
+
+.pc-admin-content .pc-stock {
+  color: var(--pc-success);
+}
+
+.pc-admin-content .pc-status-pendiente,
+.pc-admin-content .pc-status-pagada {
+  color: #705500;
+}
+
+.pc-admin-content .pc-status-enviada {
+  color: #3f3f3f;
+}
+
+.pc-admin-content .pc-status-entregada {
+  color: #166534;
+}
+
+.pc-admin-content .pc-status-cancelada {
+  color: #991b1b;
+}
+
+.pc-admin-content svg {
+  color: var(--pc-primary-dark);
+}
+
+.pc-admin-content .pc-metric span,
+.pc-admin-content .pc-metric strong {
+  color: #171717 !important;
+}
+
+.pc-admin-content .pc-admin-header,
+.pc-admin-content .pc-admin-header h1,
+.pc-admin-content .pc-admin-header h2,
+.pc-admin-content .pc-admin-header h3,
+.pc-admin-content .pc-admin-header p,
+.pc-admin-content .pc-metric,
+.pc-admin-content .pc-metric span,
+.pc-admin-content .pc-metric strong {
+  color: #171717 !important;
+}
+
+/* ============================================================
+   SEGURIDAD CONTRA FRANJA BLANCA AL FINAL
+============================================================ */
+
+html,
+body,
+#root,
+.pc-app,
+.pc-app-content {
+  background-color: #080808;
+}
+
+.pc-home {
+  background-color: #080808 !important;
+}
+
+.pc-home::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 0;
+  background: #080808;
+}
+
+.pc-home + .pc-footer {
+  margin-top: 0 !important;
+}
+
+.pc-footer {
+  background-color: #0b0b0b !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
   .pc-metrics-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -1319,6 +2100,18 @@ img {
 
   .pc-summary {
     position: static;
+  }
+
+  .pc-home-category-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .pc-home-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pc-home-benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1353,6 +2146,63 @@ img {
     grid-column: 1 / -1;
     justify-content: space-between;
   }
+
+  .pc-profile-card {
+    padding: 24px;
+  }
+
+  .pc-status-card {
+    max-width: 100%;
+  }
+
+  .pc-admin-content {
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .pc-home-hero,
+  .pc-home-hero-content {
+    min-height: 600px;
+  }
+
+  .pc-home-hero-copy {
+    padding: 40px 0;
+  }
+
+  .pc-home-hero h1 {
+    font-size: 42px;
+    letter-spacing: -1px;
+  }
+
+  .pc-home-hero p {
+    font-size: 15px;
+  }
+
+  .pc-home-category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pc-home-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pc-home-product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-home-banner-content {
+    padding: 30px 24px;
+  }
+
+  .pc-home-benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-home-product-image {
+    height: 250px;
+  }
 }
 
 @media (max-width: 680px) {
@@ -1376,6 +2226,11 @@ img {
 
   .pc-user-email {
     display: none;
+  }
+
+  .pc-profile-card,
+  .pc-profile-form {
+    padding: 22px 18px;
   }
 }
 
@@ -1412,6 +2267,10 @@ img {
   .pc-cart-item {
     gap: 12px;
   }
+
+  .pc-admin-content {
+    padding: 20px 12px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1440,98 +2299,29 @@ img {
     left: 12px;
     bottom: 12px;
   }
-}
-/* ============================================================
-   ADMIN PANEL
-   ============================================================ */
 
-.pc-admin-layout {
-  min-height: calc(100vh - 72px);
-  display: flex;
-  width: 100%;
-  background: var(--pc-bg);
-  color: #171717;
-}
+  .pc-profile-card,
+  .pc-profile-form {
+    padding: 20px 16px;
+  }
 
-.pc-admin-content {
-  flex: 1;
-  min-width: 0;
-  padding: 32px;
-  color: #171717;
-}
+  .pc-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 2.4rem;
+  }
 
-/* Todo el contenido del panel administrativo en negro */
+  .pc-status-card {
+    padding: 15px;
+    gap: 14px;
+  }
 
-.pc-admin-content,
-.pc-admin-content h1,
-.pc-admin-content h2,
-.pc-admin-content h3,
-.pc-admin-content h4,
-.pc-admin-content h5,
-.pc-admin-content h6,
-.pc-admin-content p,
-.pc-admin-content span,
-.pc-admin-content label,
-.pc-admin-content td,
-.pc-admin-content th,
-.pc-admin-content div {
-  color: #171717;
-}
+  .pc-status-button {
+    font-size: 0.88rem;
+  }
 
-/* Mantener botones con sus colores */
-
-.pc-admin-content .pc-btn-primary {
-  background: var(--pc-primary);
-  color: #0b0b0b;
-}
-
-.pc-admin-content .pc-btn-primary:hover {
-  background: var(--pc-primary-dark);
-  color: #ffffff;
-}
-
-.pc-admin-content .pc-btn-danger {
-  background: var(--pc-danger);
-  color: #ffffff;
-}
-
-/* Mantener estados */
-
-.pc-admin-content .pc-stock {
-  color: var(--pc-success);
-}
-
-.pc-admin-content .pc-status-pendiente {
-  color: #705500;
-}
-
-.pc-admin-content .pc-status-pagada {
-  color: #705500;
-}
-
-.pc-admin-content .pc-status-enviada {
-  color: #3f3f3f;
-}
-
-.pc-admin-content .pc-status-entregada {
-  color: #166534;
-}
-
-.pc-admin-content .pc-status-cancelada {
-  color: #991b1b;
-}
-
-/* Iconos del administrador */
-
-.pc-admin-content svg {
-  color: var(--pc-primary-dark);
-}
-
-/* Responsive */
-
-@media (max-width: 820px) {
-  .pc-admin-content {
-    padding: 24px 18px;
+  .pc-profile-logout {
+    padding-top: 18px;
   }
 }
 
@@ -1540,18 +2330,401 @@ img {
     padding: 20px 12px;
   }
 }
-.pc-admin-content .pc-metric span,
-.pc-admin-content .pc-metric strong {
-  color: #171717 !important;
+/* =========================================
+   PANTALLA DE ACCESO PC STORE
+========================================= */
+
+.pc-access-page {
+  position: relative;
+  min-height: calc(100vh - 80px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(212, 175, 55, 0.12),
+      transparent 38%
+    ),
+    #080808;
 }
-/* ADMIN PANEL - TODO EL RESUMEN EN NEGRO */
-.pc-admin-content .pc-admin-header,
-.pc-admin-content .pc-admin-header h1,
-.pc-admin-content .pc-admin-header h2,
-.pc-admin-content .pc-admin-header h3,
-.pc-admin-content .pc-admin-header p,
-.pc-admin-content .pc-metric,
-.pc-admin-content .pc-metric span,
-.pc-admin-content .pc-metric strong {
-  color: #171717 !important;
+
+.pc-access-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================
+   DECORACIÓN
+========================================= */
+
+.pc-access-glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.055);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.pc-access-glow-one {
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pc-access-glow-two {
+  bottom: -300px;
+  right: -150px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* =========================================
+   MARCA
+========================================= */
+
+.pc-access-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.pc-access-brand-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #d4af37;
+  color: #080808;
+}
+
+/* =========================================
+   TARJETA
+========================================= */
+
+.pc-access-card {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 48px 42px 38px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.075),
+      rgba(255, 255, 255, 0.025)
+    );
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+/* Línea dorada superior */
+
+.pc-access-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #d4af37,
+    transparent
+  );
+}
+
+/* =========================================
+   ICONO
+========================================= */
+
+.pc-access-icon-wrapper {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 28px;
+}
+
+.pc-access-icon {
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: linear-gradient(
+    145deg,
+    #d4af37,
+    #a88418
+  );
+  color: #080808;
+  box-shadow:
+    0 12px 35px rgba(212, 175, 55, 0.20);
+}
+
+.pc-access-sparkle {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 29px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #080808;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #111111;
+}
+
+/* =========================================
+   CONTENIDO
+========================================= */
+
+.pc-access-content {
+  margin-bottom: 30px;
+}
+
+.pc-access-label {
+  display: inline-block;
+  margin-bottom: 13px;
+  color: #d4af37;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.pc-access-content h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(30px, 6vw, 42px);
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.pc-access-content h1 span {
+  color: #d4af37;
+}
+
+.pc-access-content p {
+  max-width: 420px;
+  margin: 18px auto 0;
+  color: #a8a8a8;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   BOTONES
+========================================= */
+
+.pc-access-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pc-access-primary,
+.pc-access-secondary {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.pc-access-primary {
+  border: 1px solid #d4af37;
+  background: #d4af37;
+  color: #080808;
+}
+
+.pc-access-primary:hover {
+  transform: translateY(-2px);
+  background: #e0bd4b;
+  box-shadow:
+    0 10px 28px rgba(212, 175, 55, 0.20);
+}
+
+.pc-access-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.pc-access-secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+/* =========================================
+   BENEFICIOS
+========================================= */
+
+.pc-access-benefits {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pc-access-benefits div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #858585;
+  font-size: 12px;
+}
+
+.pc-access-benefits svg {
+  color: #d4af37;
+}
+
+/* =========================================
+   VOLVER
+========================================= */
+
+.pc-access-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 9px 14px;
+  border: 0;
+  background: transparent;
+  color: #888888;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.pc-access-back:hover {
+  color: #ffffff;
+  transform: translateX(-3px);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+  .pc-access-page {
+    min-height: calc(100vh - 70px);
+    padding: 40px 15px;
+  }
+
+  .pc-access-card {
+    padding: 38px 22px 30px;
+    border-radius: 20px;
+  }
+
+  .pc-access-icon-wrapper,
+  .pc-access-icon {
+    width: 76px;
+    height: 76px;
+  }
+
+  .pc-access-icon {
+    border-radius: 20px;
+  }
+
+  .pc-access-content h1 {
+    font-size: 30px;
+  }
+
+  .pc-access-content p {
+    font-size: 14px;
+  }
+
+  .pc-access-benefits {
+    gap: 5px;
+  }
+
+  .pc-access-benefits div {
+    font-size: 11px;
+  }
+}
+.pc-footer-support {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 9px 14px;
+  border: 1px solid var(--pc-primary);
+  border-radius: 8px;
+  background: var(--pc-primary);
+  color: #111111;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.18);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pc-footer-support svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: #111111;
+}
+
+.pc-footer-support:hover {
+  background: var(--pc-primary-dark);
+  border-color: var(--pc-primary-dark);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(212, 175, 55, 0.28);
+}
+
+.pc-footer-support:hover svg {
+  color: #ffffff;
+}
+
+.pc-footer-support:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(212, 175, 55, 0.2);
 }

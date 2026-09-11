@@ -6,6 +6,7 @@ import {
   ShoppingBag,
 } from 'lucide-react'
 import { useCarrito } from '../../context/CarritoContext'
+import BotonAtras from '../../components/BotonAtras'
 
 export default function Carrito() {
   const {
@@ -20,6 +21,8 @@ export default function Carrito() {
     return (
       <main className="pc-page">
         <div className="pc-container">
+
+          <BotonAtras />
 
           <div className="pc-empty">
 
@@ -57,6 +60,8 @@ export default function Carrito() {
     <main className="pc-page">
       <div className="pc-container">
 
+        <BotonAtras />
+
         <div className="pc-page-heading">
 
           <div>
@@ -72,6 +77,7 @@ export default function Carrito() {
           </div>
 
           <button
+            type="button"
             className="pc-btn pc-btn-light"
             onClick={vaciarCarrito}
             style={{
@@ -148,6 +154,7 @@ export default function Carrito() {
                   </strong>
 
                   <button
+                    type="button"
                     className="pc-link-danger"
                     onClick={() =>
                       eliminarProducto(item.producto_id)

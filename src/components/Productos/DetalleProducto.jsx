@@ -3,13 +3,11 @@ import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
 import { useCarrito } from '../../context/CarritoContext'
 import { useAuth } from '../../hooks/useAuth'
+import BotonAtras from '../../components/BotonAtras'
 
 export default function DetalleProducto() {
-
   const { id } = useParams()
-
   const { usuario } = useAuth()
-
   const { agregarProducto } = useCarrito()
 
   const [producto, setProducto] = useState(null)
@@ -20,14 +18,11 @@ export default function DetalleProducto() {
   const [cargando, setCargando] = useState(true)
   const [mensaje, setMensaje] = useState('')
 
-
   useEffect(() => {
     cargarProducto()
   }, [id])
 
-
   const cargarProducto = async () => {
-
     setCargando(true)
 
     const { data, error } = await supabase
@@ -36,13 +31,11 @@ export default function DetalleProducto() {
       .eq('id', id)
       .single()
 
-
     if (error) {
       setMensaje(error.message)
       setCargando(false)
       return
     }
-
 
     const { data: resenasData } = await supabase
       .from('reseñas')
@@ -52,26 +45,32 @@ export default function DetalleProducto() {
         ascending: false,
       })
 
-
     setProducto(data)
     setResenas(resenasData || [])
     setCargando(false)
   }
 
-
   const agregar = () => {
+    const cantidadNumerica = Number(cantidad)
+
+    if (
+      !Number.isInteger(cantidadNumerica) ||
+      cantidadNumerica < 1 ||
+      cantidadNumerica > producto.stock
+    ) {
+      setMensaje('Selecciona una cantidad válida.')
+      return
+    }
 
     const resultado = agregarProducto(
       producto,
-      Number(cantidad)
+      cantidadNumerica
     )
 
     setMensaje(resultado.message)
   }
 
-
   const guardarResena = async (e) => {
-
     e.preventDefault()
 
     if (!usuario) {
@@ -81,6 +80,10 @@ export default function DetalleProducto() {
       return
     }
 
+    if (!comentario.trim()) {
+      setMensaje('Escribe un comentario antes de publicar.')
+      return
+    }
 
     const { error } = await supabase
       .from('reseñas')
@@ -93,19 +96,16 @@ export default function DetalleProducto() {
         },
       ])
 
-
     if (error) {
       setMensaje(error.message)
       return
     }
-
 
     setComentario('')
     setCalificacion(5)
     setMensaje('Reseña publicada.')
     await cargarProducto()
   }
-
 
   if (cargando) {
     return (
@@ -117,12 +117,14 @@ export default function DetalleProducto() {
     )
   }
 
-
   if (!producto) {
     return (
       <main className="pc-page">
         <div className="pc-container pc-empty">
+          <BotonAtras />
+
           <h1>Producto no encontrado</h1>
+
           <Link to="/tienda">
             Regresar
           </Link>
@@ -131,16 +133,15 @@ export default function DetalleProducto() {
     )
   }
 
-
   const precioActual = Number(
-    producto.precio_descuento ||
-    producto.precio
+    producto.precio_descuento || producto.precio
   )
-
 
   return (
     <main className="pc-page">
       <div className="pc-container">
+
+        <BotonAtras />
 
         <div className="pc-product-detail">
 
@@ -154,7 +155,6 @@ export default function DetalleProducto() {
               <span>🖥️</span>
             )}
           </div>
-
 
           <section>
 
@@ -175,7 +175,6 @@ export default function DetalleProducto() {
               {producto.descripción}
             </p>
 
-
             <div className="pc-price-row">
 
               <span className="pc-price pc-price-large">
@@ -190,13 +189,11 @@ export default function DetalleProducto() {
 
             </div>
 
-
             <p className="pc-stock">
               {producto.stock > 0
                 ? `${producto.stock} unidades disponibles`
                 : 'Producto agotado'}
             </p>
-
 
             <div className="pc-buy-row">
 
@@ -206,12 +203,14 @@ export default function DetalleProducto() {
                 max={producto.stock}
                 className="pc-input pc-qty"
                 value={cantidad}
-                onChange={(e) =>
-                  setCantidad(e.target.value)
-                }
+                onChange={(e) => {
+                  const valor = e.target.value
+                  setCantidad(valor === '' ? '' : Number(valor))
+                }}
               />
 
               <button
+                type="button"
                 className="pc-btn pc-btn-primary"
                 disabled={producto.stock <= 0}
                 onClick={agregar}
@@ -220,7 +219,6 @@ export default function DetalleProducto() {
               </button>
 
             </div>
-
 
             {mensaje && (
               <div className="pc-message">
@@ -232,13 +230,11 @@ export default function DetalleProducto() {
 
         </div>
 
-
         <section className="pc-section">
 
           <h2 className="pc-section-title">
             Reseñas
           </h2>
-
 
           {usuario ? (
             <form
@@ -250,7 +246,7 @@ export default function DetalleProducto() {
                 className="pc-select"
                 value={calificacion}
                 onChange={(e) =>
-                  setCalificacion(e.target.value)
+                  setCalificacion(Number(e.target.value))
                 }
               >
                 <option value="5">⭐⭐⭐⭐⭐ 5</option>
@@ -259,7 +255,6 @@ export default function DetalleProducto() {
                 <option value="2">⭐⭐ 2</option>
                 <option value="1">⭐ 1</option>
               </select>
-
 
               <textarea
                 className="pc-textarea"
@@ -272,8 +267,8 @@ export default function DetalleProducto() {
                 required
               />
 
-
               <button
+                type="submit"
                 className="pc-btn pc-btn-primary"
               >
                 Publicar reseña
@@ -290,11 +285,9 @@ export default function DetalleProducto() {
             </p>
           )}
 
-
           <div className="pc-review-list">
 
             {resenas.map((resena) => (
-
               <article
                 key={resena.id}
                 className="pc-card pc-review"
@@ -313,9 +306,7 @@ export default function DetalleProducto() {
                   ).toLocaleDateString()}
                 </span>
               </article>
-
             ))}
-
 
             {resenas.length === 0 && (
               <div className="pc-empty-small">

@@ -2,29 +2,19 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { LogOut, Camera, CircleCheck, CircleX } from 'lucide-react'
+import BotonAtras from '../components/BotonAtras'
 
-const formatearTelefono = (valor = '') => {
-  const numeros = String(valor)
-    .replace(/\D/g, '')
-    .slice(0, 8)
-
-  if (numeros.length <= 4) return numeros
-
-  return `${numeros.slice(0, 4)}-${numeros.slice(4)}`
+const formatearTelefono = (v = '') => {
+  const n = String(v).replace(/\D/g, '').slice(0, 8)
+  return n.length > 4 ? `${n.slice(0, 4)}-${n.slice(4)}` : n
 }
 
-const formatearDni = (valor = '') => {
-  const numeros = String(valor)
-    .replace(/\D/g, '')
-    .slice(0, 13)
-
-  if (numeros.length <= 4) return numeros
-
-  if (numeros.length <= 8) {
-    return `${numeros.slice(0, 4)}-${numeros.slice(4)}`
-  }
-
-  return `${numeros.slice(0, 4)}-${numeros.slice(4, 8)}-${numeros.slice(8)}`
+const formatearDni = (v = '') => {
+  const n = String(v).replace(/\D/g, '').slice(0, 13)
+  if (n.length <= 4) return n
+  if (n.length <= 8) return `${n.slice(0, 4)}-${n.slice(4)}`
+  return `${n.slice(0, 4)}-${n.slice(4, 8)}-${n.slice(8)}`
 }
 
 export default function Perfil() {
@@ -41,18 +31,20 @@ export default function Perfil() {
     país: 'Honduras',
   })
 
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [activo, setActivo] = useState(true)
   const [mensaje, setMensaje] = useState('')
   const [guardando, setGuardando] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState(null)
   const [subiendoFoto, setSubiendoFoto] = useState(false)
+  const [cambiandoEstado, setCambiandoEstado] = useState(false)
+
+  const esEmpleado = usuario?.rol === 'empleado'
 
   useEffect(() => {
-    cargarPerfil()
-  }, [usuario])
+    if (usuario?.id) cargarPerfil()
+  }, [usuario?.id])
 
   const cargarPerfil = async () => {
-    if (!usuario) return
-
     const { data, error } = await supabase
       .from('usuarios')
       .select('*')
@@ -64,42 +56,65 @@ export default function Perfil() {
       return
     }
 
-    if (data) {
-      setForm({
-        nombre: data.nombre || '',
-        apellido: data.apellido || '',
-        dni: formatearDni(data.dni || ''),
-        teléfono: formatearTelefono(data.teléfono || ''),
-        dirección: data.dirección || '',
-        ciudad: data.ciudad || '',
-        país: data.país || 'Honduras',
-      })
+    setForm({
+      nombre: data.nombre || '',
+      apellido: data.apellido || '',
+      dni: formatearDni(data.dni),
+      teléfono: formatearTelefono(data.teléfono),
+      dirección: data.dirección || '',
+      ciudad: data.ciudad || '',
+      país: data.país || 'Honduras',
+    })
 
-      setAvatarUrl(data.avatar_url || null)
-    }
+    setAvatarUrl(data.avatar_url || '')
+    setActivo(data.activo !== false)
   }
 
-  // ==============================
-  // SUBIR FOTO
-  // ==============================
+  const cambiar = (campo, valor) => {
+    setForm((prev) => ({ ...prev, [campo]: valor }))
+  }
+
+  const cambiarEstadoEmpleado = async () => {
+    if (!esEmpleado || cambiandoEstado) return
+
+    setCambiandoEstado(true)
+    setMensaje('')
+
+    const nuevoEstado = !activo
+
+    const { error } = await supabase
+      .from('usuarios')
+      .update({
+        activo: nuevoEstado,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', usuario.id)
+
+    if (error) {
+      setMensaje(error.message)
+    } else {
+      setActivo(nuevoEstado)
+      setMensaje(
+        nuevoEstado
+          ? 'Ahora estás activo y puedes recibir nuevas órdenes.'
+          : 'Ahora estás fuera de servicio y no recibirás nuevas órdenes.'
+      )
+    }
+
+    setCambiandoEstado(false)
+  }
 
   const subirFotoPerfil = async (e) => {
     const archivo = e.target.files?.[0]
-
     if (!archivo || !usuario) return
 
     if (!archivo.type.startsWith('image/')) {
       setMensaje('Solo puedes seleccionar una imagen.')
-      e.target.value = ''
       return
     }
 
-    const maximoMB = 5
-    const maximoBytes = maximoMB * 1024 * 1024
-
-    if (archivo.size > maximoBytes) {
-      setMensaje(`La imagen no puede superar los ${maximoMB} MB.`)
-      e.target.value = ''
+    if (archivo.size > 5 * 1024 * 1024) {
+      setMensaje('La imagen no puede superar los 5 MB.')
       return
     }
 
@@ -107,12 +122,10 @@ export default function Perfil() {
     setMensaje('')
 
     try {
-      const extension =
-        archivo.type.split('/')[1]?.toLowerCase() || 'jpg'
-
+      const extension = archivo.type.split('/')[1] || 'jpg'
       const ruta = `${usuario.id}/avatar-${Date.now()}.${extension}`
 
-      const { error: subidaError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatares')
         .upload(ruta, archivo, {
           cacheControl: '3600',
@@ -120,104 +133,47 @@ export default function Perfil() {
           contentType: archivo.type,
         })
 
-      if (subidaError) {
-        throw new Error(
-          `Error al subir la foto: ${subidaError.message}`
-        )
-      }
+      if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data } = supabase.storage
         .from('avatares')
         .getPublicUrl(ruta)
 
-      const nuevaUrl = urlData?.publicUrl
+      const url = data?.publicUrl
 
-      if (!nuevaUrl) {
-        throw new Error(
-          'No se pudo obtener la URL de la imagen.'
-        )
-      }
+      if (!url) throw new Error('No se pudo obtener la URL de la imagen.')
 
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('usuarios')
         .update({
-          avatar_url: nuevaUrl,
+          avatar_url: url,
           updated_at: new Date().toISOString(),
         })
         .eq('id', usuario.id)
 
-      if (updateError) {
-        throw new Error(
-          `La foto se subió, pero no se pudo guardar el perfil: ${updateError.message}`
-        )
-      }
+      if (error) throw error
 
-      setAvatarUrl(nuevaUrl)
+      setAvatarUrl(url)
       setMensaje('Foto de perfil actualizada correctamente.')
-
-      e.target.value = ''
     } catch (error) {
-      console.error('Error al cambiar foto:', error)
-
-      setMensaje(
-        error.message || 'No se pudo actualizar la foto.'
-      )
+      console.error(error)
+      setMensaje(error.message || 'No se pudo actualizar la foto.')
     } finally {
       setSubiendoFoto(false)
+      e.target.value = ''
     }
   }
-
-  // ==============================
-  // CERRAR SESIÓN
-  // ==============================
-
-  const cerrarSesion = async () => {
-    await logout()
-    navigate('/')
-  }
-
-  // ==============================
-  // CAMBIAR CAMPOS
-  // ==============================
-
-  const cambiar = (campo, valor) => {
-    setForm((actual) => ({
-      ...actual,
-      [campo]: valor,
-    }))
-  }
-
-  // ==============================
-  // GUARDAR PERFIL
-  // ==============================
 
   const guardar = async (e) => {
     e.preventDefault()
 
-    if (!usuario) {
-      setMensaje(
-        'Debes iniciar sesión para guardar tu perfil.'
-      )
+    if (form.teléfono && !/^[0-9]{4}-[0-9]{4}$/.test(form.teléfono)) {
+      setMensaje('El teléfono debe tener el formato 9439-4343.')
       return
     }
 
-    if (
-      form.teléfono &&
-      !/^[0-9]{4}-[0-9]{4}$/.test(form.teléfono)
-    ) {
-      setMensaje(
-        'El teléfono debe tener el formato 9439-4343.'
-      )
-      return
-    }
-
-    if (
-      form.dni &&
-      !/^[0-9]{4}-[0-9]{4}-[0-9]{5}$/.test(form.dni)
-    ) {
-      setMensaje(
-        'El DNI debe tener el formato ####-####-#####.'
-      )
+    if (form.dni && !/^[0-9]{4}-[0-9]{4}-[0-9]{5}$/.test(form.dni)) {
+      setMensaje('El DNI debe tener el formato ####-####-#####.')
       return
     }
 
@@ -233,16 +189,11 @@ export default function Perfil() {
       .eq('id', usuario.id)
 
     if (error) {
-      if (
-        error.code === '23505' ||
-        error.message?.toLowerCase().includes('dni')
-      ) {
-        setMensaje(
-          'Este DNI ya está registrado por otro usuario.'
-        )
-      } else {
-        setMensaje(error.message)
-      }
+      setMensaje(
+        error.code === '23505' || error.message?.toLowerCase().includes('dni')
+          ? 'Este DNI ya está registrado por otro usuario.'
+          : error.message
+      )
     } else {
       setMensaje('Perfil actualizado correctamente.')
     }
@@ -250,142 +201,131 @@ export default function Perfil() {
     setGuardando(false)
   }
 
+  const cerrarSesion = async () => {
+    await logout()
+    navigate('/')
+  }
+
   return (
     <main className="pc-page">
+      <div className="pc-container">
+        <BotonAtras />
+      </div>
+
       <div className="pc-container pc-profile-wrap">
 
-        {/* PERFIL */}
-
         <section className="pc-card pc-profile-card">
-
-          <div
-            className="pc-avatar"
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="pc-avatar">
             {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt="Foto de perfil"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 'inherit',
-                }}
-              />
+              <img src={avatarUrl} alt="Foto de perfil" />
             ) : (
-              (
-                form.nombre?.[0] ||
-                usuario?.email?.[0] ||
-                'U'
-              ).toUpperCase()
+              (form.nombre?.[0] || usuario?.email?.[0] || 'U').toUpperCase()
             )}
           </div>
 
-          <label
-            className="pc-btn pc-btn-light"
-            style={{
-              cursor: subiendoFoto
-                ? 'not-allowed'
-                : 'pointer',
-              display: 'inline-block',
-              opacity: subiendoFoto ? 0.7 : 1,
-            }}
-          >
-            {subiendoFoto
-              ? 'Subiendo...'
-              : 'Cambiar foto'}
-
+          <label className="pc-btn pc-btn-light pc-profile-photo-btn">
+            <Camera size={17} />
+            {subiendoFoto ? 'Subiendo...' : 'Cambiar foto'}
             <input
               type="file"
               accept="image/*"
               onChange={subirFotoPerfil}
               disabled={subiendoFoto}
-              style={{
-                display: 'none',
-              }}
+              hidden
             />
           </label>
 
           <span className="pc-kicker">
-            Mi cuenta
+            {esEmpleado ? 'Cuenta de empleado' : 'Mi cuenta'}
           </span>
 
-          <h1>
-            {form.nombre || 'Usuario'}{' '}
-            {form.apellido}
-          </h1>
+          <div className="pc-profile-user">
+            <h2>
+              {form.nombre || 'Usuario'} {form.apellido}
+            </h2>
+            <p>{usuario?.email}</p>
+          </div>
 
-          <p>{usuario?.email}</p>
+          {esEmpleado && (
+            <div className="pc-status-card">
+              <div className="pc-status-info">
+                <div className="pc-status-title">
+                  {activo ? (
+                    <CircleCheck className="pc-status-icon-active" size={20} />
+                  ) : (
+                    <CircleX className="pc-status-icon-inactive" size={20} />
+                  )}
+                  <strong>Estado de trabajo</strong>
+                </div>
 
-          <button
-            type="button"
-            className="pc-btn pc-btn-danger"
-            onClick={cerrarSesion}
-          >
-            Cerrar sesión
-          </button>
+                <span className={`pc-status-label ${activo ? 'activo' : 'inactivo'}`}>
+                  {activo ? 'Activo' : 'Fuera de servicio'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className={`pc-btn ${activo ? 'pc-btn-light' : 'pc-btn-primary'} pc-status-button`}
+                onClick={cambiarEstadoEmpleado}
+                disabled={cambiandoEstado}
+              >
+                {cambiandoEstado
+                  ? 'Guardando...'
+                  : activo
+                    ? 'Poner fuera de servicio'
+                    : 'Activarme'}
+              </button>
+            </div>
+          )}
+
+          <div className="pc-profile-logout">
+            <button
+              type="button"
+              className="pc-btn pc-btn-danger"
+              onClick={cerrarSesion}
+            >
+              <LogOut size={17} />
+              Cerrar sesión
+            </button>
+          </div>
         </section>
 
-        {/* DATOS PERSONALES */}
-
-        <form
-          className="pc-card pc-profile-form"
-          onSubmit={guardar}
-        >
+        <form className="pc-card pc-profile-form" onSubmit={guardar}>
           <h2>Datos personales</h2>
 
           <div className="pc-form-grid">
-
             <label>
               Nombre
-
               <input
                 className="pc-input"
                 value={form.nombre}
-                onChange={(e) =>
-                  cambiar('nombre', e.target.value)
-                }
+                onChange={(e) => cambiar('nombre', e.target.value)}
               />
             </label>
 
             <label>
               Apellido
-
               <input
                 className="pc-input"
                 value={form.apellido}
-                onChange={(e) =>
-                  cambiar('apellido', e.target.value)
-                }
+                onChange={(e) => cambiar('apellido', e.target.value)}
               />
             </label>
 
             <label>
               DNI
-
               <input
                 className="pc-input"
-                type="text"
                 inputMode="numeric"
                 maxLength={15}
                 placeholder="0801-1990-12345"
                 value={form.dni}
-                onChange={(e) =>
-                  cambiar(
-                    'dni',
-                    formatearDni(e.target.value)
-                  )
-                }
+                onChange={(e) => cambiar('dni', formatearDni(e.target.value))}
               />
             </label>
 
             <label>
               Teléfono
-
               <input
                 className="pc-input"
                 type="tel"
@@ -394,68 +334,51 @@ export default function Perfil() {
                 placeholder="9439-4343"
                 value={form.teléfono}
                 onChange={(e) =>
-                  cambiar(
-                    'teléfono',
-                    formatearTelefono(e.target.value)
-                  )
+                  cambiar('teléfono', formatearTelefono(e.target.value))
                 }
               />
             </label>
 
             <label>
               Ciudad
-
               <input
                 className="pc-input"
                 value={form.ciudad}
-                onChange={(e) =>
-                  cambiar('ciudad', e.target.value)
-                }
+                onChange={(e) => cambiar('ciudad', e.target.value)}
               />
             </label>
 
             <label>
               País
-
               <input
                 className="pc-input"
                 value={form.país}
-                onChange={(e) =>
-                  cambiar('país', e.target.value)
-                }
+                onChange={(e) => cambiar('país', e.target.value)}
               />
             </label>
           </div>
 
           <label>
             Dirección
-
             <textarea
               className="pc-textarea"
               rows="3"
               value={form.dirección}
-              onChange={(e) =>
-                cambiar('dirección', e.target.value)
-              }
+              onChange={(e) => cambiar('dirección', e.target.value)}
             />
           </label>
 
-          {mensaje && (
-            <div className="pc-message">
-              {mensaje}
-            </div>
-          )}
+          {mensaje && <div className="pc-message">{mensaje}</div>}
 
           <button
             type="submit"
             disabled={guardando}
             className="pc-btn pc-btn-primary"
           >
-            {guardando
-              ? 'Guardando...'
-              : 'Guardar cambios'}
+            {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
         </form>
+
       </div>
     </main>
   )

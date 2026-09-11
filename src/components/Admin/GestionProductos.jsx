@@ -14,8 +14,12 @@ import {
   Pencil,
   Trash2,
 } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
+import BotonAtras from '../../components/BotonAtras'
 
 export default function GestionProductos() {
+  const { esAdmin } = useAuth()
+
   const [productos, setProductos] = useState([])
   const [categorias, setCategorias] = useState([])
 
@@ -167,13 +171,20 @@ export default function GestionProductos() {
   }
 
   const handleEliminar = async (id) => {
+    if (!esAdmin) {
+      setError('No tienes permiso para eliminar productos.')
+      return
+    }
+
     if (
-      !confirm(
+      !window.confirm(
         '¿Estás seguro de que deseas eliminar este producto?'
       )
     ) {
       return
     }
+
+    setError('')
 
     const resultado = await eliminarProducto(id)
 
@@ -189,6 +200,7 @@ export default function GestionProductos() {
     return (
       <main className="pc-page">
         <div className="pc-container">
+          <BotonAtras />
           Cargando...
         </div>
       </main>
@@ -198,6 +210,7 @@ export default function GestionProductos() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+        <BotonAtras />
 
         <div
           className="pc-admin-header"
@@ -209,7 +222,9 @@ export default function GestionProductos() {
         >
           <div>
             <h1>Gestión de Productos</h1>
-            <p>Administra el catálogo de componentes.</p>
+            <p>
+              Administra el catálogo de componentes.
+            </p>
           </div>
 
           <button
@@ -344,6 +359,7 @@ export default function GestionProductos() {
                     setImagen(e.target.files[0])
                   }
                 />
+
               </div>
 
               <textarea
@@ -379,7 +395,10 @@ export default function GestionProductos() {
                   }}
                 >
                   <Save size={17} />
-                  {cargando ? 'Guardando...' : 'Guardar'}
+
+                  {cargando
+                    ? 'Guardando...'
+                    : 'Guardar'}
                 </button>
 
                 <button
@@ -402,6 +421,7 @@ export default function GestionProductos() {
 
         <div className="pc-card pc-table-wrapper">
           <table className="pc-table">
+
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -414,24 +434,36 @@ export default function GestionProductos() {
             </thead>
 
             <tbody>
+
               {productos.map((producto) => (
                 <tr key={producto.id}>
-                  <td>{producto.nombre}</td>
+
+                  <td>
+                    {producto.nombre}
+                  </td>
 
                   <td>
                     {producto.categorias?.nombre ||
                       'Sin categoría'}
                   </td>
 
-                  <td>{producto.marca}</td>
-
                   <td>
-                    L {Number(producto.precio).toFixed(2)}
+                    {producto.marca}
                   </td>
 
-                  <td>{producto.stock}</td>
+                  <td>
+                    L{' '}
+                    {Number(
+                      producto.precio
+                    ).toFixed(2)}
+                  </td>
 
                   <td>
+                    {producto.stock}
+                  </td>
+
+                  <td>
+
                     <button
                       className="pc-btn pc-btn-light"
                       onClick={() =>
@@ -447,26 +479,36 @@ export default function GestionProductos() {
                       Editar
                     </button>
 
-                    {' '}
+                    {esAdmin && (
+                      <>
+                        {' '}
 
-                    <button
-                      className="pc-btn pc-btn-danger"
-                      onClick={() =>
-                        handleEliminar(producto.id)
-                      }
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <Trash2 size={16} />
-                      Eliminar
-                    </button>
+                        <button
+                          className="pc-btn pc-btn-danger"
+                          onClick={() =>
+                            handleEliminar(
+                              producto.id
+                            )
+                          }
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <Trash2 size={16} />
+                          Eliminar
+                        </button>
+                      </>
+                    )}
+
                   </td>
+
                 </tr>
               ))}
+
             </tbody>
+
           </table>
         </div>
 

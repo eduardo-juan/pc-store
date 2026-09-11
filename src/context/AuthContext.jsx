@@ -15,39 +15,101 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null)
 
   // =========================================================
-  // CARGAR PERFIL DESDE LA TABLA usuarios
+  // REGISTRAR ACCESO
+  // =========================================================
+  const registrarAcceso = async (authUser, perfil) => {
+    if (!authUser) return
+
+    try {
+      const { error } = await supabase
+        .from('auditoria_accesos')
+        .insert({
+          usuario_id: authUser.id,
+          email: authUser.email || perfil?.email || null,
+          rol: perfil?.rol || 'user',
+        })
+
+      if (error) {
+        console.error(
+          '[AUDITORIA] Error registrando acceso:',
+          error
+        )
+      }
+    } catch (err) {
+      console.error(
+        '[AUDITORIA] Error inesperado:',
+        err
+      )
+    }
+  }
+
+  // =========================================================
+  // CARGAR PERFIL
   // =========================================================
   const cargarPerfil = async (authUser) => {
     if (!authUser) {
       setUsuario(null)
-      return
+      return null
     }
 
     try {
-      const { data: perfil, error: perfilError } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('id', authUser.id)
-        .maybeSingle()
+      const { data: perfil, error: perfilError } =
+        await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('id', authUser.id)
+          .maybeSingle()
 
       if (perfilError) {
-        console.error('Error al cargar perfil:', perfilError)
+        console.error(
+          '[AUTH] Error cargando perfil:',
+          perfilError
+        )
 
-        // IMPORTANTE:
-        // Un error en usuarios NO debe cerrar la sesión.
-        setUsuario(authUser)
-        return
+        setUsuario({
+          ...authUser,
+        })
+
+        return authUser
       }
+
+      // =====================================================
+      // USUARIO BLOQUEADO
+      // =====================================================
+      if (perfil?.bloqueado === true) {
+        const mensaje =
+          'Tu cuenta está bloqueada. Contacta con el administrador.'
+
+        console.warn('[AUTH]', mensaje)
+
+        setError(mensaje)
+        setUsuario(null)
+        setSession(null)
+
+        await supabase.auth.signOut()
+
+        return null
+      }
+
+      const usuarioCompleto = {
+        ...authUser,
+        ...(perfil || {}),
+      }
+
+      setUsuario(usuarioCompleto)
+
+      return usuarioCompleto
+    } catch (err) {
+      console.error(
+        '[AUTH] Error inesperado cargando perfil:',
+        err
+      )
 
       setUsuario({
         ...authUser,
-        ...(perfil || {}),
       })
-    } catch (err) {
-      console.error('Error cargando perfil:', err)
 
-      // Mantener la sesión aunque falle la consulta del perfil.
-      setUsuario(authUser)
+      return authUser
     }
   }
 
@@ -64,14 +126,16 @@ export const AuthProvider = ({ children }) => {
           error: sessionError,
         } = await supabase.auth.getSession()
 
+        if (!activo) return
+
         if (sessionError) {
           console.error(
-            'Error obteniendo sesión:',
+            '[AUTH] Error obteniendo sesión:',
             sessionError
           )
-        }
 
-        if (!activo) return
+          setError(sessionError.message)
+        }
 
         if (sesionActual?.user) {
           setSession(sesionActual)
@@ -83,13 +147,12 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         console.error(
-          'Error inicializando autenticación:',
+          '[AUTH] Error inicializando autenticación:',
           err
         )
 
         if (activo) {
-          setSession(null)
-          setUsuario(null)
+          setError(err.message)
         }
       } finally {
         if (activo) {
@@ -101,7 +164,7 @@ export const AuthProvider = ({ children }) => {
     iniciarAuth()
 
     // =======================================================
-    // ESCUCHAR CAMBIOS DE AUTENTICACIÓN
+    // CAMBIOS DE AUTH
     // =======================================================
     const {
       data: { subscription },
@@ -116,29 +179,17 @@ export const AuthProvider = ({ children }) => {
           !!nuevaSesion
         )
 
-        // ---------------------------------------------------
-        // SESIÓN DISPONIBLE
-        // ---------------------------------------------------
-        if (nuevaSesion?.user) {
-          setSession(nuevaSesion)
-
-          // NO hacemos una consulta a Supabase directamente
-          // dentro del callback de onAuthStateChange.
-          //
-          // El perfil se cargará mediante el useEffect
-          // que observa "session".
-          return
-        }
-
-        // ---------------------------------------------------
-        // SESIÓN CERRADA
-        // ---------------------------------------------------
         if (
           event === 'SIGNED_OUT' ||
           event === 'USER_DELETED'
         ) {
           setSession(null)
           setUsuario(null)
+          return
+        }
+
+        if (nuevaSesion?.user) {
+          setSession(nuevaSesion)
         }
       }
     )
@@ -156,16 +207,8 @@ export const AuthProvider = ({ children }) => {
     let activo = true
 
     const cargar = async () => {
-      if (!session?.user) {
-        if (activo) {
-          setUsuario(null)
-        }
+      if (!session?.user) return
 
-        return
-      }
-
-      // Esperamos un momento para no ejecutar una consulta
-      // dentro del callback de onAuthStateChange.
       await new Promise((resolve) =>
         setTimeout(resolve, 0)
       )
@@ -212,33 +255,43 @@ export const AuthProvider = ({ children }) => {
         )
       }
 
-      // Crear perfil en usuarios
-      const { error: perfilError } = await supabase
-        .from('usuarios')
-        .insert([
-          {
-            id: user.id,
-            email,
-            nombre,
-            apellido,
-            rol: 'user',
-          },
-        ])
+      const { error: perfilError } =
+        await supabase
+          .from('usuarios')
+          .insert([
+            {
+              id: user.id,
+              email,
+              nombre,
+              apellido,
+              rol: 'user',
+              bloqueado: false,
+              activo: true,
+            },
+          ])
 
       if (perfilError) {
         throw perfilError
       }
 
-      // Si Supabase creó una sesión inmediatamente
-      // cargamos el perfil.
-      await cargarPerfil(user)
+      const {
+        data: { session: nuevaSesion },
+      } = await supabase.auth.getSession()
+
+      if (nuevaSesion) {
+        setSession(nuevaSesion)
+        await cargarPerfil(user)
+      }
 
       return {
         success: true,
         user,
       }
     } catch (err) {
-      console.error('Error en registro:', err)
+      console.error(
+        '[AUTH] Error en registro:',
+        err
+      )
 
       setError(err.message)
 
@@ -257,7 +310,10 @@ export const AuthProvider = ({ children }) => {
       setError(null)
 
       const {
-        data: { session: nuevaSesion, user },
+        data: {
+          session: nuevaSesion,
+          user,
+        },
         error: loginError,
       } = await supabase.auth.signInWithPassword({
         email,
@@ -268,25 +324,78 @@ export const AuthProvider = ({ children }) => {
         throw loginError
       }
 
-      if (!user) {
+      if (!user || !nuevaSesion) {
         throw new Error(
           'No se pudo iniciar sesión'
         )
       }
 
-      // Actualizamos inmediatamente el estado local.
-      if (nuevaSesion) {
+      // =====================================================
+      // CARGAR PERFIL
+      // =====================================================
+      const { data: perfil, error: perfilError } =
+        await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
+
+      if (perfilError) {
+        console.error(
+          '[AUTH] Error cargando perfil después del login:',
+          perfilError
+        )
+
         setSession(nuevaSesion)
+        setUsuario(user)
+
+        return {
+          success: true,
+          user,
+        }
       }
 
-      await cargarPerfil(user)
+      // =====================================================
+      // BLOQUEADO
+      // =====================================================
+      if (perfil?.bloqueado === true) {
+        const mensaje =
+          'Tu cuenta está bloqueada. Contacta con el administrador.'
+
+        await supabase.auth.signOut()
+
+        setSession(null)
+        setUsuario(null)
+        setError(mensaje)
+
+        return {
+          success: false,
+          error: mensaje,
+        }
+      }
+
+      // =====================================================
+      // SESIÓN CORRECTA
+      // =====================================================
+      setSession(nuevaSesion)
+
+      setUsuario({
+        ...user,
+        ...(perfil || {}),
+      })
+
+      // Registrar solamente el acceso exitoso.
+      await registrarAcceso(user, perfil)
 
       return {
         success: true,
         user,
       }
     } catch (err) {
-      console.error('Error en login:', err)
+      console.error(
+        '[AUTH] Error en login:',
+        err
+      )
 
       setError(err.message)
 
@@ -315,7 +424,7 @@ export const AuthProvider = ({ children }) => {
       setUsuario(null)
     } catch (err) {
       console.error(
-        'Error cerrando sesión:',
+        '[AUTH] Error cerrando sesión:',
         err
       )
 
@@ -324,17 +433,28 @@ export const AuthProvider = ({ children }) => {
   }
 
   // =========================================================
+  // ROLES
+  // =========================================================
+  const esAdmin = usuario?.rol === 'admin'
+  const esEmpleado = usuario?.rol === 'empleado'
+  const esStaff = esAdmin || esEmpleado
+
+  // =========================================================
   // CONTEXTO
   // =========================================================
   return (
     <AuthContext.Provider
       value={{
         usuario,
+        session,
         cargando,
         error,
         registro,
         login,
         logout,
+        esAdmin,
+        esEmpleado,
+        esStaff,
       }}
     >
       {children}

@@ -1,13 +1,14 @@
 import { Link, useParams } from 'react-router-dom'
+import BotonAtras from '../components/BotonAtras'
 
 export default function OrdenConfirmada() {
-
   const { id } = useParams()
 
   return (
     <main className="pc-page">
-
       <div className="pc-container">
+
+        <BotonAtras />
 
         <div className="pc-success-page">
 
@@ -26,8 +27,7 @@ export default function OrdenConfirmada() {
           </p>
 
           <p>
-            ID interno:
-            {' '}
+            ID interno:{' '}
             <strong>#{id}</strong>
           </p>
 
@@ -52,7 +52,6 @@ export default function OrdenConfirmada() {
         </div>
 
       </div>
-
     </main>
   )
 }

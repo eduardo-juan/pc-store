@@ -1,6 +1,15 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react'
+import {
+  Link,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom'
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  ArrowLeft,
+} from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
@@ -12,6 +21,10 @@ export default function Login() {
 
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Página a la que el usuario quería entrar
+  const paginaOrigen = location.state?.from || '/tienda'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -26,7 +39,8 @@ export default function Login() {
       )
 
       if (resultado.success) {
-        navigate('/tienda')
+        // Regresa a la página que intentaba visitar
+        navigate(paginaOrigen, { replace: true })
       } else {
         setError(
           resultado.error ||
@@ -88,7 +102,7 @@ export default function Login() {
                 height: 64,
                 margin: '0 auto 16px',
                 borderRadius: 16,
-                background: '#eef4ff',
+                background: '#f4f4f4',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -296,6 +310,7 @@ export default function Login() {
 
             <Link
               to="/registro"
+              state={{ from: paginaOrigen }}
               className="pc-btn pc-btn-light"
               style={{
                 display: 'inline-block',

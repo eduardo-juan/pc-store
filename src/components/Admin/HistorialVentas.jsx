@@ -13,6 +13,7 @@ import {
   ChevronUp,
   RotateCcw,
 } from 'lucide-react'
+import BotonAtras from '../../components/BotonAtras'
 
 const NOMBRES_MES = [
   'Enero',
@@ -38,7 +39,6 @@ export default function HistorialVentas() {
   const [ordenes, setOrdenes] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-
   const [diaExpandido, setDiaExpandido] = useState(null)
 
   useEffect(() => {
@@ -48,32 +48,28 @@ export default function HistorialVentas() {
   const cargarVentasDelMes = async () => {
     setCargando(true)
     setError('')
+    setDiaExpandido(null)
 
     const inicioMes = new Date(anio, mes, 1)
-    const inicioSiguienteMes = new Date(
-      anio,
-      mes + 1,
-      1
-    )
+    const inicioSiguienteMes = new Date(anio, mes + 1, 1)
 
     const { data, error } = await supabase
       .from('ordenes')
-      .select(
-        'id, numero_orden, total, items, created_at'
-      )
+      .select(`
+        id,
+        numero_orden,
+        total,
+        items,
+        created_at
+      `)
       .eq('estado', 'pagada')
-      .gte(
-        'created_at',
-        inicioMes.toISOString()
-      )
-      .lt(
-        'created_at',
-        inicioSiguienteMes.toISOString()
-      )
-      .order('created_at')
+      .gte('created_at', inicioMes.toISOString())
+      .lt('created_at', inicioSiguienteMes.toISOString())
+      .order('created_at', { ascending: true })
 
     if (error) {
       setError(error.message)
+      setOrdenes([])
       setCargando(false)
       return
     }
@@ -119,11 +115,7 @@ export default function HistorialVentas() {
 
     const resumenPorDia = {}
 
-    for (
-      let dia = 1;
-      dia <= totalDias;
-      dia++
-    ) {
+    for (let dia = 1; dia <= totalDias; dia++) {
       resumenPorDia[dia] = {
         total: 0,
         cantidad: 0,
@@ -133,16 +125,24 @@ export default function HistorialVentas() {
 
     ordenes.forEach((orden) => {
       const fecha = new Date(orden.created_at)
+
+      if (
+        fecha.getFullYear() !== anio ||
+        fecha.getMonth() !== mes
+      ) {
+        return
+      }
+
       const dia = fecha.getDate()
 
-      if (resumenPorDia[dia]) {
-        resumenPorDia[dia].total += Number(
-          orden.total || 0
-        )
+      if (!resumenPorDia[dia]) return
 
-        resumenPorDia[dia].cantidad += 1
-        resumenPorDia[dia].ordenes.push(orden)
-      }
+      resumenPorDia[dia].total += Number(
+        orden.total || 0
+      )
+
+      resumenPorDia[dia].cantidad += 1
+      resumenPorDia[dia].ordenes.push(orden)
     })
 
     return Array.from(
@@ -155,14 +155,14 @@ export default function HistorialVentas() {
   }, [ordenes, anio, mes])
 
   const totalMes = diasDelMes.reduce(
-    (acumulado, d) =>
-      acumulado + d.total,
+    (acumulado, dia) =>
+      acumulado + dia.total,
     0
   )
 
   const ordenesDelMes = diasDelMes.reduce(
-    (acumulado, d) =>
-      acumulado + d.cantidad,
+    (acumulado, dia) =>
+      acumulado + dia.cantidad,
     0
   )
 
@@ -173,6 +173,7 @@ export default function HistorialVentas() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+        <BotonAtras />
 
         <div className="pc-admin-header">
           <h1>Historial de Ventas</h1>
@@ -199,6 +200,7 @@ export default function HistorialVentas() {
               display: 'flex',
               alignItems: 'center',
               gap: 12,
+              flexWrap: 'wrap',
             }}
           >
             <button
@@ -315,65 +317,65 @@ export default function HistorialVentas() {
               </thead>
 
               <tbody>
-                {diasDelMes.map((d) => (
-                  <Fragment key={d.dia}>
-
+                {diasDelMes.map((dia) => (
+                  <Fragment key={dia.dia}>
                     <tr
                       style={{
                         cursor:
-                          d.cantidad > 0
+                          dia.cantidad > 0
                             ? 'pointer'
                             : 'default',
                       }}
                       onClick={() => {
-                        if (d.cantidad === 0) return
+                        if (dia.cantidad === 0) return
 
                         setDiaExpandido(
-                          diaExpandido === d.dia
+                          diaExpandido === dia.dia
                             ? null
-                            : d.dia
+                            : dia.dia
                         )
                       }}
                     >
                       <td>
-                        {String(d.dia).padStart(2, '0')}/
+                        {String(dia.dia).padStart(2, '0')}/
                         {String(mes + 1).padStart(2, '0')}/
                         {anio}
                       </td>
 
-                      <td>{d.cantidad}</td>
-
                       <td>
-                        L {d.total.toFixed(2)}
+                        {dia.cantidad}
                       </td>
 
                       <td>
-                        {d.cantidad > 0 &&
-                          (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 5,
-                              }}
-                            >
-                              {diaExpandido === d.dia ? (
-                                <>
-                                  <ChevronUp size={16} />
-                                  Ocultar
-                                </>
-                              ) : (
-                                <>
-                                  <ChevronDown size={16} />
-                                  Ver productos
-                                </>
-                              )}
-                            </span>
-                          )}
+                        L {dia.total.toFixed(2)}
+                      </td>
+
+                      <td>
+                        {dia.cantidad > 0 && (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 5,
+                            }}
+                          >
+                            {diaExpandido === dia.dia ? (
+                              <>
+                                <ChevronUp size={16} />
+                                Ocultar
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown size={16} />
+                                Ver productos
+                              </>
+                            )}
+                          </span>
+                        )}
                       </td>
                     </tr>
 
-                    {diaExpandido === d.dia && (
+                    {diaExpandido === dia.dia && (
                       <tr>
                         <td
                           colSpan={4}
@@ -386,25 +388,49 @@ export default function HistorialVentas() {
                                 'rgba(0,0,0,0.03)',
                             }}
                           >
-                            {d.ordenes.map((orden) => (
+                            {dia.ordenes.map((orden) => (
                               <div
                                 key={orden.id}
                                 style={{
-                                  marginBottom: 12,
+                                  marginBottom: 14,
+                                  paddingBottom: 10,
+                                  borderBottom:
+                                    '1px solid rgba(0,0,0,0.08)',
                                 }}
                               >
-                                <strong
+                                <div
                                   style={{
-                                    fontSize: 13,
+                                    display: 'flex',
+                                    justifyContent:
+                                      'space-between',
+                                    alignItems: 'center',
+                                    gap: 10,
                                   }}
                                 >
-                                  {orden.numero_orden ||
-                                    `Orden #${orden.id}`}
-                                </strong>
+                                  <strong
+                                    style={{
+                                      fontSize: 13,
+                                    }}
+                                  >
+                                    {orden.numero_orden ||
+                                      `Orden #${orden.id}`}
+                                  </strong>
+
+                                  <strong
+                                    style={{
+                                      fontSize: 13,
+                                    }}
+                                  >
+                                    L{' '}
+                                    {Number(
+                                      orden.total || 0
+                                    ).toFixed(2)}
+                                  </strong>
+                                </div>
 
                                 <div
                                   style={{
-                                    marginTop: 4,
+                                    marginTop: 6,
                                   }}
                                 >
                                   {(orden.items || []).map(
@@ -417,6 +443,7 @@ export default function HistorialVentas() {
                                             'space-between',
                                           fontSize: 13,
                                           padding: '2px 0',
+                                          gap: 12,
                                         }}
                                       >
                                         <span>
@@ -440,14 +467,12 @@ export default function HistorialVentas() {
                         </td>
                       </tr>
                     )}
-
                   </Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-
       </div>
     </main>
   )
