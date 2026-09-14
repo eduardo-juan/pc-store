@@ -1,660 +1,244 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
-const ORDENES_POR_PAGINA = 10
+const ORDENES_POR_PAGINA = 8
+const ESTADOS = [
+  ['pendiente', 'Pendiente'],
+  ['pagada', 'Pagada'],
+  ['enviada', 'Enviada'],
+  ['entregada', 'Entregada'],
+  ['cancelada', 'Cancelada'],
+]
+
+const estadoActivo = ['pendiente', 'pagada', 'enviada']
+
+const estiloEstado = {
+  pendiente: { background: '#fff7ed', border: '#fed7aa', color: '#c2410c' },
+  pagada: { background: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8' },
+  enviada: { background: '#f5f3ff', border: '#ddd6fe', color: '#6d28d9' },
+  entregada: { background: '#f0fdf4', border: '#bbf7d0', color: '#15803d' },
+  cancelada: { background: '#fef2f2', border: '#fecaca', color: '#b91c1c' },
+}
 
 export default function GestionOrdenes() {
   const { usuario, esAdmin, esEmpleado } = useAuth()
-
   const [ordenes, setOrdenes] = useState([])
   const [proveedores, setProveedores] = useState({})
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('todas')
+  const [fecha, setFecha] = useState('')
   const [pagina, setPagina] = useState(1)
+  const [cancelacion, setCancelacion] = useState(null)
+  const [motivo, setMotivo] = useState('')
+  const [procesando, setProcesando] = useState(false)
 
-  useEffect(() => {
-    cargarOrdenes()
-  }, [usuario, esAdmin, esEmpleado])
-
-  useEffect(() => {
-    setPagina(1)
-  }, [filtro])
+  useEffect(() => { cargarOrdenes() }, [usuario, esAdmin, esEmpleado])
+  useEffect(() => { setPagina(1) }, [filtro, fecha])
 
   const cargarOrdenes = async () => {
     setError('')
-
     if (esEmpleado && !usuario?.id) {
       setError('No se pudo identificar al empleado actual.')
       setCargando(false)
       return
     }
-
     setCargando(true)
-
-    let consulta = supabase
-      .from('ordenes')
-      .select('*')
-      .order('created_at', {
-        ascending: false,
-      })
-
-    if (esEmpleado && !esAdmin) {
-      consulta = consulta.eq('empleado_id', usuario.id)
-    }
-
-    const { data, error } = await consulta
-
-    if (error) {
-      setError(error.message)
+    let consulta = supabase.from('ordenes').select('*').order('created_at', { ascending: false })
+    if (esEmpleado && !esAdmin) consulta = consulta.eq('empleado_id', usuario.id)
+    const { data, error: consultaError } = await consulta
+    if (consultaError) {
+      setError(consultaError.message)
       setCargando(false)
       return
     }
-
-    const ordenesCargadas = data || []
-    setOrdenes(ordenesCargadas)
-
+    const cargadas = data || []
+    setOrdenes(cargadas)
     if (esAdmin) {
-      const productoIds = [
-        ...new Set(
-          ordenesCargadas.flatMap((orden) =>
-            (orden.items || [])
-              .map((item) => item.producto_id)
-              .filter(Boolean)
-          )
-        ),
-      ]
-
-      if (productoIds.length > 0) {
-        const { data: proveedoresData, error: proveedoresError } = await supabase
-          .from('producto_proveedores')
-          .select('producto_id, proveedor, url_compra, activo')
-          .in('producto_id', productoIds)
-          .eq('activo', true)
-
-        if (proveedoresError) {
-          setError(proveedoresError.message)
-          setProveedores({})
-        } else {
-          const mapa = {}
-          ;(proveedoresData || []).forEach((proveedor) => {
-            if (!mapa[proveedor.producto_id]) {
-              mapa[proveedor.producto_id] = proveedor
-            }
-          })
-          setProveedores(mapa)
-        }
-      } else {
-        setProveedores({})
-      }
-    } else {
-      setProveedores({})
-    }
-
+      const ids = [...new Set(cargadas.flatMap(o => (o.items || []).map(i => i.producto_id).filter(Boolean)))]
+      if (ids.length) {
+        const { data: proveedoresData, error: proveedoresError } = await supabase.from('producto_proveedores').select('producto_id, proveedor, url_compra, activo').in('producto_id', ids).eq('activo', true)
+        if (proveedoresError) setError(proveedoresError.message)
+        const mapa = {}
+        ;(proveedoresData || []).forEach(p => { if (!mapa[p.producto_id]) mapa[p.producto_id] = p })
+        setProveedores(mapa)
+      } else setProveedores({})
+    } else setProveedores({})
     setCargando(false)
   }
 
   const cambiarEstado = async (id, nuevoEstado) => {
     setError('')
+    const orden = ordenes.find(o => o.id === id)
+    if (!orden) return setError('No se encontró la orden.')
+    const actual = orden.estado || 'pendiente'
 
-    const orden = ordenes.find(
-      (item) => item.id === id
-    )
-
-    if (!orden) {
-      setError('No se encontró la orden.')
-      return
-    }
-
-    const estadoActual =
-      orden.estado || 'pendiente'
-
-    if (estadoActual === 'pagada') {
-      setError(
-        'Una orden pagada está cerrada y ya no puede modificarse.'
-      )
-      return
-    }
-
-    if (estadoActual === 'cancelada') {
-      setError(
-        'Una orden cancelada no puede modificarse.'
-      )
-      return
-    }
-
+    if (actual === 'cancelada') return setError('Una orden cancelada no puede modificarse.')
     if (nuevoEstado === 'cancelada') {
-      if (!esAdmin) {
-        setError(
-          'Solo el administrador puede cancelar órdenes.'
-        )
-        return
-      }
-
-      const confirmar = window.confirm(
-        '¿Estás seguro de que deseas cancelar esta orden? El stock será restaurado.'
-      )
-
-      if (!confirmar) return
-
-      const { error } = await supabase.rpc(
-        'cancelar_orden_pc_store',
-        {
-          p_orden_id: id,
-        }
-      )
-
-      if (error) {
-        setError(error.message)
-        return
-      }
-
-      await cargarOrdenes()
+      if (!esAdmin) return setError('Solo el administrador puede cancelar órdenes.')
+      setMotivo('')
+      setCancelacion(orden)
       return
     }
+    if (actual === 'pagada') return setError('Una orden pagada está cerrada y ya no puede modificarse.')
 
-    if (esEmpleado && !usuario?.id) {
-      setError(
-        'No se pudo identificar al empleado actual.'
-      )
-      return
-    }
-
-    const datosActualizacion = {
-      estado: nuevoEstado,
-    }
-
-    if (esEmpleado) {
-      datosActualizacion.empleado_id =
-        usuario.id
-    }
-
-    const { error } = await supabase
-      .from('ordenes')
-      .update(datosActualizacion)
-      .eq('id', id)
-
-    if (error) {
-      setError(error.message)
-      return
-    }
-
+    const datos = { estado: nuevoEstado }
+    if (esEmpleado) datos.empleado_id = usuario.id
+    const { error: updateError } = await supabase.from('ordenes').update(datos).eq('id', id)
+    if (updateError) return setError(updateError.message)
     await cargarOrdenes()
   }
 
-  const ordenesFiltradas = ordenes.filter(
-    (orden) => {
-      if (filtro === 'todas') {
-        return true
-      }
-
-      if (filtro === 'activas') {
-        return [
-          'pendiente',
-          'pagada',
-          'enviada',
-        ].includes(orden.estado)
-      }
-
-      if (filtro === 'pendientes') {
-        return orden.estado === 'pendiente'
-      }
-
-      if (filtro === 'pagadas') {
-        return orden.estado === 'pagada'
-      }
-
-      if (filtro === 'enviadas') {
-        return orden.estado === 'enviada'
-      }
-
-      if (filtro === 'entregadas') {
-        return orden.estado === 'entregada'
-      }
-
-      if (filtro === 'canceladas') {
-        return orden.estado === 'cancelada'
-      }
-
-      return true
+  const confirmarCancelacion = async () => {
+    if (!cancelacion) return
+    const texto = motivo.trim()
+    if (!texto) return setError('Debes indicar al cliente el motivo de la cancelación.')
+    setProcesando(true)
+    setError('')
+    const { error: rpcError } = await supabase.rpc('cancelar_orden_pc_store', { p_orden_id: cancelacion.id, p_motivo: texto })
+    if (rpcError) {
+      setError(rpcError.message)
+      setProcesando(false)
+      return
     }
-  )
+    setCancelacion(null)
+    setMotivo('')
+    setProcesando(false)
+    await cargarOrdenes()
+  }
 
-  const totalPaginas = Math.max(
-    1,
-    Math.ceil(
-      ordenesFiltradas.length /
-        ORDENES_POR_PAGINA
-    )
-  )
+  const ordenesFiltradas = useMemo(() => ordenes.filter(orden => {
+    const estado = orden.estado || 'pendiente'
+    if (filtro === 'activas' && !estadoActivo.includes(estado)) return false
+    if (filtro !== 'todas' && filtro !== 'activas' && estado !== filtro) return false
+    if (fecha) {
+      const dia = new Date(orden.created_at).toLocaleDateString('en-CA')
+      if (dia !== fecha) return false
+    }
+    return true
+  }), [ordenes, filtro, fecha])
 
-  const paginaActual = Math.min(
-    pagina,
-    totalPaginas
-  )
-
-  const inicio =
-    (paginaActual - 1) *
-    ORDENES_POR_PAGINA
-
-  const ordenesPagina =
-    ordenesFiltradas.slice(
-      inicio,
-      inicio + ORDENES_POR_PAGINA
-    )
+  const totalPaginas = Math.max(1, Math.ceil(ordenesFiltradas.length / ORDENES_POR_PAGINA))
+  const paginaActual = Math.min(pagina, totalPaginas)
+  const ordenesPagina = ordenesFiltradas.slice((paginaActual - 1) * ORDENES_POR_PAGINA, paginaActual * ORDENES_POR_PAGINA)
 
   return (
     <main className="pc-page">
       <div className="pc-container">
         <BotonAtras />
-
         <div className="pc-admin-header">
-          <h1>
-            Gestión de Órdenes
-          </h1>
-
-          <p>
-            {esEmpleado
-              ? 'Gestiona las órdenes asignadas a ti.'
-              : 'Administra todas las compras y consulta los datos de entrega.'}
-          </p>
+          <h1>Gestión de Órdenes</h1>
+          <p>{esEmpleado ? 'Gestiona las órdenes asignadas a ti.' : 'Administra pedidos, entregas, estados y cancelaciones.'}</p>
         </div>
 
-        {error && (
-          <div
-            className="pc-card"
-            style={{
-              padding: 16,
-              marginBottom: 20,
-              color: '#dc2626',
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="pc-card" style={{ padding: 14, marginBottom: 18, color: '#dc2626' }}>{error}</div>}
 
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            marginBottom: '20px',
-          }}
-        >
-          {[
-            ['todas', 'Todas'],
-            ['activas', 'Activas'],
-            ['pendientes', 'Pendientes'],
-            ['pagadas', 'Pagadas'],
-            ['enviadas', 'Enviadas'],
-            ['entregadas', 'Entregadas'],
-            ['canceladas', 'Canceladas'],
-          ].map(([valor, texto]) => (
-            <button
-              key={valor}
-              type="button"
-              className={
-                filtro === valor
-                  ? 'pc-btn pc-btn-primary'
-                  : 'pc-btn pc-btn-light'
-              }
-              onClick={() =>
-                setFiltro(valor)
-              }
-            >
-              {texto}
-            </button>
-          ))}
+        <div className="pc-card" style={{ padding: 14, marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <select className="pc-select" value={filtro} onChange={e => setFiltro(e.target.value)} style={{ minWidth: 190 }}>
+            <option value="todas">Todas las órdenes</option>
+            <option value="activas">Activas</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="pagada">Pagadas</option>
+            <option value="enviada">Enviadas</option>
+            <option value="entregada">Entregadas</option>
+            <option value="cancelada">Canceladas</option>
+          </select>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600 }}>
+            Día:
+            <input type="date" className="pc-input" value={fecha} onChange={e => setFecha(e.target.value)} />
+          </label>
+          {(fecha || filtro !== 'todas') && <button type="button" className="pc-btn pc-btn-light" onClick={() => { setFecha(''); setFiltro('todas') }}>Limpiar</button>}
+          <span style={{ marginLeft: 'auto', fontWeight: 600 }}>{ordenesFiltradas.length} órdenes</span>
         </div>
 
-        <div className="pc-card pc-table-wrapper">
-          <table className="pc-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Datos de entrega</th>
-                <th>Productos</th>
-                <th>Subtotal</th>
-                <th>Envío</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
+        <div style={{ display: 'grid', gap: 16 }}>
+          {cargando ? <div className="pc-card" style={{ padding: 30, textAlign: 'center' }}>Cargando órdenes...</div> : ordenesPagina.length === 0 ? <div className="pc-card" style={{ padding: 30, textAlign: 'center' }}>No hay órdenes para mostrar.</div> : ordenesPagina.map(orden => {
+            const estado = orden.estado || 'pendiente'
+            const s = estiloEstado[estado] || estiloEstado.pendiente
+            const subtotal = Number(orden.subtotal || 0)
+            const envio = Number(orden.envío || 0)
+            const total = Number(orden.total || 0)
+            return (
+              <article key={orden.id} className="pc-card" style={{ padding: 20, overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
+                  <div>
+                    <div style={{ fontSize: 13, color: '#666', marginBottom: 4 }}>Orden #{orden.id} · {orden.numero_orden || 'Sin número'}</div>
+                    <h2 style={{ margin: 0, fontSize: 20 }}>{orden.nombre_cliente} {orden.apellido_cliente}</h2>
+                    <div style={{ marginTop: 5, color: '#666', fontSize: 13 }}>{orden.email || 'Sin correo'} · {orden.created_at ? new Date(orden.created_at).toLocaleString() : '-'}</div>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 800 }}>L {total.toFixed(2)}</div>
+                </div>
 
-            <tbody>
-              {cargando ? (
-                <tr>
-                  <td colSpan="9">
-                    Cargando órdenes...
-                  </td>
-                </tr>
-              ) : ordenesPagina.length === 0 ? (
-                <tr>
-                  <td colSpan="9">
-                    No hay órdenes para mostrar.
-                  </td>
-                </tr>
-              ) : (
-                ordenesPagina.map((orden) => {
-                  const subtotal =
-                    Number(
-                      orden.subtotal || 0
-                    )
-
-                  const envio =
-                    Number(
-                      orden.envío || 0
-                    )
-
-                  const total =
-                    Number(
-                      orden.total || 0
-                    )
-
-                  const estadoActual =
-                    orden.estado ||
-                    'pendiente'
-
-                  const ordenCerrada = [
-                    'pagada',
-                    'cancelada',
-                  ].includes(estadoActual)
-
-                  const ordenCancelada =
-                    estadoActual ===
-                    'cancelada'
-
-                  return (
-                    <tr key={orden.id}>
-                      <td>
-                        #{orden.id}
-                      </td>
-
-                      <td>
-                        <div>
-                          <strong>
-                            {orden.nombre_cliente}{' '}
-                            {orden.apellido_cliente}
-                          </strong>
-
-                          <div
-                            style={{
-                              fontSize: '12px',
-                              color: '#666',
-                            }}
-                          >
-                            {orden.email || '-'}
-                          </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 14, marginBottom: 18 }}>
+                  <section style={{ background: '#fafafa', borderRadius: 12, padding: 14 }}>
+                    <strong>Entrega</strong>
+                    <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.7 }}>
+                      <div><b>Tel:</b> {orden.teléfono_contacto || '-'}</div>
+                      <div><b>Dirección:</b> {orden.dirección_envío || '-'}</div>
+                      <div><b>Ciudad:</b> {orden.ciudad_envío || '-'}</div>
+                      <div><b>Referencia:</b> {orden.referencia || '-'}</div>
+                      {orden.notas && <div><b>Notas:</b> {orden.notas}</div>}
+                    </div>
+                  </section>
+                  <section style={{ background: '#fafafa', borderRadius: 12, padding: 14 }}>
+                    <strong>Resumen</strong>
+                    <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.8 }}>
+                      <div>Subtotal: <b>L {subtotal.toFixed(2)}</b></div>
+                      <div>Envío: <b>L {envio.toFixed(2)}</b></div>
+                      <div>Método de pago: <b>{orden.metodo_pago || '-'}</b></div>
+                    </div>
+                  </section>
+                  <section style={{ background: '#fafafa', borderRadius: 12, padding: 14 }}>
+                    <strong>Productos</strong>
+                    <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.7 }}>
+                      {(orden.items || []).map((item, index) => {
+                        const proveedor = esAdmin ? proveedores[item.producto_id] : null
+                        return <div key={`${orden.id}-${item.producto_id || index}`} style={{ marginBottom: 7 }}>
+                          <div>{item.cantidad}× {item.nombre}</div>
+                          {proveedor?.url_compra && <a href={proveedor.url_compra} target="_blank" rel="noopener noreferrer" className="pc-btn pc-btn-light" style={{ display: 'inline-block', marginTop: 3, padding: '4px 8px', fontSize: 11, textDecoration: 'none' }}>Comprar en {proveedor.proveedor || 'Amazon'}</a>}
                         </div>
-                      </td>
+                      })}
+                    </div>
+                  </section>
+                </div>
 
-                      <td>
-                        <div
-                          style={{
-                            minWidth: '220px',
-                            fontSize: '13px',
-                          }}
-                        >
-                          <strong>
-                            Receptor:
-                          </strong>{' '}
-                          {orden.nombre_cliente}{' '}
-                          {orden.apellido_cliente}
+                {estado === 'cancelada' && orden.motivo_cancelacion && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: 12, marginBottom: 16, color: '#991b1b' }}><b>Motivo de cancelación:</b> {orden.motivo_cancelacion}</div>}
 
-                          <br />
-
-                          <strong>
-                            Tel:
-                          </strong>{' '}
-                          {orden.teléfono_contacto ||
-                            '-'}
-
-                          <br />
-
-                          <strong>
-                            Dirección:
-                          </strong>{' '}
-                          {orden.dirección_envío ||
-                            '-'}
-
-                          <br />
-
-                          <strong>
-                            Ciudad:
-                          </strong>{' '}
-                          {orden.ciudad_envío ||
-                            '-'}
-
-                          {orden.referencia && (
-                            <>
-                              <br />
-
-                              <strong>
-                                Referencia:
-                              </strong>{' '}
-                              {orden.referencia}
-                            </>
-                          )}
-
-                          {orden.notas && (
-                            <>
-                              <br />
-
-                              <strong>
-                                Notas:
-                              </strong>{' '}
-                              {orden.notas}
-                            </>
-                          )}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div
-                          style={{
-                            fontSize: '12px',
-                          }}
-                        >
-                          {(orden.items || []).map(
-                            (item, index) => {
-                              const proveedor = esAdmin
-                                ? proveedores[item.producto_id]
-                                : null
-
-                              return (
-                                <div
-                                  key={`${orden.id}-${item.producto_id || index}`}
-                                  style={{
-                                    marginBottom: proveedor ? '8px' : '0',
-                                  }}
-                                >
-                                  <div>
-                                    {item.cantidad}×{' '}
-                                    {item.nombre}
-                                  </div>
-
-                                  {proveedor?.url_compra && (
-                                    <a
-                                      href={proveedor.url_compra}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="pc-btn pc-btn-light"
-                                      style={{
-                                        display: 'inline-block',
-                                        marginTop: '4px',
-                                        padding: '5px 9px',
-                                        fontSize: '11px',
-                                        textDecoration: 'none',
-                                      }}
-                                    >
-                                      Comprar en {proveedor.proveedor || 'Amazon'}
-                                    </a>
-                                  )}
-                                </div>
-                              )
-                            }
-                          )}
-                        </div>
-                      </td>
-
-                      <td>
-                        <strong>
-                          L{' '}
-                          {subtotal.toFixed(2)}
-                        </strong>
-                      </td>
-
-                      <td>
-                        <strong>
-                          L{' '}
-                          {envio.toFixed(2)}
-                        </strong>
-                      </td>
-
-                      <td>
-                        <strong>
-                          L{' '}
-                          {total.toFixed(2)}
-                        </strong>
-                      </td>
-
-                      <td>
-                        <select
-                          className="pc-select"
-                          value={
-                            estadoActual
-                          }
-                          disabled={
-                            ordenCerrada
-                          }
-                          title={
-                            estadoActual === 'pagada'
-                              ? 'Orden pagada: no se puede modificar'
-                              : undefined
-                          }
-                          onChange={(e) =>
-                            cambiarEstado(
-                              orden.id,
-                              e.target.value
-                            )
-                          }
-                        >
-                          <option value="pendiente">
-                            Pendiente
-                          </option>
-
-                          <option value="pagada">
-                            Pagada
-                          </option>
-
-                          <option value="enviada">
-                            Enviada
-                          </option>
-
-                          <option value="entregada">
-                            Entregada
-                          </option>
-
-                          {esAdmin && (
-                            <option value="cancelada">
-                              Cancelada
-                            </option>
-                          )}
-                        </select>
-
-                        {estadoActual === 'pagada' && (
-                          <div
-                            style={{
-                              marginTop: '5px',
-                              fontSize: '11px',
-                              color: '#666',
-                            }}
-                          >
-                            Cerrada
-                          </div>
-                        )}
-                      </td>
-
-                      <td>
-                        {orden.created_at
-                          ? new Date(
-                              orden.created_at
-                            ).toLocaleString()
-                          : '-'}
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
+                <div style={{ borderTop: '1px solid rgba(0,0,0,.08)', paddingTop: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 9 }}>Estado de la orden</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {ESTADOS.map(([valor, texto]) => {
+                      const esCancelacion = valor === 'cancelada'
+                      const deshabilitado = estado === 'cancelada' || estado === 'pagada' || (!esAdmin && esCancelacion) || (esCancelacion && estado !== 'pendiente')
+                      return <button key={valor} type="button" disabled={deshabilitado} onClick={() => cambiarEstado(orden.id, valor)} style={{ border: `1px solid ${estado === valor ? s.border : '#ddd'}`, background: estado === valor ? s.background : '#fff', color: estado === valor ? s.color : '#444', borderRadius: 9, padding: '8px 13px', fontWeight: 700, cursor: deshabilitado ? 'not-allowed' : 'pointer', opacity: deshabilitado && estado !== valor ? .45 : 1 }}>{texto}</button>
+                    })}
+                  </div>
+                  {estado === 'pagada' && <div style={{ marginTop: 7, fontSize: 12, color: '#666' }}>La orden pagada queda cerrada según las reglas actuales.</div>}
+                </div>
+              </article>
+            )
+          })}
         </div>
 
-        {!cargando &&
-          ordenesFiltradas.length > 0 &&
-          totalPaginas > 1 && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '12px',
-                marginTop: '24px',
-              }}
-            >
-              <button
-                type="button"
-                className="pc-btn pc-btn-light"
-                disabled={
-                  paginaActual === 1
-                }
-                onClick={() =>
-                  setPagina(
-                    (valor) =>
-                      Math.max(
-                        1,
-                        valor - 1
-                      )
-                  )
-                }
-              >
-                Anterior
-              </button>
+        {!cargando && ordenesFiltradas.length > 0 && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, marginTop: 24 }}>
+          <button type="button" className="pc-btn pc-btn-light" disabled={paginaActual === 1} onClick={() => setPagina(v => Math.max(1, v - 1))}>Anterior</button>
+          <span style={{ fontWeight: 600 }}>Página {paginaActual} de {totalPaginas}</span>
+          <button type="button" className="pc-btn pc-btn-light" disabled={paginaActual === totalPaginas} onClick={() => setPagina(v => Math.min(totalPaginas, v + 1))}>Siguiente</button>
+        </div>}
 
-              <span
-                style={{
-                  fontWeight: 600,
-                }}
-              >
-                Página {paginaActual} de{' '}
-                {totalPaginas}
-              </span>
-
-              <button
-                type="button"
-                className="pc-btn pc-btn-light"
-                disabled={
-                  paginaActual ===
-                  totalPaginas
-                }
-                onClick={() =>
-                  setPagina(
-                    (valor) =>
-                      Math.min(
-                        totalPaginas,
-                        valor + 1
-                      )
-                  )
-                }
-              >
-                Siguiente
-              </button>
+        {cancelacion && <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', display: 'grid', placeItems: 'center', padding: 20, zIndex: 1000 }}>
+          <div className="pc-card" style={{ width: 'min(560px,100%)', padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Cancelar orden #{cancelacion.id}</h2>
+            <p style={{ color: '#555', lineHeight: 1.5 }}>Escribe el motivo que se mostrará al cliente. Esto también quedará guardado en el historial de la orden.</p>
+            <textarea className="pc-input" rows="5" maxLength="500" value={motivo} onChange={e => setMotivo(e.target.value)} placeholder="Ej.: No hay disponibilidad del producto solicitado..." style={{ width: '100%', resize: 'vertical', boxSizing: 'border-box' }} autoFocus />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button type="button" className="pc-btn pc-btn-light" disabled={procesando} onClick={() => { setCancelacion(null); setMotivo('') }}>Volver</button>
+              <button type="button" className="pc-btn pc-btn-primary" disabled={procesando || !motivo.trim()} onClick={confirmarCancelacion}>{procesando ? 'Cancelando...' : 'Confirmar cancelación'}</button>
             </div>
-          )}
+          </div>
+        </div>}
       </div>
     </main>
   )
