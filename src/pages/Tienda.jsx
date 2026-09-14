@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Monitor, ShoppingCart } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
 import BotonAtras from '../components/BotonAtras'
+import { obtenerImagenProducto } from '../utils/imagenesProductos'
 
 export default function Tienda() {
   const [productos, setProductos] = useState([])
@@ -24,10 +25,7 @@ export default function Tienda() {
     setCargando(true)
     setError('')
 
-    const {
-      data: productosData,
-      error: productosError,
-    } = await supabase
+    const { data: productosData, error: productosError } = await supabase
       .from('productos')
       .select('*, categorias(id, nombre)')
       .eq('activo', true)
@@ -39,10 +37,7 @@ export default function Tienda() {
       return
     }
 
-    const {
-      data: categoriasData,
-      error: categoriasError,
-    } = await supabase
+    const { data: categoriasData, error: categoriasError } = await supabase
       .from('categorias')
       .select('id, nombre')
       .order('nombre')
@@ -61,7 +56,6 @@ export default function Tienda() {
   const productosFiltrados = useMemo(() => {
     return productos.filter((producto) => {
       const texto = busqueda.trim().toLowerCase()
-
       const coincideTexto =
         texto === '' ||
         producto.nombre?.toLowerCase().includes(texto) ||
@@ -79,9 +73,7 @@ export default function Tienda() {
   if (cargando) {
     return (
       <main className="pc-page">
-        <div className="pc-container">
-          Cargando productos...
-        </div>
+        <div className="pc-container">Cargando productos...</div>
       </main>
     )
   }
@@ -89,20 +81,14 @@ export default function Tienda() {
   return (
     <main className="pc-page">
       <div className="pc-container">
-
         <BotonAtras />
 
         <div className="pc-admin-header">
           <h1>Tienda</h1>
-
-          <p>
-            Encuentra componentes disponibles
-            en PC Store.
-          </p>
+          <p>Encuentra componentes disponibles en PC Store.</p>
         </div>
 
         <div className="pc-toolbar">
-
           <input
             type="search"
             className="pc-input"
@@ -116,72 +102,35 @@ export default function Tienda() {
             value={categoriaId}
             onChange={(e) => setCategoriaId(e.target.value)}
           >
-            <option value="">
-              Todas las categorías
-            </option>
-
+            <option value="">Todas las categorías</option>
             {categorias.map((categoria) => (
-              <option
-                key={categoria.id}
-                value={categoria.id}
-              >
+              <option key={categoria.id} value={categoria.id}>
                 {categoria.nombre}
               </option>
             ))}
           </select>
-
         </div>
 
-        {error && (
-          <div
-            className="pc-card"
-            style={{ padding: 18 }}
-          >
-            Error: {error}
-          </div>
-        )}
-
-        {mensaje && (
-          <div className="pc-toast">
-            {mensaje}
-          </div>
-        )}
+        {error && <div className="pc-card" style={{ padding: 18 }}>Error: {error}</div>}
+        {mensaje && <div className="pc-toast">{mensaje}</div>}
 
         <div className="pc-product-grid">
-
           {productosFiltrados.map((producto) => (
-            <article
-              key={producto.id}
-              className="pc-card pc-product-card"
-            >
-
+            <article key={producto.id} className="pc-card pc-product-card">
               <div className="pc-product-image">
-
-                {producto.imagen_principal ? (
-                  <img
-                    src={producto.imagen_principal}
-                    alt={producto.nombre}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : (
-                  <Monitor size={48} strokeWidth={1.5} />
-                )}
-
+                <img
+                  src={obtenerImagenProducto(producto)}
+                  alt={producto.nombre}
+                  loading="lazy"
+                />
               </div>
 
               <div className="pc-product-body">
-
                 <div className="pc-product-category">
                   {producto.categorias?.nombre || 'Sin categoría'}
                 </div>
 
-                <h3 className="pc-product-name">
-                  {producto.nombre}
-                </h3>
+                <h3 className="pc-product-name">{producto.nombre}</h3>
 
                 <p className="pc-product-description">
                   {producto.descripción?.substring(0, 90)}
@@ -189,35 +138,20 @@ export default function Tienda() {
                 </p>
 
                 <div className="pc-price-row">
-
                   {producto.precio_descuento ? (
                     <>
-                      <span className="pc-price">
-                        L {Number(producto.precio_descuento).toFixed(2)}
-                      </span>
-
-                      <span className="pc-old-price">
-                        L {Number(producto.precio).toFixed(2)}
-                      </span>
+                      <span className="pc-price">L {Number(producto.precio_descuento).toFixed(2)}</span>
+                      <span className="pc-old-price">L {Number(producto.precio).toFixed(2)}</span>
                     </>
                   ) : (
-                    <span className="pc-price">
-                      L {Number(producto.precio).toFixed(2)}
-                    </span>
+                    <span className="pc-price">L {Number(producto.precio).toFixed(2)}</span>
                   )}
-
                 </div>
 
-                <div className="pc-stock">
-                  Stock disponible: {producto.stock}
-                </div>
+                <div className="pc-stock">Stock disponible: {producto.stock}</div>
 
                 <div className="pc-product-actions">
-
-                  <Link
-                    to={`/producto/${producto.id}`}
-                    className="pc-btn pc-btn-light"
-                  >
+                  <Link to={`/producto/${producto.id}`} className="pc-btn pc-btn-light">
                     Ver detalle
                   </Link>
 
@@ -227,13 +161,8 @@ export default function Tienda() {
                     disabled={producto.stock <= 0}
                     onClick={() => {
                       const resultado = agregarProducto(producto)
-
                       setMensaje(resultado.message)
-
-                      setTimeout(
-                        () => setMensaje(''),
-                        2200
-                      )
+                      setTimeout(() => setMensaje(''), 2200)
                     }}
                   >
                     {producto.stock > 0 ? (
@@ -245,29 +174,17 @@ export default function Tienda() {
                       'Agotado'
                     )}
                   </button>
-
                 </div>
-
               </div>
-
             </article>
           ))}
-
         </div>
 
         {productosFiltrados.length === 0 && (
-          <div
-            className="pc-card"
-            style={{
-              padding: 30,
-              textAlign: 'center',
-              marginTop: 20,
-            }}
-          >
+          <div className="pc-card" style={{ padding: 30, textAlign: 'center', marginTop: 20 }}>
             No encontramos productos con esos filtros.
           </div>
         )}
-
       </div>
     </main>
   )
