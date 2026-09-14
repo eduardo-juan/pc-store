@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
 import { useAuth } from '../hooks/useAuth'
-import { ShoppingBag, UserRound } from 'lucide-react'
+import { ShoppingBag } from 'lucide-react'
 import BotonAtras from '../components/BotonAtras'
 
 const COSTO_ENVIO = 100
@@ -16,10 +16,7 @@ const limpiarTexto = (valor = '', max = 50) =>
 
 const formatearTelefono = (valor = '') => {
   const numeros = String(valor).replace(/\D/g, '').slice(0, 8)
-
-  return numeros.length <= 4
-    ? numeros
-    : `${numeros.slice(0, 4)}-${numeros.slice(4)}`
+  return numeros.length <= 4 ? numeros : `${numeros.slice(0, 4)}-${numeros.slice(4)}`
 }
 
 export default function Checkout() {
@@ -34,88 +31,26 @@ export default function Checkout() {
   const [ciudad, setCiudad] = useState('')
   const [referencia, setReferencia] = useState('')
   const [notas, setNotas] = useState('')
+  const [referenciaTransferencia, setReferenciaTransferencia] = useState('')
   const [metodoPago, setMetodoPago] = useState('transferencia')
-
-  const [empleados, setEmpleados] = useState([])
-  const [empleadoId, setEmpleadoId] = useState('')
-  const [cargandoEmpleados, setCargandoEmpleados] = useState(true)
   const [procesando, setProcesando] = useState(false)
   const [error, setError] = useState('')
 
   const subtotalNumerico = Number(subtotal) || 0
   const total = subtotalNumerico + COSTO_ENVIO
 
-  useEffect(() => {
-    cargarEmpleados()
-  }, [])
-
-  const cargarEmpleados = async () => {
-    setCargandoEmpleados(true)
-    setError('')
-
-    const { data, error: empleadosError } = await supabase.rpc(
-      'obtener_empleados_disponibles'
-    )
-
-    if (empleadosError) {
-      console.error('Error cargando empleados:', empleadosError)
-      setError('No se pudieron cargar los empleados disponibles.')
-      setEmpleados([])
-    } else {
-      setEmpleados(data || [])
-    }
-
-    setCargandoEmpleados(false)
-  }
-
   const finalizarCompra = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!usuario) {
-      setError('Debes iniciar sesión para continuar.')
-      return
-    }
-
-    if (items.length === 0) {
-      setError('Tu carrito está vacío.')
-      return
-    }
-
-    if (!empleadoId) {
-      setError('Selecciona el empleado que realizará la entrega.')
-      return
-    }
-
-    if (!nombre.trim()) {
-      setError('Ingresa el nombre de la persona que recibirá el pedido.')
-      return
-    }
-
-    if (!apellido.trim()) {
-      setError('Ingresa el apellido de la persona que recibirá el pedido.')
-      return
-    }
-
-    if (!/^[0-9]{4}-[0-9]{4}$/.test(telefono)) {
-      setError('El teléfono debe tener el formato 9439-4343.')
-      return
-    }
-
-    if (!ciudad.trim()) {
-      setError('Ingresa la ciudad de entrega.')
-      return
-    }
-
-    if (!direccion.trim()) {
-      setError('Ingresa la dirección de entrega.')
-      return
-    }
-
-    if (!referencia.trim()) {
-      setError('Ingresa una referencia de entrega.')
-      return
-    }
+    if (!usuario) return setError('Debes iniciar sesión para continuar.')
+    if (items.length === 0) return setError('Tu carrito está vacío.')
+    if (!nombre.trim()) return setError('Ingresa el nombre de la persona que recibirá el pedido.')
+    if (!apellido.trim()) return setError('Ingresa el apellido de la persona que recibirá el pedido.')
+    if (!/^[0-9]{4}-[0-9]{4}$/.test(telefono)) return setError('El teléfono debe tener el formato 9439-4343.')
+    if (!ciudad.trim()) return setError('Ingresa la ciudad de entrega.')
+    if (!direccion.trim()) return setError('Ingresa la dirección de entrega.')
+    if (!referencia.trim()) return setError('Ingresa una referencia de entrega.')
 
     setProcesando(true)
 
@@ -124,21 +59,24 @@ export default function Checkout() {
       cantidad: Number(item.cantidad),
     }))
 
-    const { data, error: rpcError } = await supabase.rpc(
-      'crear_orden_pc_store',
-      {
-        p_items: itemsRpc,
-        p_nombre_cliente: nombre.trim(),
-        p_apellido_cliente: apellido.trim(),
-        p_telefono: telefono.trim(),
-        p_direccion: direccion.trim(),
-        p_ciudad: ciudad.trim(),
-        p_metodo_pago: metodoPago,
-        p_notas: notas.trim() || null,
-        p_referencia: referencia.trim() || null,
-        p_empleado_id: empleadoId,
-      }
-    )
+    const notasFinales = [
+      notas.trim(),
+      metodoPago === 'transferencia' && referenciaTransferencia.trim()
+        ? `Referencia de transferencia: ${referenciaTransferencia.trim()}`
+        : '',
+    ].filter(Boolean).join('\n') || null
+
+    const { data, error: rpcError } = await supabase.rpc('crear_orden_pc_store', {
+      p_items: itemsRpc,
+      p_nombre_cliente: nombre.trim(),
+      p_apellido_cliente: apellido.trim(),
+      p_telefono: telefono.trim(),
+      p_direccion: direccion.trim(),
+      p_ciudad: ciudad.trim(),
+      p_metodo_pago: metodoPago,
+      p_notas: notasFinales,
+      p_referencia: referencia.trim(),
+    })
 
     if (rpcError) {
       console.error('Error creando orden:', rpcError)
@@ -167,26 +105,21 @@ export default function Checkout() {
         <form className="pc-checkout-layout" onSubmit={finalizarCompra}>
           <section className="pc-card pc-checkout-form">
             <h2>Datos de entrega</h2>
-            <p className="pc-muted">
-              Estos datos corresponden a la persona y dirección donde se entregará este pedido.
-            </p>
+            <p className="pc-muted">Estos datos corresponden a la persona y dirección donde se entregará este pedido.</p>
 
             <div className="pc-form-grid">
               <label>
                 Nombre del receptor <span style={{ color: 'red' }}>*</span>
                 <input className="pc-input" type="text" maxLength={50} value={nombre} onChange={(e) => setNombre(limpiarTexto(e.target.value))} placeholder="Nombre" required />
               </label>
-
               <label>
                 Apellido del receptor <span style={{ color: 'red' }}>*</span>
                 <input className="pc-input" type="text" maxLength={50} value={apellido} onChange={(e) => setApellido(limpiarTexto(e.target.value))} placeholder="Apellido" required />
               </label>
-
               <label>
                 Teléfono <span style={{ color: 'red' }}>*</span>
                 <input className="pc-input" type="tel" inputMode="numeric" maxLength={9} placeholder="9439-4343" value={telefono} onChange={(e) => setTelefono(formatearTelefono(e.target.value))} required />
               </label>
-
               <label>
                 Ciudad <span style={{ color: 'red' }}>*</span>
                 <input className="pc-input" type="text" maxLength={50} value={ciudad} onChange={(e) => setCiudad(limpiarTexto(e.target.value))} placeholder="Ciudad" required />
@@ -208,25 +141,6 @@ export default function Checkout() {
               <textarea className="pc-textarea" rows="3" maxLength={500} value={notas} onChange={(e) => setNotas(e.target.value.slice(0, 500))} placeholder="Indicaciones adicionales para la entrega" />
             </label>
 
-            <h2>Empleado responsable</h2>
-            <div className="pc-card" style={{ padding: '16px', marginBottom: '20px' }}>
-              <label>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <UserRound size={18} />
-                  <strong>Selecciona el empleado</strong>
-                </span>
-                <select className="pc-select" value={empleadoId} onChange={(e) => setEmpleadoId(e.target.value)} disabled={cargandoEmpleados || procesando} required>
-                  <option value="">{cargandoEmpleados ? 'Cargando empleados...' : 'Selecciona un empleado'}</option>
-                  {empleados.map((empleado) => (
-                    <option key={empleado.id} value={empleado.id}>{empleado.nombre} {empleado.apellido || ''}</option>
-                  ))}
-                </select>
-              </label>
-              {!cargandoEmpleados && empleados.length === 0 && (
-                <p className="pc-muted" style={{ margin: '10px 0 0' }}>No hay empleados disponibles para realizar entregas.</p>
-              )}
-            </div>
-
             <h2>Envío</h2>
             <div className="pc-card" style={{ padding: '16px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
@@ -247,7 +161,7 @@ export default function Checkout() {
             {metodoPago === 'transferencia' && (
               <label>
                 Referencia de transferencia
-                <input className="pc-input" type="text" maxLength={150} placeholder="Opcional" value={referencia} onChange={(e) => setReferencia(e.target.value.slice(0, 150))} />
+                <input className="pc-input" type="text" maxLength={150} placeholder="Opcional" value={referenciaTransferencia} onChange={(e) => setReferenciaTransferencia(e.target.value.slice(0, 150))} />
               </label>
             )}
 
@@ -259,20 +173,17 @@ export default function Checkout() {
             {items.map((item) => (
               <div className="pc-summary-product" key={item.producto_id}>
                 <span>{item.cantidad} × {item.nombre}</span>
-                <strong>L { (Number(item.precio) * Number(item.cantidad)).toFixed(2)}</strong>
+                <strong>L {(Number(item.precio) * Number(item.cantidad)).toFixed(2)}</strong>
               </div>
             ))}
-
             <div className="pc-summary-total"><span>Subtotal</span><strong>L {subtotalNumerico.toFixed(2)}</strong></div>
             <div className="pc-summary-total" style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '12px', marginTop: '8px' }}><span>Envío</span><strong>L {COSTO_ENVIO.toFixed(2)}</strong></div>
             <div className="pc-summary-total" style={{ fontSize: '1.15rem', marginTop: '12px' }}><span>Total</span><strong>L {total.toFixed(2)}</strong></div>
-
-            <button type="submit" disabled={procesando || cargandoEmpleados || empleados.length === 0} className="pc-btn pc-btn-primary pc-btn-block" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <button type="submit" disabled={procesando} className="pc-btn pc-btn-primary pc-btn-block" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <ShoppingBag size={18} />
               {procesando ? 'Procesando...' : 'Confirmar orden'}
             </button>
-
-            <small className="pc-muted">El servidor volverá a validar precios, stock, empleado y costo de envío.</small>
+            <small className="pc-muted">La orden se publicará automáticamente para los empleados disponibles.</small>
           </aside>
         </form>
       </div>
