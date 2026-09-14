@@ -7,9 +7,12 @@ const esRutaAdmin = () => ADMIN_PATHS.some((ruta) => window.location.pathname ==
 
 const textoFecha = (valor) => {
   if (!valor) return null
-  const match = String(valor).match(/(\d{4})[-\/]?(\d{2})[-\/]?(\d{2})/)
-  if (match) return `${match[1]}-${match[2]}-${match[3]}`
-  const fecha = new Date(valor)
+  const texto = String(valor)
+  const iso = texto.match(/(\d{4})[-\/]?(\d{2})[-\/]?(\d{2})/)
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`
+  const local = texto.match(/(\d{2})[\/]?(\d{2})[\/](\d{4})/)
+  if (local) return `${local[3]}-${local[2]}-${local[1]}`
+  const fecha = new Date(texto)
   return Number.isNaN(fecha.getTime()) ? null : fecha.toISOString().slice(0, 10)
 }
 
@@ -19,11 +22,7 @@ const instalar = (wrapper) => {
   if (wrapper.dataset.adminTools === 'true') return
   const table = wrapper.querySelector('table')
   if (!table) return
-
-  const tbody = table.querySelector('tbody')
-  if (!tbody) return
-  const filas = Array.from(tbody.querySelectorAll('tr'))
-  if (!filas.length) return
+  if (!table.querySelector('tbody')) return
 
   wrapper.dataset.adminTools = 'true'
 
@@ -64,9 +63,7 @@ const instalar = (wrapper) => {
   siguiente.textContent = 'Siguiente'
 
   controles.appendChild(buscador)
-  if (tieneColumnaFecha(table) && !wrapper.querySelector('input[type="date"]')) {
-    controles.appendChild(fecha)
-  }
+  if (tieneColumnaFecha(table) && !wrapper.querySelector('input[type="date"]')) controles.appendChild(fecha)
   controles.appendChild(limpiar)
   wrapper.insertBefore(controles, table)
 
@@ -76,14 +73,14 @@ const instalar = (wrapper) => {
   let pagina = 1
 
   const aplicar = () => {
+    const filas = Array.from(table.querySelectorAll('tbody tr'))
     const termino = buscador.value.trim().toLowerCase()
     const dia = fecha.value
     const filtradas = filas.filter((fila) => {
       const coincideTexto = !termino || (fila.textContent || '').toLowerCase().includes(termino)
       let coincideFecha = true
       if (dia) {
-        const celdas = Array.from(fila.querySelectorAll('td'))
-        const valoresFecha = celdas.map((celda) => textoFecha(celda.textContent)).filter(Boolean)
+        const valoresFecha = Array.from(fila.querySelectorAll('td')).map((celda) => textoFecha(celda.textContent)).filter(Boolean)
         coincideFecha = valoresFecha.includes(dia)
       }
       return coincideTexto && coincideFecha
@@ -94,10 +91,7 @@ const instalar = (wrapper) => {
     const inicio = (pagina - 1) * PAGE_SIZE
     const visibles = new Set(filtradas.slice(inicio, inicio + PAGE_SIZE))
 
-    filas.forEach((fila) => {
-      fila.style.display = visibles.has(fila) ? '' : 'none'
-    })
-
+    filas.forEach((fila) => { fila.style.display = visibles.has(fila) ? '' : 'none' })
     indicador.textContent = `Página ${pagina} de ${totalPaginas}`
     anterior.disabled = pagina <= 1
     siguiente.disabled = pagina >= totalPaginas
@@ -119,9 +113,8 @@ const instalar = (wrapper) => {
 
 export default function AdminTableTools() {
   useEffect(() => {
-    if (!esRutaAdmin()) return undefined
-
     const escanear = () => {
+      if (!esRutaAdmin()) return
       document.querySelectorAll('.pc-table-wrapper').forEach(instalar)
     }
 
