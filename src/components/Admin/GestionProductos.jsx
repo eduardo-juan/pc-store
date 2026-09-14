@@ -15,6 +15,7 @@ import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
 const BUCKET_PRODUCTOS = 'productos-imagenes'
+const limpiarTextoProducto = (valor, max = 120) => valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ _-]/g, '').slice(0, max)
 
 const obtenerRutasImagenesPropias = (producto) => {
   const urls = [producto?.imagen_principal]
@@ -141,7 +142,6 @@ export default function GestionProductos() {
 
       if (!resultado.success) throw new Error(resultado.error)
 
-      // Al reemplazar imágenes, elimina las anteriores solo después de guardar la nueva referencia.
       if (productoAnterior && imagenes.length > 0) {
         await limpiarImagenes(productoAnterior)
       }
@@ -169,7 +169,6 @@ export default function GestionProductos() {
       resetFormulario()
       await cargarProductos()
     } catch (err) {
-      // Si se subieron archivos pero la operación de BD falló, evita dejar huérfanos.
       for (const ruta of nuevasRutas) await eliminarImagen(BUCKET_PRODUCTOS, ruta)
       setError(err.message)
     }
@@ -219,7 +218,6 @@ export default function GestionProductos() {
     const producto = productos.find((item) => Number(item.id) === Number(id))
     const resultado = await eliminarProducto(id)
     if (resultado.success) {
-      // Solo elimina archivos que pertenecen a nuestro bucket; las URLs externas se conservan.
       await limpiarImagenes(producto)
       alert('Producto eliminado')
       await cargarProductos()
@@ -244,9 +242,9 @@ export default function GestionProductos() {
             <h2 style={{ marginBottom: 16 }}>{editandoId ? 'Editar Producto' : 'Nuevo Producto'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="pc-form-grid">
-                <input type="text" placeholder="Nombre del producto" className="pc-input" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-                <input type="text" placeholder="Marca" className="pc-input" value={marca} onChange={(e) => setMarca(e.target.value)} />
-                <input type="text" placeholder="Modelo" className="pc-input" value={modelo} onChange={(e) => setModelo(e.target.value)} />
+                <input type="text" placeholder="Nombre del producto" className="pc-input" value={nombre} onChange={(e) => setNombre(limpiarTextoProducto(e.target.value, 100))} required />
+                <input type="text" placeholder="Marca" className="pc-input" value={marca} onChange={(e) => setMarca(limpiarTextoProducto(e.target.value, 60))} />
+                <input type="text" placeholder="Modelo" className="pc-input" value={modelo} onChange={(e) => setModelo(limpiarTextoProducto(e.target.value, 80))} />
                 <select className="pc-select" value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required><option value="">Selecciona una categoría</option>{categorias.map((categoria) => <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>)}</select>
                 <input type="number" placeholder="Precio (Lps)" step="0.01" min="0" className="pc-input" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
                 <input type="number" placeholder="Stock" min="0" className="pc-input" value={stock} onChange={(e) => setStock(e.target.value)} required />
@@ -263,7 +261,7 @@ export default function GestionProductos() {
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 0 }}><Truck size={18} /> Dropshipping</h3>
                 <p style={{ marginTop: 0 }}>Información privada del proveedor. Solo los administradores pueden verla.</p>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}><input type="checkbox" checked={dropshippingActivo} onChange={(e) => setDropshippingActivo(e.target.checked)} /> Activar dropshipping para este producto</label>
-                {dropshippingActivo && <div className="pc-form-grid"><input type="text" placeholder="Proveedor" className="pc-input" value={proveedor} onChange={(e) => setProveedor(e.target.value)} required /><input type="url" placeholder="https://proveedor.com/producto" className="pc-input" value={urlProveedor} onChange={(e) => setUrlProveedor(e.target.value)} required /><input type="number" placeholder="Costo del proveedor (Lps)" step="0.01" min="0" className="pc-input" value={costoProveedor} onChange={(e) => setCostoProveedor(e.target.value)} required /></div>}
+                {dropshippingActivo && <div className="pc-form-grid"><input type="text" placeholder="Proveedor" className="pc-input" value={proveedor} onChange={(e) => setProveedor(limpiarTextoProducto(e.target.value, 100))} required /><input type="url" placeholder="https://proveedor.com/producto" className="pc-input" value={urlProveedor} onChange={(e) => setUrlProveedor(e.target.value)} required /><input type="number" placeholder="Costo del proveedor (Lps)" step="0.01" min="0" className="pc-input" value={costoProveedor} onChange={(e) => setCostoProveedor(e.target.value)} required /></div>}
               </div>}
 
               <div style={{ display: 'flex', gap: 10, marginTop: 16 }}><button type="submit" disabled={cargando} className="pc-btn pc-btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Save size={17} /> {cargando ? 'Guardando...' : 'Guardar'}</button><button type="button" className="pc-btn pc-btn-light" onClick={resetFormulario} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><X size={17} /> Cancelar</button></div>
