@@ -9,7 +9,7 @@ import { CarritoProvider } from './context/CarritoContext'
 import ProtectedRoute from './components/Auth/ProtectedRoute'
 import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
-import './responsive.css'
+import './responsive.js'
 
 import Home from './pages/Home'
 import Tienda from './pages/Tienda'
