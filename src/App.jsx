@@ -32,6 +32,7 @@ import GestionCategorias from './components/Admin/GestionCategorias'
 import GestionOrdenes from './components/Admin/GestionOrdenes'
 import GestionUsuarios from './components/Admin/GestionUsuarios'
 import GestionEmpleados from './components/Admin/GestionEmpleados'
+import RegistroEmpleado from './components/Admin/RegistroEmpleado'
 import HistorialVentas from './components/Admin/HistorialVentas'
 import AuditoriaAccesos from './components/Admin/AuditoriaAccesos'
 import AdminTableTools from './components/Admin/AdminTableTools'
@@ -76,6 +77,7 @@ export default function App() {
 
                 <Route path="/admin/usuarios" element={<ProtectedRoute requiereAdmin><GestionUsuarios /></ProtectedRoute>} />
                 <Route path="/admin/empleados" element={<ProtectedRoute requiereAdmin><GestionEmpleados /></ProtectedRoute>} />
+                <Route path="/admin/empleados/nuevo" element={<ProtectedRoute requiereAdmin><RegistroEmpleado /></ProtectedRoute>} />
                 <Route path="/admin/ventas" element={<ProtectedRoute requiereAdmin><HistorialVentas /></ProtectedRoute>} />
                 <Route path="/admin/auditoria" element={<ProtectedRoute requiereAdmin><AuditoriaAccesos /></ProtectedRoute>} />
 
