@@ -10,41 +10,26 @@ export const obtenerProductos = async (filtros = {}) => {
       .select('*, categorias(nombre)')
       .eq('activo', true)
 
-    // Filtrar por categoría
     if (filtros.categoria_id) {
       query = query.eq('categoria_id', filtros.categoria_id)
     }
 
-    // Filtrar por marca
     if (filtros.marca) {
       query = query.eq('marca', filtros.marca)
     }
 
-    // Buscar por nombre
     if (filtros.busqueda) {
-      query = query.ilike(
-        'nombre',
-        `%${filtros.busqueda}%`
-      )
+      query = query.ilike('nombre', `%${filtros.busqueda}%`)
     }
 
     const { data, error } = await query
-
     if (error) throw error
 
-    return {
-      success: true,
-      data: data || []
-    }
-
+    return { success: true, data: data || [] }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
-
 
 // ==========================================
 // OBTENER UN PRODUCTO
@@ -58,23 +43,64 @@ export const obtenerProducto = async (id) => {
       .single()
 
     if (error) throw error
-
-    return {
-      success: true,
-      data
-    }
-
+    return { success: true, data }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
 
+// ==========================================
+// PROVEEDOR DROPSHIPPING - SOLO ADMIN
+// ==========================================
+export const obtenerProveedorProducto = async (productoId) => {
+  try {
+    const { data, error } = await supabase
+      .from('producto_proveedores')
+      .select('*')
+      .eq('producto_id', productoId)
+      .maybeSingle()
+
+    if (error) throw error
+    return { success: true, data: data || null }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+}
+
+export const guardarProveedorProducto = async (productoId, proveedor) => {
+  try {
+    const { data, error } = await supabase
+      .from('producto_proveedores')
+      .upsert(
+        [{ producto_id: productoId, ...proveedor }],
+        { onConflict: 'producto_id' }
+      )
+      .select()
+      .single()
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+}
+
+export const eliminarProveedorProducto = async (productoId) => {
+  try {
+    const { error } = await supabase
+      .from('producto_proveedores')
+      .delete()
+      .eq('producto_id', productoId)
+
+    if (error) throw error
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+}
 
 // ==========================================
-// CREAR PRODUCTO - SOLO ADMIN
+// CREAR PRODUCTO - SOLO STAFF
 // ==========================================
 export const crearProducto = async (producto) => {
   try {
@@ -84,23 +110,14 @@ export const crearProducto = async (producto) => {
       .select()
 
     if (error) throw error
-
-    return {
-      success: true,
-      data: data?.[0] || null
-    }
-
+    return { success: true, data: data?.[0] || null }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
 
-
 // ==========================================
-// ACTUALIZAR PRODUCTO - SOLO ADMIN
+// ACTUALIZAR PRODUCTO - SOLO STAFF
 // ==========================================
 export const actualizarProducto = async (id, cambios) => {
   try {
@@ -111,20 +128,11 @@ export const actualizarProducto = async (id, cambios) => {
       .select()
 
     if (error) throw error
-
-    return {
-      success: true,
-      data: data?.[0] || null
-    }
-
+    return { success: true, data: data?.[0] || null }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
-
 
 // ==========================================
 // ELIMINAR PRODUCTO - SOLO ADMIN
@@ -137,19 +145,11 @@ export const eliminarProducto = async (id) => {
       .eq('id', id)
 
     if (error) throw error
-
-    return {
-      success: true
-    }
-
+    return { success: true }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
-
 
 // ==========================================
 // OBTENER CATEGORÍAS
@@ -162,16 +162,8 @@ export const obtenerCategorias = async () => {
       .order('nombre')
 
     if (error) throw error
-
-    return {
-      success: true,
-      data: data || []
-    }
-
+    return { success: true, data: data || [] }
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    }
+    return { success: false, error: error.message }
   }
 }
