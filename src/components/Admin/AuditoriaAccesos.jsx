@@ -14,7 +14,7 @@ export default function AuditoriaAccesos() {
 
     const { data, error: consultaError } = await supabase
       .from('auditoria_accesos')
-      .select('id, usuario_id, email, rol, fecha_acceso')
+      .select('id, usuario_id, email, nombre, rol, fecha_acceso')
       .order('fecha_acceso', { ascending: false })
       .limit(200)
 
@@ -45,9 +45,7 @@ export default function AuditoriaAccesos() {
 
         <div className="pc-page-heading">
           <div>
-            <span className="pc-kicker" style={{ color: '#171717' }}>
-              Seguridad
-            </span>
+            <span className="pc-kicker" style={{ color: '#171717' }}>Seguridad</span>
             <h1 style={{ color: '#171717' }}>Auditoría de accesos</h1>
             <p style={{ color: '#171717' }}>
               Registro de los inicios de sesión exitosos realizados en PC Store.
@@ -82,6 +80,7 @@ export default function AuditoriaAccesos() {
               <thead>
                 <tr>
                   <th>Fecha y hora</th>
+                  <th>Nombre</th>
                   <th>Email</th>
                   <th>Rol</th>
                   <th>ID de usuario</th>
@@ -91,6 +90,7 @@ export default function AuditoriaAccesos() {
                 {registros.map((registro) => (
                   <tr key={registro.id}>
                     <td style={{ whiteSpace: 'nowrap' }}>{formatearFecha(registro.fecha_acceso)}</td>
+                    <td>{registro.nombre || '-'}</td>
                     <td>{registro.email || '-'}</td>
                     <td style={{ textTransform: 'capitalize' }}>{registro.rol}</td>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{registro.usuario_id}</td>
@@ -98,7 +98,7 @@ export default function AuditoriaAccesos() {
                 ))}
                 {registros.length === 0 && (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: 35 }}>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: 35 }}>
                       <ClipboardList size={28} style={{ margin: '0 auto 8px' }} />
                       Todavía no hay accesos registrados.
                     </td>
