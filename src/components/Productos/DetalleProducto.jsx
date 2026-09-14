@@ -61,6 +61,26 @@ export default function DetalleProducto() {
     setCargando(false)
   }
 
+  const limpiarImagenRota = async (url) => {
+    if (!url || !producto) return
+
+    const esPrincipal = producto.imagen_principal === url
+    const adicionales = Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []
+    const nuevosAdicionales = adicionales.filter((imagen) => imagen !== url)
+    const cambios = {}
+
+    if (esPrincipal) cambios.imagen_principal = null
+    if (nuevosAdicionales.length !== adicionales.length) cambios.imágenes_adicionales = nuevosAdicionales
+    if (Object.keys(cambios).length === 0) return
+
+    const { error } = await supabase.from('productos').update(cambios).eq('id', producto.id)
+    if (!error) {
+      const actualizado = { ...producto, ...cambios }
+      setProducto(actualizado)
+      setImagenSeleccionada(obtenerImagenProducto(actualizado))
+    }
+  }
+
   const agregar = () => {
     const cantidadNumerica = Number(cantidad)
     if (!Number.isInteger(cantidadNumerica) || cantidadNumerica < 1 || cantidadNumerica > producto.stock) {
@@ -134,7 +154,15 @@ export default function DetalleProducto() {
         <div className="pc-product-detail">
           <div>
             <div className="pc-detail-image">
-              <img src={imagenSeleccionada || imagenesProducto[0]} alt={producto.nombre} />
+              <img
+                src={imagenSeleccionada || imagenesProducto[0]}
+                alt={producto.nombre}
+                onError={(e) => {
+                  const urlFallida = e.currentTarget.src
+                  e.currentTarget.style.display = 'none'
+                  limpiarImagenRota(urlFallida)
+                }}
+              />
             </div>
             {imagenesProducto.length > 1 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
@@ -146,7 +174,15 @@ export default function DetalleProducto() {
                     aria-label={`Ver imagen ${index + 1}`}
                     style={{ padding: 5, border: `2px solid ${imagenSeleccionada === url ? '#d4af37' : '#e0e0e0'}`, borderRadius: 10, background: '#fff', cursor: 'pointer' }}
                   >
-                    <img src={url} alt={`${producto.nombre} vista ${index + 1}`} style={{ width: '100%', height: 90, objectFit: 'contain' }} />
+                    <img
+                      src={url}
+                      alt={`${producto.nombre} vista ${index + 1}`}
+                      onError={(e) => {
+                        e.currentTarget.parentElement?.remove()
+                        limpiarImagenRota(url)
+                      }}
+                      style={{ width: '100%', height: 90, objectFit: 'contain' }}
+                    />
                   </button>
                 ))}
               </div>
