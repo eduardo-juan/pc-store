@@ -190,6 +190,15 @@ export default function GestionUsuarios() {
           </div>
         )}
 
+        {!cargando && (
+          <div className="pc-metrics-grid" style={{ marginBottom: 30 }}>
+            <article className="pc-card pc-metric">
+              <span style={{ color: '#171717' }}>Usuarios registrados</span>
+              <strong style={{ color: '#171717' }}>{usuarios.length}</strong>
+            </article>
+          </div>
+        )}
+
         <div
           className="pc-card"
           style={{
@@ -273,6 +282,7 @@ export default function GestionUsuarios() {
             <table className="pc-table">
               <thead>
                 <tr>
+                  <th>N.º</th>
                   <th>Nombre</th>
                   <th>Email</th>
                   <th>Ciudad</th>
@@ -283,7 +293,7 @@ export default function GestionUsuarios() {
               </thead>
 
               <tbody>
-                {usuariosFiltrados.map((usuarioItem) => {
+                {usuariosFiltrados.map((usuarioItem, indice) => {
                   const esActual = usuarioItem.id === usuario?.id
                   const esAdmin = usuarioItem.rol === 'admin'
                   const estaBloqueado =
@@ -293,6 +303,8 @@ export default function GestionUsuarios() {
 
                   return (
                     <tr key={usuarioItem.id}>
+                      <td><strong>{indice + 1}</strong></td>
+
                       <td>
                         <strong>
                           {obtenerNombre(usuarioItem)}
@@ -449,7 +461,7 @@ export default function GestionUsuarios() {
                 {usuariosFiltrados.length === 0 && (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       style={{
                         textAlign: 'center',
                         padding: 30,
