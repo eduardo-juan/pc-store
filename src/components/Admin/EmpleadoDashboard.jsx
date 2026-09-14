@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Package, BarChart3, Tags, FileText, Bell, CheckCircle2, Coins } from 'lucide-react'
+import { Package, BarChart3, Tags, FileText, Bell, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
@@ -9,6 +9,7 @@ export default function EmpleadoDashboard() {
   const { usuario, perfil } = useAuth()
   const [metricas, setMetricas] = useState({ ordenes: 0, ventas: 0, pendientes: 0, pagadas: 0, enviadas: 0, entregadas: 0, activas: 0, comisiones: 0 })
   const [ordenesDisponibles, setOrdenesDisponibles] = useState([])
+  const [maxOrdenes, setMaxOrdenes] = useState(5)
   const [cargando, setCargando] = useState(true)
   const [aceptando, setAceptando] = useState(null)
   const [error, setError] = useState('')
@@ -16,18 +17,20 @@ export default function EmpleadoDashboard() {
   const cargarDatos = useCallback(async () => {
     if (!usuario?.id) return
     setError('')
-
-    const [ordenesResult, disponiblesResult, comisionesResult] = await Promise.all([
+    const [ordenesResult, disponiblesResult, comisionesResult, configResult] = await Promise.all([
       supabase.from('ordenes').select('id,total,estado,empleado_id,created_at').eq('empleado_id', usuario.id),
       supabase.rpc('obtener_ordenes_disponibles_empleado'),
       supabase.from('empleado_comisiones').select('monto').eq('empleado_id', usuario.id),
+      supabase.rpc('obtener_configuracion_entregas'),
     ])
-
     if (ordenesResult.error) setError(ordenesResult.error.message)
     if (disponiblesResult.error) setError(disponiblesResult.error.message)
     if (comisionesResult.error) setError(comisionesResult.error.message)
+    if (configResult.error) setError(configResult.error.message)
 
     const ordenes = ordenesResult.data || []
+    const config = configResult.data?.[0]
+    setMaxOrdenes(Number(config?.max_ordenes_activas) || 5)
     setOrdenesDisponibles(disponiblesResult.data || [])
     setMetricas({
       ordenes: ordenes.length,
@@ -64,9 +67,7 @@ export default function EmpleadoDashboard() {
     { icono: FileText, titulo: 'Órdenes', ruta: '/admin/ordenes' },
   ]
 
-  if (cargando) {
-    return <main className="pc-page"><div className="pc-container"><BotonAtras /><div className="pc-loading"><div className="pc-loader" /><p>Cargando información...</p></div></div></main>
-  }
+  if (cargando) return <main className="pc-page"><div className="pc-container"><BotonAtras /><div className="pc-loading"><div className="pc-loader" /><p>Cargando información...</p></div></div></main>
 
   return (
     <main className="pc-page">
@@ -79,11 +80,10 @@ export default function EmpleadoDashboard() {
             <p style={{ color: '#171717' }}>Las nuevas órdenes aparecen aquí automáticamente. Elige las que quieras gestionar.</p>
           </div>
         </div>
-
         {error && <div className="pc-card" style={{ padding: 16, marginBottom: 20, color: '#dc2626' }}>{error}</div>}
 
         <div className="pc-metrics-grid">
-          <article className="pc-card pc-metric"><span style={{ color: '#171717' }}>Órdenes activas</span><strong style={{ color: '#171717' }}>{metricas.activas}</strong></article>
+          <article className="pc-card pc-metric"><span style={{ color: '#171717' }}>Órdenes activas</span><strong style={{ color: '#171717' }}>{metricas.activas} / {maxOrdenes}</strong></article>
           <article className="pc-card pc-metric"><span style={{ color: '#171717' }}>Órdenes gestionadas</span><strong style={{ color: '#171717' }}>{metricas.ordenes}</strong></article>
           <article className="pc-card pc-metric"><span style={{ color: '#171717' }}>Entregadas</span><strong style={{ color: '#171717' }}>{metricas.entregadas}</strong></article>
           <article className="pc-card pc-metric"><span style={{ color: '#171717' }}>Comisiones</span><strong style={{ color: '#171717' }}>L {metricas.comisiones.toFixed(2)}</strong></article>
@@ -97,10 +97,7 @@ export default function EmpleadoDashboard() {
             </div>
             <strong style={{ color: '#171717' }}>{ordenesDisponibles.length} disponibles</strong>
           </div>
-
-          {ordenesDisponibles.length === 0 ? (
-            <div className="pc-muted" style={{ padding: '20px 0' }}>No hay órdenes nuevas disponibles en este momento.</div>
-          ) : (
+          {ordenesDisponibles.length === 0 ? <div className="pc-muted" style={{ padding: '20px 0' }}>No hay órdenes nuevas disponibles en este momento.</div> : (
             <div style={{ display: 'grid', gap: 12 }}>
               {ordenesDisponibles.map((orden) => (
                 <article key={orden.id} className="pc-card" style={{ padding: 16, border: '1px solid rgba(0,0,0,.08)' }}>
@@ -113,9 +110,9 @@ export default function EmpleadoDashboard() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <strong style={{ color: '#171717' }}>L {Number(orden.total || 0).toFixed(2)}</strong>
-                      <button type="button" className="pc-btn pc-btn-primary" disabled={aceptando !== null || metricas.activas >= 5} onClick={() => aceptarOrden(orden.id)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+                      <button type="button" className="pc-btn pc-btn-primary" disabled={aceptando !== null || metricas.activas >= maxOrdenes} onClick={() => aceptarOrden(orden.id)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
                         <CheckCircle2 size={17} />
-                        {aceptando === orden.id ? 'Aceptando...' : 'Aceptar orden'}
+                        {aceptando === orden.id ? 'Aceptando...' : metricas.activas >= maxOrdenes ? 'Límite alcanzado' : 'Aceptar orden'}
                       </button>
                     </div>
                   </div>
