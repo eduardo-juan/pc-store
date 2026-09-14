@@ -111,6 +111,13 @@ export default function GestionOrdenes() {
     const estadoActual =
       orden.estado || 'pendiente'
 
+    if (estadoActual === 'pagada') {
+      setError(
+        'Una orden pagada está cerrada y ya no puede modificarse.'
+      )
+      return
+    }
+
     if (estadoActual === 'cancelada') {
       setError(
         'Una orden cancelada no puede modificarse.'
@@ -352,6 +359,11 @@ export default function GestionOrdenes() {
                     orden.estado ||
                     'pendiente'
 
+                  const ordenCerrada = [
+                    'pagada',
+                    'cancelada',
+                  ].includes(estadoActual)
+
                   const ordenCancelada =
                     estadoActual ===
                     'cancelada'
@@ -517,7 +529,12 @@ export default function GestionOrdenes() {
                             estadoActual
                           }
                           disabled={
-                            ordenCancelada
+                            ordenCerrada
+                          }
+                          title={
+                            estadoActual === 'pagada'
+                              ? 'Orden pagada: no se puede modificar'
+                              : undefined
                           }
                           onChange={(e) =>
                             cambiarEstado(
@@ -548,6 +565,18 @@ export default function GestionOrdenes() {
                             </option>
                           )}
                         </select>
+
+                        {estadoActual === 'pagada' && (
+                          <div
+                            style={{
+                              marginTop: '5px',
+                              fontSize: '11px',
+                              color: '#666',
+                            }}
+                          >
+                            Cerrada
+                          </div>
+                        )}
                       </td>
 
                       <td>
