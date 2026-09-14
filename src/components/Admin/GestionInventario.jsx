@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../supabaseClient'
 import BotonAtras from '../../components/BotonAtras'
 import {
@@ -7,7 +7,16 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   RefreshCw,
+  CalendarDays,
+  X,
 } from 'lucide-react'
+
+const obtenerFechaLocal = (fecha = new Date()) => {
+  const year = fecha.getFullYear()
+  const month = String(fecha.getMonth() + 1).padStart(2, '0')
+  const day = String(fecha.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 export default function GestionInventario() {
   const [productos, setProductos] = useState([])
@@ -17,6 +26,7 @@ export default function GestionInventario() {
   const [cantidad, setCantidad] = useState('')
   const [razon, setRazon] = useState('ajuste')
   const [operacion, setOperacion] = useState('entrada')
+  const [fechaFiltro, setFechaFiltro] = useState('')
 
   useEffect(() => {
     cargarDatos()
@@ -171,6 +181,15 @@ export default function GestionInventario() {
     setRazon('ajuste')
     setOperacion('entrada')
   }
+
+  const historialFiltrado = useMemo(() => {
+    if (!fechaFiltro) return historial
+
+    return historial.filter((item) => {
+      if (!item.created_at) return false
+      return obtenerFechaLocal(new Date(item.created_at)) === fechaFiltro
+    })
+  }, [historial, fechaFiltro])
 
   if (cargando) {
     return (
@@ -379,9 +398,57 @@ export default function GestionInventario() {
             className="pc-card"
             style={{ padding: 22 }}
           >
-            <h2 style={{ marginBottom: 16 }}>
-              Historial de Cambios
-            </h2>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                flexWrap: 'wrap',
+                marginBottom: 16,
+              }}
+            >
+              <h2 style={{ margin: 0 }}>
+                Historial de Cambios
+              </h2>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <CalendarDays size={18} />
+                <input
+                  type="date"
+                  className="pc-input"
+                  value={fechaFiltro}
+                  max={obtenerFechaLocal()}
+                  onChange={(e) => setFechaFiltro(e.target.value)}
+                  title="Filtrar movimientos por día"
+                />
+
+                {fechaFiltro && (
+                  <button
+                    type="button"
+                    className="pc-btn pc-btn-light"
+                    onClick={() => setFechaFiltro('')}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <X size={16} />
+                    Limpiar
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <p style={{ margin: '0 0 12px', fontSize: 13, opacity: 0.65 }}>
+              {fechaFiltro
+                ? `${historialFiltrado.length} movimiento(s) del ${new Date(`${fechaFiltro}T00:00:00`).toLocaleDateString('es-HN')}.`
+                : `${historialFiltrado.length} movimiento(s) registrados.`}
+            </p>
 
             <div
               style={{
@@ -392,13 +459,15 @@ export default function GestionInventario() {
                 overflowY: 'auto',
               }}
             >
-              {historial.length === 0 && (
+              {historialFiltrado.length === 0 && (
                 <p style={{ opacity: 0.6 }}>
-                  No hay movimientos registrados.
+                  {fechaFiltro
+                    ? 'No hay movimientos registrados en ese día.'
+                    : 'No hay movimientos registrados.'}
                 </p>
               )}
 
-              {historial.map((item) => (
+              {historialFiltrado.map((item) => (
                 <div
                   key={item.id}
                   className="pc-card"
@@ -441,7 +510,7 @@ export default function GestionInventario() {
                   >
                     {new Date(
                       item.created_at
-                    ).toLocaleDateString()}
+                    ).toLocaleDateString('es-HN')}
                   </p>
                 </div>
               ))}
