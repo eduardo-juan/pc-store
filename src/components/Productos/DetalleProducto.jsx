@@ -5,6 +5,7 @@ import { supabase } from '../../supabaseClient'
 import { useCarrito } from '../../context/CarritoContext'
 import { useAuth } from '../../hooks/useAuth'
 import { obtenerProveedorProducto } from '../../services/productosService'
+import { obtenerImagenProducto } from '../../utils/imagenesProductos'
 import BotonAtras from '../../components/BotonAtras'
 
 export default function DetalleProducto() {
@@ -48,9 +49,7 @@ export default function DetalleProducto() {
 
     if (esAdmin) {
       const proveedorResultado = await obtenerProveedorProducto(id)
-      if (proveedorResultado.success) {
-        setProveedor(proveedorResultado.data)
-      }
+      if (proveedorResultado.success) setProveedor(proveedorResultado.data)
     } else {
       setProveedor(null)
     }
@@ -62,41 +61,31 @@ export default function DetalleProducto() {
 
   const agregar = () => {
     const cantidadNumerica = Number(cantidad)
-
-    if (
-      !Number.isInteger(cantidadNumerica) ||
-      cantidadNumerica < 1 ||
-      cantidadNumerica > producto.stock
-    ) {
+    if (!Number.isInteger(cantidadNumerica) || cantidadNumerica < 1 || cantidadNumerica > producto.stock) {
       setMensaje('Selecciona una cantidad válida.')
       return
     }
-
     const resultado = agregarProducto(producto, cantidadNumerica)
     setMensaje(resultado.message)
   }
 
   const guardarResena = async (e) => {
     e.preventDefault()
-
     if (!usuario) {
       setMensaje('Debes iniciar sesión para publicar una reseña.')
       return
     }
-
     if (!comentario.trim()) {
       setMensaje('Escribe un comentario antes de publicar.')
       return
     }
 
-    const { error } = await supabase
-      .from('reseñas')
-      .insert([{
-        producto_id: producto.id,
-        usuario_id: usuario.id,
-        calificación: Number(calificacion),
-        comentario: comentario.trim(),
-      }])
+    const { error } = await supabase.from('reseñas').insert([{
+      producto_id: producto.id,
+      usuario_id: usuario.id,
+      calificación: Number(calificacion),
+      comentario: comentario.trim(),
+    }])
 
     if (error) {
       setMensaje(error.message)
@@ -138,11 +127,7 @@ export default function DetalleProducto() {
 
         <div className="pc-product-detail">
           <div className="pc-detail-image">
-            {producto.imagen_principal ? (
-              <img src={producto.imagen_principal} alt={producto.nombre} />
-            ) : (
-              <span>🖥️</span>
-            )}
+            <img src={obtenerImagenProducto(producto)} alt={producto.nombre} loading="lazy" />
           </div>
 
           <section>
@@ -170,13 +155,7 @@ export default function DetalleProducto() {
                 <p style={{ margin: '6px 0 12px' }}>
                   Proveedor: {proveedor.proveedor} · Costo: L {Number(proveedor.costo).toFixed(2)}
                 </p>
-                <a
-                  href={proveedor.url_compra}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="pc-btn pc-btn-light"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}
-                >
+                <a href={proveedor.url_compra} target="_blank" rel="noopener noreferrer" className="pc-btn pc-btn-light">
                   <ExternalLink size={16} />
                   Comprar al proveedor
                 </a>
@@ -192,12 +171,7 @@ export default function DetalleProducto() {
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))}
               />
-              <button
-                type="button"
-                className="pc-btn pc-btn-primary"
-                disabled={producto.stock <= 0}
-                onClick={agregar}
-              >
+              <button type="button" className="pc-btn pc-btn-primary" disabled={producto.stock <= 0} onClick={agregar}>
                 Agregar al carrito
               </button>
             </div>
@@ -218,14 +192,7 @@ export default function DetalleProducto() {
                 <option value="2">⭐⭐ 2</option>
                 <option value="1">⭐ 1</option>
               </select>
-              <textarea
-                className="pc-textarea"
-                rows="4"
-                placeholder="Cuéntanos tu experiencia..."
-                value={comentario}
-                onChange={(e) => setComentario(e.target.value)}
-                required
-              />
+              <textarea className="pc-textarea" rows="4" placeholder="Cuéntanos tu experiencia..." value={comentario} onChange={(e) => setComentario(e.target.value)} required />
               <button type="submit" className="pc-btn pc-btn-primary">Publicar reseña</button>
             </form>
           ) : (
@@ -240,9 +207,7 @@ export default function DetalleProducto() {
                 <span>{new Date(resena.created_at).toLocaleDateString()}</span>
               </article>
             ))}
-            {resenas.length === 0 && (
-              <div className="pc-empty-small">Este producto todavía no tiene reseñas.</div>
-            )}
+            {resenas.length === 0 && <div className="pc-empty-small">Este producto todavía no tiene reseñas.</div>}
           </div>
         </section>
       </div>
