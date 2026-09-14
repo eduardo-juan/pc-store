@@ -29,7 +29,7 @@ export default function GestionProductos() {
   const [marca, setMarca] = useState('')
   const [modelo, setModelo] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
-  const [imagen, setImagen] = useState(null)
+  const [imagenes, setImagenes] = useState([])
   const [editandoId, setEditandoId] = useState(null)
 
   const [proveedor, setProveedor] = useState('')
@@ -80,18 +80,27 @@ export default function GestionProductos() {
     try {
       if (!categoriaId) throw new Error('Debes seleccionar una categoría')
 
-      let imagenUrl = null
-      if (imagen) {
+      let imagenPrincipal = null
+      let imagenesAdicionales = null
+
+      if (imagenes.length > 0) {
         const categoriaSeleccionada = categorias.find((categoria) => Number(categoria.id) === Number(categoriaId))
         const nombreCategoria = categoriaSeleccionada?.nombre || 'sin-categoria'
-        const resultSubida = await subirImagen(
-          'productos-imagenes',
-          imagen,
-          `${nombre}-${Date.now()}`,
-          `productos/${nombreCategoria}`
-        )
-        if (!resultSubida.success) throw new Error(resultSubida.error)
-        imagenUrl = resultSubida.url
+        const subidas = []
+
+        for (let i = 0; i < imagenes.length; i += 1) {
+          const resultadoSubida = await subirImagen(
+            'productos-imagenes',
+            imagenes[i],
+            `${nombre}-${Date.now()}-${i + 1}`,
+            `productos/${nombreCategoria}`
+          )
+          if (!resultadoSubida.success) throw new Error(resultadoSubida.error)
+          subidas.push(resultadoSubida.url)
+        }
+
+        imagenPrincipal = subidas[0] || null
+        imagenesAdicionales = subidas.slice(1)
       }
 
       const datosProducto = {
@@ -102,7 +111,8 @@ export default function GestionProductos() {
         marca,
         modelo,
         categoria_id: Number(categoriaId),
-        ...(imagenUrl && { imagen_principal: imagenUrl }),
+        ...(imagenPrincipal && { imagen_principal: imagenPrincipal }),
+        ...(imagenesAdicionales && { imágenes_adicionales: imagenesAdicionales }),
       }
 
       let resultado
@@ -161,7 +171,7 @@ export default function GestionProductos() {
     setMarca('')
     setModelo('')
     setCategoriaId('')
-    setImagen(null)
+    setImagenes([])
     setEditandoId(null)
     setProveedor('')
     setUrlProveedor('')
@@ -179,7 +189,7 @@ export default function GestionProductos() {
     setMarca(producto.marca || '')
     setModelo(producto.modelo || '')
     setCategoriaId(producto.categoria_id || '')
-    setImagen(null)
+    setImagenes([])
     setMostrarFormulario(true)
     await cargarProveedor(producto.id)
   }
@@ -235,17 +245,22 @@ export default function GestionProductos() {
                 <input type="number" placeholder="Precio (Lps)" step="0.01" min="0" className="pc-input" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
                 <input type="number" placeholder="Stock" min="0" className="pc-input" value={stock} onChange={(e) => setStock(e.target.value)} required />
                 <div>
-                  <label style={{ display: 'block', marginBottom: 7, fontWeight: 600 }}>Imagen del producto</label>
+                  <label style={{ display: 'block', marginBottom: 7, fontWeight: 600 }}>Imágenes del producto (máximo 2)</label>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
+                    multiple
                     className="pc-input"
-                    onChange={(e) => setImagen(e.target.files?.[0] || null)}
+                    onChange={(e) => setImagenes(Array.from(e.target.files || []).slice(0, 2))}
                   />
-                  <small style={{ display: 'block', marginTop: 6 }}>Se convertirá automáticamente a PNG transparente y se guardará en la carpeta de su categoría.</small>
-                  {imagen && (
-                    <div style={{ marginTop: 10, padding: 10, border: '1px solid #ddd', borderRadius: 8, background: 'repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}><ImageIcon size={16} /> {imagen.name}</div>
+                  <small style={{ display: 'block', marginTop: 6 }}>La primera será la imagen principal y la segunda se mostrará como imagen adicional. Ambas se convierten a PNG transparente y se guardan por categoría.</small>
+                  {imagenes.length > 0 && (
+                    <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+                      {imagenes.map((archivo, index) => (
+                        <div key={`${archivo.name}-${index}`} style={{ padding: 10, border: '1px solid #ddd', borderRadius: 8, background: 'repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}><ImageIcon size={16} /> {index + 1}. {archivo.name}</div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
