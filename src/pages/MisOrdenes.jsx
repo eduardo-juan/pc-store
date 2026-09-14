@@ -105,7 +105,7 @@ export default function MisOrdenes() {
 
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:14}}>
             <section style={{background:'#fafafa',borderRadius:12,padding:14}}><strong>Entrega</strong><div style={{marginTop:8,fontSize:13,lineHeight:1.7}}>
-              {empleado ? <><div><b>Empleado encargado:</b> {empleado.nombre || ''} {empleado.apellido || ''}</div>{empleado.teléfono && <div><b>Teléfono empleado:</b> {empleado.teléfono}</div></> : <div style={{color:'#777'}}>Empleado encargado: Pendiente de asignación</div>}
+              {empleado ? <div><div><b>Empleado encargado:</b> {empleado.nombre || ''} {empleado.apellido || ''}</div>{empleado.teléfono && <div><b>Teléfono empleado:</b> {empleado.teléfono}</div>}</div> : <div style={{color:'#777'}}>Empleado encargado: Pendiente de asignación</div>}
               <div><b>Receptor:</b> {orden.nombre_cliente || '-'} {orden.apellido_cliente || ''}</div><div><b>Teléfono:</b> {orden.teléfono_contacto || '-'}</div><div><b>Dirección:</b> {orden.dirección_envío || '-'}</div><div><b>Ciudad:</b> {orden.ciudad_envío || '-'}</div>{orden.referencia && <div><b>Referencia:</b> {orden.referencia}</div>}{orden.notas && <div><b>Notas:</b> {orden.notas}</div>}
             </div></section>
             <section style={{background:'#fafafa',borderRadius:12,padding:14}}><strong>Resumen</strong><div style={{marginTop:8,fontSize:13,lineHeight:1.8}}><div>Subtotal: <b>L {subtotal.toFixed(2)}</b></div><div>Envío: <b>L {envio.toFixed(2)}</b></div><div>Método de pago: <b>{orden.método_pago || orden.metodo_pago || '-'}</b></div></div></section>
