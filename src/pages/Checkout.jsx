@@ -8,6 +8,12 @@ import BotonAtras from '../components/BotonAtras'
 
 const COSTO_ENVIO = 100
 
+const limpiarTexto = (valor = '', max = 50) =>
+  String(valor)
+    .replace(/[0-9]/g, '')
+    .replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s.'-]/g, '')
+    .slice(0, max)
+
 const formatearTelefono = (valor = '') => {
   const numeros = String(valor).replace(/\D/g, '').slice(0, 8)
 
@@ -177,8 +183,9 @@ export default function Checkout() {
                 <input
                   className="pc-input"
                   type="text"
+                  maxLength={50}
                   value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
+                  onChange={(e) => setNombre(limpiarTexto(e.target.value))}
                   placeholder="Nombre"
                   required
                 />
@@ -190,8 +197,9 @@ export default function Checkout() {
                 <input
                   className="pc-input"
                   type="text"
+                  maxLength={50}
                   value={apellido}
-                  onChange={(e) => setApellido(e.target.value)}
+                  onChange={(e) => setApellido(limpiarTexto(e.target.value))}
                   placeholder="Apellido"
                   required
                 />
@@ -220,8 +228,9 @@ export default function Checkout() {
                 <input
                   className="pc-input"
                   type="text"
+                  maxLength={50}
                   value={ciudad}
-                  onChange={(e) => setCiudad(e.target.value)}
+                  onChange={(e) => setCiudad(limpiarTexto(e.target.value))}
                   placeholder="Ciudad"
                   required
                 />
@@ -235,8 +244,9 @@ export default function Checkout() {
               <textarea
                 className="pc-textarea"
                 rows="3"
+                maxLength={150}
                 value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
+                onChange={(e) => setDireccion(e.target.value.slice(0, 150))}
                 placeholder="Colonia, calle, casa, número, etc."
                 required
               />
@@ -248,8 +258,9 @@ export default function Checkout() {
               <input
                 className="pc-input"
                 type="text"
+                maxLength={150}
                 value={referencia}
-                onChange={(e) => setReferencia(e.target.value)}
+                onChange={(e) => setReferencia(e.target.value.slice(0, 150))}
                 placeholder="Ej. Casa con portón negro"
               />
             </label>
@@ -260,8 +271,9 @@ export default function Checkout() {
               <textarea
                 className="pc-textarea"
                 rows="3"
+                maxLength={500}
                 value={notas}
-                onChange={(e) => setNotas(e.target.value)}
+                onChange={(e) => setNotas(e.target.value.slice(0, 500))}
                 placeholder="Indicaciones adicionales para la entrega"
               />
             </label>
@@ -381,10 +393,11 @@ export default function Checkout() {
                 <input
                   className="pc-input"
                   type="text"
+                  maxLength={150}
                   placeholder="Opcional"
                   value={referencia}
                   onChange={(e) =>
-                    setReferencia(e.target.value)
+                    setReferencia(e.target.value.slice(0, 150))
                   }
                 />
               </label>
