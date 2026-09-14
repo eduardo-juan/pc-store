@@ -62,7 +62,6 @@ const limpiarSegmento = (valor) => String(valor || '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '') || 'sin-categoria'
 
-// Limpia cada parte de la ruta sin convertir las barras en guiones.
 const limpiarCarpeta = (carpeta) => String(carpeta || 'productos')
   .split('/')
   .map(limpiarSegmento)
@@ -94,8 +93,18 @@ export const subirImagen = async (bucket, archivo, nombreArchivo, carpeta = 'pro
   }
 }
 
+// Devuelve la ruta interna solo para URLs del bucket propio.
+// Las URLs externas nunca se eliminan.
+export const obtenerRutaStorage = (bucket, url) => {
+  if (!url || typeof url !== 'string') return null
+  const prefijo = `${supabase.storage.from(bucket).getPublicUrl('').data.publicUrl}`.replace(/\/$/, '')
+  if (!url.startsWith(`${prefijo}/`)) return null
+  return decodeURIComponent(url.slice(prefijo.length + 1).split('?')[0])
+}
+
 export const eliminarImagen = async (bucket, ruta) => {
   try {
+    if (!ruta) return { success: true }
     const { error } = await supabase.storage.from(bucket).remove([ruta])
     if (error) throw error
     return { success: true }
