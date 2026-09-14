@@ -19,6 +19,7 @@ export default function DetalleProducto() {
   const [cantidad, setCantidad] = useState(1)
   const [calificacion, setCalificacion] = useState(5)
   const [comentario, setComentario] = useState('')
+  const [imagenSeleccionada, setImagenSeleccionada] = useState('')
   const [cargando, setCargando] = useState(true)
   const [mensaje, setMensaje] = useState('')
 
@@ -55,6 +56,7 @@ export default function DetalleProducto() {
     }
 
     setProducto(data)
+    setImagenSeleccionada(obtenerImagenProducto(data))
     setResenas(resenasData || [])
     setCargando(false)
   }
@@ -119,6 +121,10 @@ export default function DetalleProducto() {
   }
 
   const precioActual = Number(producto.precio_descuento || producto.precio)
+  const imagenesProducto = [
+    obtenerImagenProducto(producto),
+    ...(Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []),
+  ].filter(Boolean).filter((url, index, lista) => lista.indexOf(url) === index).slice(0, 2)
 
   return (
     <main className="pc-page">
@@ -126,8 +132,25 @@ export default function DetalleProducto() {
         <BotonAtras />
 
         <div className="pc-product-detail">
-          <div className="pc-detail-image">
-            <img src={obtenerImagenProducto(producto)} alt={producto.nombre} loading="lazy" />
+          <div>
+            <div className="pc-detail-image">
+              <img src={imagenSeleccionada || imagenesProducto[0]} alt={producto.nombre} />
+            </div>
+            {imagenesProducto.length > 1 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
+                {imagenesProducto.map((url, index) => (
+                  <button
+                    key={url}
+                    type="button"
+                    onClick={() => setImagenSeleccionada(url)}
+                    aria-label={`Ver imagen ${index + 1}`}
+                    style={{ padding: 5, border: `2px solid ${imagenSeleccionada === url ? '#d4af37' : '#e0e0e0'}`, borderRadius: 10, background: '#fff', cursor: 'pointer' }}
+                  >
+                    <img src={url} alt={`${producto.nombre} vista ${index + 1}`} style={{ width: '100%', height: 90, objectFit: 'contain' }} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <section>
@@ -163,17 +186,8 @@ export default function DetalleProducto() {
             )}
 
             <div className="pc-buy-row">
-              <input
-                type="number"
-                min="1"
-                max={producto.stock}
-                className="pc-input pc-qty"
-                value={cantidad}
-                onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))}
-              />
-              <button type="button" className="pc-btn pc-btn-primary" disabled={producto.stock <= 0} onClick={agregar}>
-                Agregar al carrito
-              </button>
+              <input type="number" min="1" max={producto.stock} className="pc-input pc-qty" value={cantidad} onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))} />
+              <button type="button" className="pc-btn pc-btn-primary" disabled={producto.stock <= 0} onClick={agregar}>Agregar al carrito</button>
             </div>
 
             {mensaje && <div className="pc-message">{mensaje}</div>}
@@ -182,7 +196,6 @@ export default function DetalleProducto() {
 
         <section className="pc-section">
           <h2 className="pc-section-title">Reseñas</h2>
-
           {usuario ? (
             <form className="pc-card pc-review-form" onSubmit={guardarResena}>
               <select className="pc-select" value={calificacion} onChange={(e) => setCalificacion(Number(e.target.value))}>
