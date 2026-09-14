@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Eraser } from 'lucide-react'
 
 const ADMIN_PATHS = ['/admin/productos', '/admin/inventario', '/admin/categorias', '/admin/ordenes', '/admin/usuarios', '/admin/empleados', '/admin/ventas', '/admin/auditoria']
 const PAGE_SIZE = 10
@@ -44,7 +45,13 @@ const instalar = (wrapper) => {
   const limpiar = document.createElement('button')
   limpiar.type = 'button'
   limpiar.className = 'pc-btn pc-btn-light'
-  limpiar.textContent = 'Limpiar filtros'
+  limpiar.title = 'Borrar filtros'
+  limpiar.setAttribute('aria-label', 'Borrar filtros')
+  const icono = document.createElement('span')
+  icono.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;'
+  const iconoReact = document.createElement('span')
+  limpiar.appendChild(iconoReact)
+  limpiar.appendChild(document.createTextNode(' Borrar'))
 
   const paginacion = document.createElement('div')
   paginacion.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid #e5e5e5;'
