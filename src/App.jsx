@@ -34,6 +34,7 @@ import GestionUsuarios from './components/Admin/GestionUsuarios'
 import GestionEmpleados from './components/Admin/GestionEmpleados'
 import HistorialVentas from './components/Admin/HistorialVentas'
 import AuditoriaAccesos from './components/Admin/AuditoriaAccesos'
+import AdminTableTools from './components/Admin/AdminTableTools'
 
 import { useAuth } from './hooks/useAuth'
 
@@ -52,6 +53,7 @@ export default function App() {
           <div className="pc-app">
             <Navbar />
             <div className="pc-app-content">
+              <AdminTableTools />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/tienda" element={<ProtectedRoute><Tienda /></ProtectedRoute>} />
