@@ -298,6 +298,7 @@ export default function GestionEmpleados() {
               <table className="pc-table">
                 <thead>
                   <tr>
+                    <th>N.º</th>
                     <th>Nombre</th>
                     <th>Email</th>
                     <th>Ciudad</th>
@@ -308,13 +309,15 @@ export default function GestionEmpleados() {
                 </thead>
 
                 <tbody>
-                  {empleados.map((empleado) => {
+                  {empleados.map((empleado, indice) => {
                     const estaActivo =
                       empleado.activo === true &&
                       empleado.bloqueado !== true
 
                     return (
                       <tr key={empleado.id}>
+                        <td><strong>{indice + 1}</strong></td>
+
                         <td>
                           {empleado.nombre || ''}{' '}
                           {empleado.apellido || ''}
@@ -410,7 +413,7 @@ export default function GestionEmpleados() {
                   {empleados.length === 0 && (
                     <tr>
                       <td
-                        colSpan="6"
+                        colSpan="7"
                         style={{
                           textAlign: 'center',
                           padding: 30,
@@ -437,6 +440,7 @@ export default function GestionEmpleados() {
               <table className="pc-table">
                 <thead>
                   <tr>
+                    <th>N.º</th>
                     <th>Nombre</th>
                     <th>Email</th>
                     <th>Ciudad</th>
@@ -445,8 +449,10 @@ export default function GestionEmpleados() {
                 </thead>
 
                 <tbody>
-                  {candidatos.map((usuario) => (
+                  {candidatos.map((usuario, indice) => (
                     <tr key={usuario.id}>
+                      <td><strong>{indice + 1}</strong></td>
+
                       <td>
                         {usuario.nombre || ''}{' '}
                         {usuario.apellido || ''}
@@ -483,7 +489,7 @@ export default function GestionEmpleados() {
                   {candidatos.length === 0 && (
                     <tr>
                       <td
-                        colSpan="4"
+                        colSpan="5"
                         style={{
                           textAlign: 'center',
                           padding: 30,
