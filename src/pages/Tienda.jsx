@@ -113,14 +113,44 @@ export default function Tienda() {
 
   if (cargando) {
     return (
-      <main className="pc-page">
+      <main className="pc-page" style={{ background: '#ffffff', color: '#171717' }}>
         <div className="pc-container">Cargando productos...</div>
       </main>
     )
   }
 
   return (
-    <main className="pc-page pc-store-page">
+    <main className="pc-page pc-store-page" style={{ background: '#ffffff', color: '#171717' }}>
+      <style>{`
+        .pc-store-page, .pc-store-page * { color-scheme: light; }
+        .pc-store-page { background:#fff !important; color:#171717 !important; }
+        .pc-store-page .pc-store-heading h1 { color:#171717 !important; }
+        .pc-store-page .pc-store-heading p { color:#6b6b6b !important; }
+        .pc-store-page .pc-kicker, .pc-store-page .pc-sidebar-title svg { color:#a67c00 !important; }
+        .pc-store-page .pc-store-count { color:#a67c00 !important; background:#fbf4d6 !important; border-color:rgba(212,175,55,.4) !important; }
+        .pc-store-page .pc-sidebar-block, .pc-store-page .pc-store-product-card { background:#fff !important; border-color:#e0e0e0 !important; }
+        .pc-store-page .pc-category-item { background:#fff !important; color:#555 !important; }
+        .pc-store-page .pc-category-item:hover, .pc-store-page .pc-category-item.active { background:#fbf4d6 !important; color:#a67c00 !important; border-color:rgba(212,175,55,.5) !important; }
+        .pc-store-page .pc-category-item b { color:#888 !important; }
+        .pc-store-page .pc-filter-label, .pc-store-page .pc-check-row { color:#666 !important; }
+        .pc-store-page .pc-filter-label span, .pc-store-page .pc-filter-group>strong { color:#171717 !important; }
+        .pc-store-page .pc-price-range, .pc-store-page .pc-check-row input { accent-color:#d4af37; }
+        .pc-store-page .pc-filter-reset { color:#a67c00 !important; }
+        .pc-store-page .pc-store-search, .pc-store-page .pc-store-sort { background:#fff !important; border-color:#e0e0e0 !important; color:#171717 !important; }
+        .pc-store-page .pc-store-search:focus-within { border-color:#d4af37 !important; box-shadow:0 0 0 3px rgba(212,175,55,.12) !important; }
+        .pc-store-page .pc-store-search input { color:#171717 !important; }
+        .pc-store-page .pc-store-search input::placeholder { color:#888 !important; }
+        .pc-store-page .pc-store-product-image { background:linear-gradient(135deg,#f1f1f1,#fff) !important; border-color:#e0e0e0 !important; }
+        .pc-store-page .pc-product-category, .pc-store-page .pc-price { color:#a67c00 !important; }
+        .pc-store-page .pc-product-name { color:#171717 !important; }
+        .pc-store-page .pc-product-description { color:#666 !important; }
+        .pc-store-page .pc-old-price { color:#777 !important; }
+        .pc-store-page .pc-stock-badge { background:#edf7ef !important; color:#15803d !important; }
+        .pc-store-page .pc-store-cart-btn { background:#d4af37 !important; color:#0b0b0b !important; box-shadow:0 6px 18px rgba(212,175,55,.2) !important; }
+        .pc-store-page .pc-store-cart-btn:hover { background:#a67c00 !important; color:#fff !important; }
+        .pc-store-page .pc-empty-small { background:#fff !important; color:#666 !important; border-color:#e0e0e0 !important; }
+        .pc-store-page .pc-toast { background:#fbf4d6 !important; color:#171717 !important; border-color:rgba(212,175,55,.45) !important; }
+      `}</style>
       <div className="pc-container pc-store-container">
         <BotonAtras />
 
