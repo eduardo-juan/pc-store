@@ -9,6 +9,7 @@ export default function GestionOrdenes() {
   const { usuario, esAdmin, esEmpleado } = useAuth()
 
   const [ordenes, setOrdenes] = useState([])
+  const [proveedores, setProveedores] = useState({})
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('todas')
@@ -52,7 +53,46 @@ export default function GestionOrdenes() {
       return
     }
 
-    setOrdenes(data || [])
+    const ordenesCargadas = data || []
+    setOrdenes(ordenesCargadas)
+
+    if (esAdmin) {
+      const productoIds = [
+        ...new Set(
+          ordenesCargadas.flatMap((orden) =>
+            (orden.items || [])
+              .map((item) => item.producto_id)
+              .filter(Boolean)
+          )
+        ),
+      ]
+
+      if (productoIds.length > 0) {
+        const { data: proveedoresData, error: proveedoresError } = await supabase
+          .from('producto_proveedores')
+          .select('producto_id, proveedor, url_compra, activo')
+          .in('producto_id', productoIds)
+          .eq('activo', true)
+
+        if (proveedoresError) {
+          setError(proveedoresError.message)
+          setProveedores({})
+        } else {
+          const mapa = {}
+          ;(proveedoresData || []).forEach((proveedor) => {
+            if (!mapa[proveedor.producto_id]) {
+              mapa[proveedor.producto_id] = proveedor
+            }
+          })
+          setProveedores(mapa)
+        }
+      } else {
+        setProveedores({})
+      }
+    } else {
+      setProveedores({})
+    }
+
     setCargando(false)
   }
 
@@ -408,14 +448,43 @@ export default function GestionOrdenes() {
                           }}
                         >
                           {(orden.items || []).map(
-                            (item, index) => (
-                              <div
-                                key={`${orden.id}-${item.producto_id || index}`}
-                              >
-                                {item.cantidad}×{' '}
-                                {item.nombre}
-                              </div>
-                            )
+                            (item, index) => {
+                              const proveedor = esAdmin
+                                ? proveedores[item.producto_id]
+                                : null
+
+                              return (
+                                <div
+                                  key={`${orden.id}-${item.producto_id || index}`}
+                                  style={{
+                                    marginBottom: proveedor ? '8px' : '0',
+                                  }}
+                                >
+                                  <div>
+                                    {item.cantidad}×{' '}
+                                    {item.nombre}
+                                  </div>
+
+                                  {proveedor?.url_compra && (
+                                    <a
+                                      href={proveedor.url_compra}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="pc-btn pc-btn-light"
+                                      style={{
+                                        display: 'inline-block',
+                                        marginTop: '4px',
+                                        padding: '5px 9px',
+                                        fontSize: '11px',
+                                        textDecoration: 'none',
+                                      }}
+                                    >
+                                      Comprar en {proveedor.proveedor || 'Amazon'}
+                                    </a>
+                                  )}
+                                </div>
+                              )
+                            }
                           )}
                         </div>
                       </td>
