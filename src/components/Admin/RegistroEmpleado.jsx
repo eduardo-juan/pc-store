@@ -40,7 +40,7 @@ export default function RegistroEmpleado() {
     if (!validar()) return
     setGuardando(true)
     try {
-      const { data, error } = await supabase.functions.invoke('crear_empleado', { body: { ...form, email: form.email.trim().toLowerCase() } })
+      const { data, error } = await supabase.functions.invoke('crear_empleado_api', { body: { ...form, email: form.email.trim().toLowerCase() } })
       if (error) throw new Error(error.message || 'No se pudo crear el empleado.')
       if (!data?.success) throw new Error(data?.error || 'No se pudo crear el empleado.')
       navigate('/admin/empleados', { replace: true })
@@ -55,9 +55,7 @@ export default function RegistroEmpleado() {
 
   const Campo = ({ campo, label, ...props }) => (
     <label style={{ display: 'block' }}>
-      <span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores[campo] ? '#dc2626' : '#171717' }}>
-        {label} <span style={{ color: '#dc2626' }}>*</span>
-      </span>
+      <span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores[campo] ? '#dc2626' : '#171717' }}>{label} <span style={{ color: '#dc2626' }}>*</span></span>
       <input {...props} className={clase(campo)} value={form[campo]} onChange={(e) => cambiar(campo, e.target.value)} />
       {errores[campo] && <small style={{ display: 'block', marginTop: 5, color: '#dc2626' }}>Completa este campo.</small>}
     </label>
@@ -67,14 +65,10 @@ export default function RegistroEmpleado() {
     <main className="pc-page">
       <div className="pc-container">
         <BotonAtras />
-        <div className="pc-admin-header">
-          <h1>Registrar empleado</h1>
-          <p>Completa todos los datos para crear la cuenta del empleado.</p>
-        </div>
+        <div className="pc-admin-header"><h1>Registrar empleado</h1><p>Completa todos los datos para crear la cuenta del empleado.</p></div>
 
         <form className="pc-card pc-profile-form" onSubmit={guardar} style={{ maxWidth: 900, margin: '0 auto' }}>
           {errorGeneral && <div style={{ padding: 14, marginBottom: 20, border: '1px solid #fecaca', background: '#fef2f2', color: '#b91c1c', borderRadius: 10 }}><strong>Error:</strong> {errorGeneral}</div>}
-
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}><UserPlus size={22} /><h2 style={{ margin: 0 }}>Datos del empleado</h2></div>
 
           <div className="pc-form-grid">
@@ -85,35 +79,15 @@ export default function RegistroEmpleado() {
             <Campo campo="ciudad" label="Ciudad" type="text" />
             <Campo campo="país" label="País" type="text" />
             <Campo campo="email" label="Correo electrónico" type="email" autoComplete="email" />
-            <label style={{ display: 'block' }}>
-              <span style={{ display: 'block', marginBottom: 7, fontWeight: 600 }}>Rol <span style={{ color: '#dc2626' }}>*</span></span>
-              <select className="pc-input" value={form.rol} onChange={(e) => cambiar('rol', e.target.value)}>
-                <option value="empleado">Empleado</option>
-              </select>
-            </label>
+            <label style={{ display: 'block' }}><span style={{ display: 'block', marginBottom: 7, fontWeight: 600 }}>Rol <span style={{ color: '#dc2626' }}>*</span></span><select className="pc-input" value={form.rol} onChange={(e) => cambiar('rol', e.target.value)}><option value="empleado">Empleado</option></select></label>
           </div>
 
-          <label style={{ display: 'block', marginTop: 18 }}>
-            <span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores.dirección ? '#dc2626' : '#171717' }}>Dirección <span style={{ color: '#dc2626' }}>*</span></span>
-            <textarea className={errores.dirección ? 'pc-textarea pc-empleado-textarea-error' : 'pc-textarea'} rows="3" value={form.dirección} onChange={(e) => cambiar('dirección', e.target.value)} />
-            {errores.dirección && <small style={{ display: 'block', marginTop: 5, color: '#dc2626' }}>Completa este campo.</small>}
-          </label>
+          <label style={{ display: 'block', marginTop: 18 }}><span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores.dirección ? '#dc2626' : '#171717' }}>Dirección <span style={{ color: '#dc2626' }}>*</span></span><textarea className={errores.dirección ? 'pc-textarea pc-empleado-textarea-error' : 'pc-textarea'} rows="3" value={form.dirección} onChange={(e) => cambiar('dirección', e.target.value)} />{errores.dirección && <small style={{ display: 'block', marginTop: 5, color: '#dc2626' }}>Completa este campo.</small>}</label>
 
-          <label style={{ display: 'block', marginTop: 18 }}>
-            <span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores.password ? '#dc2626' : '#171717' }}>Contraseña <span style={{ color: '#dc2626' }}>*</span></span>
-            <div style={{ position: 'relative' }}>
-              <input className={clase('password')} type={mostrarPassword ? 'text' : 'password'} value={form.password} onChange={(e) => cambiar('password', e.target.value)} minLength={6} autoComplete="new-password" style={{ paddingRight: 50 }} />
-              <button type="button" onClick={() => setMostrarPassword((v) => !v)} title={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', cursor: 'pointer', padding: 6 }}>{mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}</button>
-            </div>
-            {errores.password && <small style={{ display: 'block', marginTop: 5, color: '#dc2626' }}>Completa este campo.</small>}
-          </label>
+          <label style={{ display: 'block', marginTop: 18 }}><span style={{ display: 'block', marginBottom: 7, fontWeight: 600, color: errores.password ? '#dc2626' : '#171717' }}>Contraseña <span style={{ color: '#dc2626' }}>*</span></span><div style={{ position: 'relative' }}><input className={clase('password')} type={mostrarPassword ? 'text' : 'password'} value={form.password} onChange={(e) => cambiar('password', e.target.value)} minLength={6} autoComplete="new-password" style={{ paddingRight: 50 }} /><button type="button" onClick={() => setMostrarPassword((v) => !v)} title={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', cursor: 'pointer', padding: 6 }}>{mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}</button></div>{errores.password && <small style={{ display: 'block', marginTop: 5, color: '#dc2626' }}>Completa este campo.</small>}</label>
 
           <p style={{ marginTop: 18, color: '#64748b', fontSize: 14 }}>Los campos marcados con <span style={{ color: '#dc2626' }}>*</span> son obligatorios. La contraseña debe tener al menos 6 caracteres.</p>
-
-          <div style={{ display: 'flex', gap: 10, marginTop: 22, flexWrap: 'wrap' }}>
-            <button type="submit" className="pc-btn pc-btn-primary" disabled={guardando}>{guardando ? 'Creando cuenta...' : 'Crear cuenta de empleado'}</button>
-            <button type="button" className="pc-btn pc-btn-light" onClick={() => navigate('/admin/empleados')} disabled={guardando}>Cancelar</button>
-          </div>
+          <div style={{ display: 'flex', gap: 10, marginTop: 22, flexWrap: 'wrap' }}><button type="submit" className="pc-btn pc-btn-primary" disabled={guardando}>{guardando ? 'Creando cuenta...' : 'Crear cuenta de empleado'}</button><button type="button" className="pc-btn pc-btn-light" onClick={() => navigate('/admin/empleados')} disabled={guardando}>Cancelar</button></div>
         </form>
       </div>
     </main>
