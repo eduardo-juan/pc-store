@@ -17,10 +17,7 @@ export const AuthProvider = ({ children }) => {
   const registrarAcceso = async () => {
     try {
       const { error } = await supabase.rpc('registrar_acceso_auditoria')
-
-      if (error) {
-        console.error('[AUDITORIA] Error registrando acceso:', error)
-      }
+      if (error) console.error('[AUDITORIA] Error registrando acceso:', error)
     } catch (err) {
       console.error('[AUDITORIA] Error inesperado:', err)
     }
@@ -31,20 +28,13 @@ export const AuthProvider = ({ children }) => {
       setUsuario(null)
       return null
     }
-
     try {
-      const { data: perfil, error: perfilError } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('id', authUser.id)
-        .maybeSingle()
-
+      const { data: perfil, error: perfilError } = await supabase.from('usuarios').select('*').eq('id', authUser.id).maybeSingle()
       if (perfilError) {
         console.error('[AUTH] Error cargando perfil:', perfilError)
         setUsuario({ ...authUser })
         return authUser
       }
-
       if (perfil?.bloqueado === true) {
         const mensaje = 'Tu cuenta está bloqueada. Contacta con el administrador.'
         setError(mensaje)
@@ -53,7 +43,6 @@ export const AuthProvider = ({ children }) => {
         await supabase.auth.signOut()
         return null
       }
-
       const usuarioCompleto = { ...authUser, ...(perfil || {}) }
       setUsuario(usuarioCompleto)
       return usuarioCompleto
@@ -66,21 +55,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let activo = true
-
     const iniciarAuth = async () => {
       try {
-        const {
-          data: { session: sesionActual },
-          error: sessionError,
-        } = await supabase.auth.getSession()
-
+        const { data: { session: sesionActual }, error: sessionError } = await supabase.auth.getSession()
         if (!activo) return
-
         if (sessionError) {
           console.error('[AUTH] Error obteniendo sesión:', sessionError)
           setError(sessionError.message)
         }
-
         if (sesionActual?.user) {
           setSession(sesionActual)
           await cargarPerfil(sesionActual.user)
@@ -95,25 +77,17 @@ export const AuthProvider = ({ children }) => {
         if (activo) setCargando(false)
       }
     }
-
     iniciarAuth()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, nuevaSesion) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nuevaSesion) => {
       if (!activo) return
-
       console.log('[AUTH]', event, 'sesión:', !!nuevaSesion)
-
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setSession(null)
         setUsuario(null)
         return
       }
-
       if (nuevaSesion?.user) setSession(nuevaSesion)
     })
-
     return () => {
       activo = false
       subscription?.unsubscribe()
@@ -122,54 +96,40 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let activo = true
-
     const cargar = async () => {
       if (!session?.user) return
       await new Promise((resolve) => setTimeout(resolve, 0))
       if (!activo) return
       await cargarPerfil(session.user)
     }
-
     cargar()
-    return () => {
-      activo = false
-    }
+    return () => { activo = false }
   }, [session])
 
-  const registro = async (email, password, nombre, apellido) => {
+  const registro = async (email, password, nombre, apellido, teléfono) => {
     try {
       setError(null)
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.signUp({ email, password })
-
+      const { data: { user }, error: authError } = await supabase.auth.signUp({ email, password })
       if (authError) throw authError
       if (!user) throw new Error('No se pudo crear el usuario')
 
-      const { error: perfilError } = await supabase.from('usuarios').insert([
-        {
-          id: user.id,
-          email,
-          nombre,
-          apellido,
-          rol: 'user',
-          bloqueado: false,
-          activo: true,
-        },
-      ])
-
+      const { error: perfilError } = await supabase.from('usuarios').insert([{
+        id: user.id,
+        email,
+        nombre,
+        apellido,
+        teléfono,
+        rol: 'user',
+        bloqueado: false,
+        activo: true,
+      }])
       if (perfilError) throw perfilError
 
-      const {
-        data: { session: nuevaSesion },
-      } = await supabase.auth.getSession()
-
+      const { data: { session: nuevaSesion } } = await supabase.auth.getSession()
       if (nuevaSesion) {
         setSession(nuevaSesion)
         await cargarPerfil(user)
       }
-
       return { success: true, user }
     } catch (err) {
       console.error('[AUTH] Error en registro:', err)
@@ -181,20 +141,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null)
-      const {
-        data: { session: nuevaSesion, user },
-        error: loginError,
-      } = await supabase.auth.signInWithPassword({ email, password })
-
+      const { data: { session: nuevaSesion, user }, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
       if (loginError) throw loginError
       if (!user || !nuevaSesion) throw new Error('No se pudo iniciar sesión')
-
-      const { data: perfil, error: perfilError } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
-
+      const { data: perfil, error: perfilError } = await supabase.from('usuarios').select('*').eq('id', user.id).maybeSingle()
       if (perfilError) {
         console.error('[AUTH] Error cargando perfil después del login:', perfilError)
         setSession(nuevaSesion)
@@ -202,7 +152,6 @@ export const AuthProvider = ({ children }) => {
         await registrarAcceso()
         return { success: true, user }
       }
-
       if (perfil?.bloqueado === true) {
         const mensaje = 'Tu cuenta está bloqueada. Contacta con el administrador.'
         await supabase.auth.signOut()
@@ -211,11 +160,9 @@ export const AuthProvider = ({ children }) => {
         setError(mensaje)
         return { success: false, error: mensaje }
       }
-
       setSession(nuevaSesion)
       setUsuario({ ...user, ...(perfil || {}) })
       await registrarAcceso()
-
       return { success: true, user }
     } catch (err) {
       console.error('[AUTH] Error en login:', err)
@@ -241,25 +188,7 @@ export const AuthProvider = ({ children }) => {
   const esEmpleado = usuario?.rol === 'empleado'
   const esStaff = esAdmin || esEmpleado
 
-  return (
-    <AuthContext.Provider
-      value={{
-        usuario,
-        perfil: usuario,
-        session,
-        cargando,
-        error,
-        registro,
-        login,
-        logout,
-        esAdmin,
-        esEmpleado,
-        esStaff,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ usuario, perfil: usuario, session, cargando, error, registro, login, logout, esAdmin, esEmpleado, esStaff }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {
