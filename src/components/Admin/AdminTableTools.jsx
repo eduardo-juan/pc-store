@@ -47,7 +47,7 @@ const instalar = (wrapper) => {
   limpiar.title = 'Borrar filtros'
   limpiar.setAttribute('aria-label', 'Borrar filtros')
   limpiar.style.cssText = 'width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;'
-  limpiar.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21 5.5-5.5"/><path d="M17.85 4.15a2.5 2.5 0 0 0-3.54 0L3.5 15a2.5 2.5 0 0 0 0 3.54l.96.96a2.5 2.5 0 0 0 3.54 0L19.5 8a2.5 2.5 0 0 0 0-3.54Z"/><path d="m15 7 3 3"/></svg>'
+  limpiar.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>'
 
   const paginacion = document.createElement('div')
   paginacion.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid #e5e5e5;'
