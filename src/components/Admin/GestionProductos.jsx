@@ -10,7 +10,7 @@ import {
   eliminarProveedorProducto,
 } from '../../services/productosService'
 import { subirImagen } from '../../services/storageService'
-import { Plus, Save, X, Pencil, Trash2, Truck } from 'lucide-react'
+import { Plus, Save, X, Pencil, Trash2, Truck, Image as ImageIcon } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
@@ -82,7 +82,14 @@ export default function GestionProductos() {
 
       let imagenUrl = null
       if (imagen) {
-        const resultSubida = await subirImagen('productos-imagenes', imagen, `${nombre}-${Date.now()}`)
+        const categoriaSeleccionada = categorias.find((categoria) => Number(categoria.id) === Number(categoriaId))
+        const nombreCategoria = categoriaSeleccionada?.nombre || 'sin-categoria'
+        const resultSubida = await subirImagen(
+          'productos-imagenes',
+          imagen,
+          `${nombre}-${Date.now()}`,
+          `productos/${nombreCategoria}`
+        )
         if (!resultSubida.success) throw new Error(resultSubida.error)
         imagenUrl = resultSubida.url
       }
@@ -227,7 +234,21 @@ export default function GestionProductos() {
                 </select>
                 <input type="number" placeholder="Precio (Lps)" step="0.01" min="0" className="pc-input" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
                 <input type="number" placeholder="Stock" min="0" className="pc-input" value={stock} onChange={(e) => setStock(e.target.value)} required />
-                <input type="file" accept="image/*" className="pc-input" onChange={(e) => setImagen(e.target.files[0])} />
+                <div>
+                  <label style={{ display: 'block', marginBottom: 7, fontWeight: 600 }}>Imagen del producto</label>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="pc-input"
+                    onChange={(e) => setImagen(e.target.files?.[0] || null)}
+                  />
+                  <small style={{ display: 'block', marginTop: 6 }}>Se convertirá automáticamente a PNG transparente y se guardará en la carpeta de su categoría.</small>
+                  {imagen && (
+                    <div style={{ marginTop: 10, padding: 10, border: '1px solid #ddd', borderRadius: 8, background: 'repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}><ImageIcon size={16} /> {imagen.name}</div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <textarea placeholder="Descripción del producto" className="pc-textarea" rows={4} style={{ marginTop: 14, width: '100%' }} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
