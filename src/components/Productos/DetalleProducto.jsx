@@ -65,12 +65,15 @@ export default function DetalleProducto() {
     if (!url || !producto) return
 
     const esPrincipal = producto.imagen_principal === url
-    const adicionales = Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []
+    const adicionales = Array.isArray(producto.imágenes_adicionales)
+      ? producto.imágenes_adicionales
+      : []
     const nuevosAdicionales = adicionales.filter((imagen) => imagen !== url)
     const cambios = {}
 
     if (esPrincipal) cambios.imagen_principal = null
-    if (nuevosAdicionales.length !== adicionales.length) cambios.imágenes_adicionales = nuevosAdicionales
+    if (nuevosAdicionales.length !== adicionales.length)
+      cambios.imágenes_adicionales = nuevosAdicionales
     if (Object.keys(cambios).length === 0) return
 
     const { error } = await supabase.from('productos').update(cambios).eq('id', producto.id)
@@ -83,7 +86,11 @@ export default function DetalleProducto() {
 
   const agregar = () => {
     const cantidadNumerica = Number(cantidad)
-    if (!Number.isInteger(cantidadNumerica) || cantidadNumerica < 1 || cantidadNumerica > producto.stock) {
+    if (
+      !Number.isInteger(cantidadNumerica) ||
+      cantidadNumerica < 1 ||
+      cantidadNumerica > producto.stock
+    ) {
       setMensaje('Selecciona una cantidad válida.')
       return
     }
@@ -102,12 +109,14 @@ export default function DetalleProducto() {
       return
     }
 
-    const { error } = await supabase.from('reseñas').insert([{
-      producto_id: producto.id,
-      usuario_id: usuario.id,
-      calificación: Number(calificacion),
-      comentario: comentario.trim(),
-    }])
+    const { error } = await supabase.from('reseñas').insert([
+      {
+        producto_id: producto.id,
+        usuario_id: usuario.id,
+        calificación: Number(calificacion),
+        comentario: comentario.trim(),
+      },
+    ])
 
     if (error) {
       setMensaje(error.message)
@@ -123,7 +132,9 @@ export default function DetalleProducto() {
   if (cargando) {
     return (
       <main className="pc-page">
-        <div className="pc-container"><div className="pc-loader" /></div>
+        <div className="pc-container">
+          <div className="pc-loader" />
+        </div>
       </main>
     )
   }
@@ -144,7 +155,10 @@ export default function DetalleProducto() {
   const imagenesProducto = [
     obtenerImagenProducto(producto),
     ...(Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []),
-  ].filter(Boolean).filter((url, index, lista) => lista.indexOf(url) === index).slice(0, 2)
+  ]
+    .filter(Boolean)
+    .filter((url, index, lista) => lista.indexOf(url) === index)
+    .slice(0, 2)
 
   return (
     <main className="pc-page">
@@ -165,14 +179,27 @@ export default function DetalleProducto() {
               />
             </div>
             {imagenesProducto.length > 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 10,
+                  marginTop: 12,
+                }}
+              >
                 {imagenesProducto.map((url, index) => (
                   <button
                     key={url}
                     type="button"
                     onClick={() => setImagenSeleccionada(url)}
                     aria-label={`Ver imagen ${index + 1}`}
-                    style={{ padding: 5, border: `2px solid ${imagenSeleccionada === url ? '#d4af37' : '#e0e0e0'}`, borderRadius: 10, background: '#fff', cursor: 'pointer' }}
+                    style={{
+                      padding: 5,
+                      border: `2px solid ${imagenSeleccionada === url ? '#d4af37' : '#e0e0e0'}`,
+                      borderRadius: 10,
+                      background: '#fff',
+                      cursor: 'pointer',
+                    }}
                   >
                     <img
                       src={url}
@@ -193,7 +220,8 @@ export default function DetalleProducto() {
             <span className="pc-kicker">{producto.categorias?.nombre}</span>
             <h1>{producto.nombre}</h1>
             <p className="pc-detail-brand">
-              {producto.marca}{producto.modelo ? ` · ${producto.modelo}` : ''}
+              {producto.marca}
+              {producto.modelo ? ` · ${producto.modelo}` : ''}
             </p>
             <p className="pc-detail-description">{producto.descripción}</p>
 
@@ -214,7 +242,12 @@ export default function DetalleProducto() {
                 <p style={{ margin: '6px 0 12px' }}>
                   Proveedor: {proveedor.proveedor} · Costo: L {Number(proveedor.costo).toFixed(2)}
                 </p>
-                <a href={proveedor.url_compra} target="_blank" rel="noopener noreferrer" className="pc-btn pc-btn-light">
+                <a
+                  href={proveedor.url_compra}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pc-btn pc-btn-light"
+                >
                   <ExternalLink size={16} />
                   Comprar al proveedor
                 </a>
@@ -222,8 +255,22 @@ export default function DetalleProducto() {
             )}
 
             <div className="pc-buy-row">
-              <input type="number" min="1" max={producto.stock} className="pc-input pc-qty" value={cantidad} onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))} />
-              <button type="button" className="pc-btn pc-btn-primary" disabled={producto.stock <= 0} onClick={agregar}>Agregar al carrito</button>
+              <input
+                type="number"
+                min="1"
+                max={producto.stock}
+                className="pc-input pc-qty"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))}
+              />
+              <button
+                type="button"
+                className="pc-btn pc-btn-primary"
+                disabled={producto.stock <= 0}
+                onClick={agregar}
+              >
+                Agregar al carrito
+              </button>
             </div>
 
             {mensaje && <div className="pc-message">{mensaje}</div>}
@@ -234,18 +281,33 @@ export default function DetalleProducto() {
           <h2 className="pc-section-title">Reseñas</h2>
           {usuario ? (
             <form className="pc-card pc-review-form" onSubmit={guardarResena}>
-              <select className="pc-select" value={calificacion} onChange={(e) => setCalificacion(Number(e.target.value))}>
+              <select
+                className="pc-select"
+                value={calificacion}
+                onChange={(e) => setCalificacion(Number(e.target.value))}
+              >
                 <option value="5">⭐⭐⭐⭐⭐ 5</option>
                 <option value="4">⭐⭐⭐⭐ 4</option>
                 <option value="3">⭐⭐⭐ 3</option>
                 <option value="2">⭐⭐ 2</option>
                 <option value="1">⭐ 1</option>
               </select>
-              <textarea className="pc-textarea" rows="4" placeholder="Cuéntanos tu experiencia..." value={comentario} onChange={(e) => setComentario(e.target.value)} required />
-              <button type="submit" className="pc-btn pc-btn-primary">Publicar reseña</button>
+              <textarea
+                className="pc-textarea"
+                rows="4"
+                placeholder="Cuéntanos tu experiencia..."
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+                required
+              />
+              <button type="submit" className="pc-btn pc-btn-primary">
+                Publicar reseña
+              </button>
             </form>
           ) : (
-            <p><Link to="/login">Inicia sesión</Link> para publicar una reseña.</p>
+            <p>
+              <Link to="/login">Inicia sesión</Link> para publicar una reseña.
+            </p>
           )}
 
           <div className="pc-review-list">
@@ -256,7 +318,9 @@ export default function DetalleProducto() {
                 <span>{new Date(resena.created_at).toLocaleDateString()}</span>
               </article>
             ))}
-            {resenas.length === 0 && <div className="pc-empty-small">Este producto todavía no tiene reseñas.</div>}
+            {resenas.length === 0 && (
+              <div className="pc-empty-small">Este producto todavía no tiene reseñas.</div>
+            )}
           </div>
         </section>
       </div>

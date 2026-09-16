@@ -1,17 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 const CarritoContext = createContext(null)
 
 const CLAVE_STORAGE = 'pc-store-carrito'
 
 export function CarritoProvider({ children }) {
-
   // Cargar carrito al iniciar.
   const [items, setItems] = useState(() => {
     try {
@@ -22,18 +15,12 @@ export function CarritoProvider({ children }) {
     }
   })
 
-
   // Guardar cada cambio.
   useEffect(() => {
-    localStorage.setItem(
-      CLAVE_STORAGE,
-      JSON.stringify(items)
-    )
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items))
   }, [items])
 
-
   const agregarProducto = (producto, cantidad = 1) => {
-
     if (!producto || producto.stock <= 0) {
       return {
         success: false,
@@ -41,26 +28,18 @@ export function CarritoProvider({ children }) {
       }
     }
 
-    const precio = Number(
-      producto.precio_descuento || producto.precio
-    )
+    const precio = Number(producto.precio_descuento || producto.precio)
 
     let resultado = {
       success: true,
       message: 'Producto agregado al carrito',
     }
 
-
     setItems((actuales) => {
-
-      const existente = actuales.find(
-        (item) => item.producto_id === producto.id
-      )
+      const existente = actuales.find((item) => item.producto_id === producto.id)
 
       if (existente) {
-
-        const nuevaCantidad =
-          existente.cantidad + cantidad
+        const nuevaCantidad = existente.cantidad + cantidad
 
         if (nuevaCantidad > producto.stock) {
           resultado = {
@@ -70,7 +49,6 @@ export function CarritoProvider({ children }) {
 
           return actuales
         }
-
 
         return actuales.map((item) =>
           item.producto_id === producto.id
@@ -82,7 +60,6 @@ export function CarritoProvider({ children }) {
             : item
         )
       }
-
 
       return [
         ...actuales,
@@ -97,13 +74,10 @@ export function CarritoProvider({ children }) {
       ]
     })
 
-
     return resultado
   }
 
-
   const cambiarCantidad = (productoId, cantidad) => {
-
     const cantidadNumero = Number(cantidad)
 
     if (cantidadNumero <= 0) {
@@ -113,15 +87,11 @@ export function CarritoProvider({ children }) {
 
     setItems((actuales) =>
       actuales.map((item) => {
-
         if (item.producto_id !== productoId) {
           return item
         }
 
-        const cantidadFinal = Math.min(
-          cantidadNumero,
-          item.stock
-        )
+        const cantidadFinal = Math.min(cantidadNumero, item.stock)
 
         return {
           ...item,
@@ -131,41 +101,23 @@ export function CarritoProvider({ children }) {
     )
   }
 
-
   const eliminarProducto = (productoId) => {
-    setItems((actuales) =>
-      actuales.filter(
-        (item) => item.producto_id !== productoId
-      )
-    )
+    setItems((actuales) => actuales.filter((item) => item.producto_id !== productoId))
   }
-
 
   const vaciarCarrito = () => {
     setItems([])
   }
 
-
   const cantidadTotal = useMemo(
-    () =>
-      items.reduce(
-        (total, item) => total + item.cantidad,
-        0
-      ),
+    () => items.reduce((total, item) => total + item.cantidad, 0),
     [items]
   )
-
 
   const subtotal = useMemo(
-    () =>
-      items.reduce(
-        (total, item) =>
-          total + item.precio * item.cantidad,
-        0
-      ),
+    () => items.reduce((total, item) => total + item.precio * item.cantidad, 0),
     [items]
   )
-
 
   return (
     <CarritoContext.Provider
@@ -184,15 +136,11 @@ export function CarritoProvider({ children }) {
   )
 }
 
-
 export function useCarrito() {
-
   const context = useContext(CarritoContext)
 
   if (!context) {
-    throw new Error(
-      'useCarrito debe usarse dentro de CarritoProvider'
-    )
+    throw new Error('useCarrito debe usarse dentro de CarritoProvider')
   }
 
   return context

@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../supabaseClient'
-import {
-  UserCog,
-  UserCheck,
-  UserX,
-  Trash2,
-  Search,
-  X,
-} from 'lucide-react'
+import { UserCog, UserCheck, UserX, Trash2, Search, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
@@ -85,9 +78,7 @@ export default function GestionUsuarios() {
     }
 
     if (usuarioSeleccionado.rol === 'admin') {
-      setError(
-        'No puedes eliminar un administrador desde este módulo.'
-      )
+      setError('No puedes eliminar un administrador desde este módulo.')
       return
     }
 
@@ -103,12 +94,9 @@ export default function GestionUsuarios() {
     setProcesando(usuarioSeleccionado.id)
     setError('')
 
-    const { error } = await supabase.rpc(
-      'eliminar_usuario_pc_store',
-      {
-        p_usuario_id: usuarioSeleccionado.id,
-      }
-    )
+    const { error } = await supabase.rpc('eliminar_usuario_pc_store', {
+      p_usuario_id: usuarioSeleccionado.id,
+    })
 
     if (error) {
       setError(error.message)
@@ -125,10 +113,7 @@ export default function GestionUsuarios() {
   const usuariosFiltrados = usuarios.filter((usuarioItem) => {
     if (!textoBusqueda) return true
 
-    const nombreCompleto = [
-      usuarioItem.nombre || '',
-      usuarioItem.apellido || '',
-    ]
+    const nombreCompleto = [usuarioItem.nombre || '', usuarioItem.apellido || '']
       .join(' ')
       .toLowerCase()
 
@@ -149,12 +134,7 @@ export default function GestionUsuarios() {
   }
 
   const obtenerNombre = (usuarioItem) => {
-    const nombre = [
-      usuarioItem.nombre || '',
-      usuarioItem.apellido || '',
-    ]
-      .join(' ')
-      .trim()
+    const nombre = [usuarioItem.nombre || '', usuarioItem.apellido || ''].join(' ').trim()
 
     return nombre || 'Sin nombre'
   }
@@ -172,9 +152,7 @@ export default function GestionUsuarios() {
 
         <div className="pc-admin-header">
           <h1>Gestión de Usuarios</h1>
-          <p>
-            Administra los usuarios registrados, su acceso y sus cuentas.
-          </p>
+          <p>Administra los usuarios registrados, su acceso y sus cuentas.</p>
         </div>
 
         {error && (
@@ -296,19 +274,17 @@ export default function GestionUsuarios() {
                 {usuariosFiltrados.map((usuarioItem, indice) => {
                   const esActual = usuarioItem.id === usuario?.id
                   const esAdmin = usuarioItem.rol === 'admin'
-                  const estaBloqueado =
-                    usuarioItem.bloqueado === true
-                  const estaProcesando =
-                    procesando === usuarioItem.id
+                  const estaBloqueado = usuarioItem.bloqueado === true
+                  const estaProcesando = procesando === usuarioItem.id
 
                   return (
                     <tr key={usuarioItem.id}>
-                      <td><strong>{indice + 1}</strong></td>
+                      <td>
+                        <strong>{indice + 1}</strong>
+                      </td>
 
                       <td>
-                        <strong>
-                          {obtenerNombre(usuarioItem)}
-                        </strong>
+                        <strong>{obtenerNombre(usuarioItem)}</strong>
 
                         {esActual && (
                           <span
@@ -385,13 +361,9 @@ export default function GestionUsuarios() {
                             <>
                               <button
                                 className={
-                                  estaBloqueado
-                                    ? 'pc-btn pc-btn-primary'
-                                    : 'pc-btn pc-btn-light'
+                                  estaBloqueado ? 'pc-btn pc-btn-primary' : 'pc-btn pc-btn-light'
                                 }
-                                onClick={() =>
-                                  cambiarBloqueo(usuarioItem)
-                                }
+                                onClick={() => cambiarBloqueo(usuarioItem)}
                                 disabled={estaProcesando}
                                 style={{
                                   display: 'inline-flex',
@@ -414,9 +386,7 @@ export default function GestionUsuarios() {
 
                               <button
                                 className="pc-btn pc-btn-light"
-                                onClick={() =>
-                                  eliminarUsuario(usuarioItem)
-                                }
+                                onClick={() => eliminarUsuario(usuarioItem)}
                                 disabled={estaProcesando}
                                 style={{
                                   display: 'inline-flex',

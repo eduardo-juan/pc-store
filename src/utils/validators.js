@@ -13,5 +13,5 @@ export const validators = {
 
   isNotEmpty(value) {
     return value && value.trim().length > 0
-  }
+  },
 }

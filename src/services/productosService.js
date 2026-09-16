@@ -5,10 +5,7 @@ import { supabase } from '../supabaseClient'
 // ==========================================
 export const obtenerProductos = async (filtros = {}) => {
   try {
-    let query = supabase
-      .from('productos')
-      .select('*, categorias(nombre)')
-      .eq('activo', true)
+    let query = supabase.from('productos').select('*, categorias(nombre)').eq('activo', true)
 
     if (filtros.categoria_id) {
       query = query.eq('categoria_id', filtros.categoria_id)
@@ -71,10 +68,7 @@ export const guardarProveedorProducto = async (productoId, proveedor) => {
   try {
     const { data, error } = await supabase
       .from('producto_proveedores')
-      .upsert(
-        [{ producto_id: productoId, ...proveedor }],
-        { onConflict: 'producto_id' }
-      )
+      .upsert([{ producto_id: productoId, ...proveedor }], { onConflict: 'producto_id' })
       .select()
       .single()
 
@@ -104,10 +98,7 @@ export const eliminarProveedorProducto = async (productoId) => {
 // ==========================================
 export const crearProducto = async (producto) => {
   try {
-    const { data, error } = await supabase
-      .from('productos')
-      .insert([producto])
-      .select()
+    const { data, error } = await supabase.from('productos').insert([producto]).select()
 
     if (error) throw error
     return { success: true, data: data?.[0] || null }
@@ -121,11 +112,7 @@ export const crearProducto = async (producto) => {
 // ==========================================
 export const actualizarProducto = async (id, cambios) => {
   try {
-    const { data, error } = await supabase
-      .from('productos')
-      .update(cambios)
-      .eq('id', id)
-      .select()
+    const { data, error } = await supabase.from('productos').update(cambios).eq('id', id).select()
 
     if (error) throw error
     return { success: true, data: data?.[0] || null }
@@ -139,10 +126,7 @@ export const actualizarProducto = async (id, cambios) => {
 // ==========================================
 export const eliminarProducto = async (id) => {
   try {
-    const { error } = await supabase
-      .from('productos')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('productos').delete().eq('id', id)
 
     if (error) throw error
     return { success: true }
@@ -156,10 +140,7 @@ export const eliminarProducto = async (id) => {
 // ==========================================
 export const obtenerCategorias = async () => {
   try {
-    const { data, error } = await supabase
-      .from('categorias')
-      .select('*')
-      .order('nombre')
+    const { data, error } = await supabase.from('categorias').select('*').order('nombre')
 
     if (error) throw error
     return { success: true, data: data || [] }

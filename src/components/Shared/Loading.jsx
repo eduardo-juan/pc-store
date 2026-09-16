@@ -1,6 +1,4 @@
-export default function Loading({
-  texto = 'Cargando...',
-}) {
+export default function Loading({ texto = 'Cargando...' }) {
   return (
     <div className="pc-loading">
       <div className="pc-loader" />

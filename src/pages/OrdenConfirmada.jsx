@@ -7,50 +7,31 @@ export default function OrdenConfirmada() {
   return (
     <main className="pc-page">
       <div className="pc-container">
-
         <BotonAtras />
 
         <div className="pc-success-page">
+          <div className="pc-success-icon">✓</div>
 
-          <div className="pc-success-icon">
-            ✓
-          </div>
-
-          <span className="pc-kicker">
-            Orden creada
-          </span>
+          <span className="pc-kicker">Orden creada</span>
 
           <h1>¡Gracias por tu compra!</h1>
 
-          <p>
-            Tu orden fue registrada correctamente.
-          </p>
+          <p>Tu orden fue registrada correctamente.</p>
 
           <p>
-            ID interno:{' '}
-            <strong>#{id}</strong>
+            ID interno: <strong>#{id}</strong>
           </p>
 
           <div className="pc-hero-actions">
-
-            <Link
-              className="pc-btn pc-btn-primary"
-              to="/mis-ordenes"
-            >
+            <Link className="pc-btn pc-btn-primary" to="/mis-ordenes">
               Ver mis órdenes
             </Link>
 
-            <Link
-              className="pc-btn pc-btn-light"
-              to="/tienda"
-            >
+            <Link className="pc-btn pc-btn-light" to="/tienda">
               Seguir comprando
             </Link>
-
           </div>
-
         </div>
-
       </div>
     </main>
   )

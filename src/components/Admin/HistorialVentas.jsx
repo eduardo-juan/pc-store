@@ -1,9 +1,4 @@
-import {
-  Fragment,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../supabaseClient'
 import {
   ChevronLeft,
@@ -55,13 +50,15 @@ export default function HistorialVentas() {
 
     const { data, error } = await supabase
       .from('ordenes')
-      .select(`
+      .select(
+        `
         id,
         numero_orden,
         total,
         items,
         created_at
-      `)
+      `
+      )
       .eq('estado', 'pagada')
       .gte('created_at', inicioMes.toISOString())
       .lt('created_at', inicioSiguienteMes.toISOString())
@@ -107,11 +104,7 @@ export default function HistorialVentas() {
   }
 
   const diasDelMes = useMemo(() => {
-    const totalDias = new Date(
-      anio,
-      mes + 1,
-      0
-    ).getDate()
+    const totalDias = new Date(anio, mes + 1, 0).getDate()
 
     const resumenPorDia = {}
 
@@ -126,10 +119,7 @@ export default function HistorialVentas() {
     ordenes.forEach((orden) => {
       const fecha = new Date(orden.created_at)
 
-      if (
-        fecha.getFullYear() !== anio ||
-        fecha.getMonth() !== mes
-      ) {
+      if (fecha.getFullYear() !== anio || fecha.getMonth() !== mes) {
         return
       }
 
@@ -137,38 +127,23 @@ export default function HistorialVentas() {
 
       if (!resumenPorDia[dia]) return
 
-      resumenPorDia[dia].total += Number(
-        orden.total || 0
-      )
+      resumenPorDia[dia].total += Number(orden.total || 0)
 
       resumenPorDia[dia].cantidad += 1
       resumenPorDia[dia].ordenes.push(orden)
     })
 
-    return Array.from(
-      { length: totalDias },
-      (_, i) => ({
-        dia: i + 1,
-        ...resumenPorDia[i + 1],
-      })
-    )
+    return Array.from({ length: totalDias }, (_, i) => ({
+      dia: i + 1,
+      ...resumenPorDia[i + 1],
+    }))
   }, [ordenes, anio, mes])
 
-  const totalMes = diasDelMes.reduce(
-    (acumulado, dia) =>
-      acumulado + dia.total,
-    0
-  )
+  const totalMes = diasDelMes.reduce((acumulado, dia) => acumulado + dia.total, 0)
 
-  const ordenesDelMes = diasDelMes.reduce(
-    (acumulado, dia) =>
-      acumulado + dia.cantidad,
-    0
-  )
+  const ordenesDelMes = diasDelMes.reduce((acumulado, dia) => acumulado + dia.cantidad, 0)
 
-  const esMesActual =
-    anio === hoy.getFullYear() &&
-    mes === hoy.getMonth()
+  const esMesActual = anio === hoy.getFullYear() && mes === hoy.getMonth()
 
   return (
     <main className="pc-page">
@@ -178,9 +153,7 @@ export default function HistorialVentas() {
         <div className="pc-admin-header">
           <h1>Historial de Ventas</h1>
 
-          <p>
-            Ventas confirmadas (pagadas) por día, mes a mes.
-          </p>
+          <p>Ventas confirmadas (pagadas) por día, mes a mes.</p>
         </div>
 
         <div
@@ -276,32 +249,22 @@ export default function HistorialVentas() {
           </div>
         )}
 
-        <div
-          className="pc-metrics-grid"
-          style={{ marginBottom: 24 }}
-        >
+        <div className="pc-metrics-grid" style={{ marginBottom: 24 }}>
           <article className="pc-card pc-metric">
             <span>Total del mes</span>
 
-            <strong>
-              L {totalMes.toFixed(2)}
-            </strong>
+            <strong>L {totalMes.toFixed(2)}</strong>
           </article>
 
           <article className="pc-card pc-metric">
             <span>Órdenes pagadas</span>
 
-            <strong>
-              {ordenesDelMes}
-            </strong>
+            <strong>{ordenesDelMes}</strong>
           </article>
         </div>
 
         {cargando ? (
-          <div
-            className="pc-card"
-            style={{ padding: 20 }}
-          >
+          <div className="pc-card" style={{ padding: 20 }}>
             Cargando...
           </div>
         ) : (
@@ -321,34 +284,21 @@ export default function HistorialVentas() {
                   <Fragment key={dia.dia}>
                     <tr
                       style={{
-                        cursor:
-                          dia.cantidad > 0
-                            ? 'pointer'
-                            : 'default',
+                        cursor: dia.cantidad > 0 ? 'pointer' : 'default',
                       }}
                       onClick={() => {
                         if (dia.cantidad === 0) return
 
-                        setDiaExpandido(
-                          diaExpandido === dia.dia
-                            ? null
-                            : dia.dia
-                        )
+                        setDiaExpandido(diaExpandido === dia.dia ? null : dia.dia)
                       }}
                     >
                       <td>
-                        {String(dia.dia).padStart(2, '0')}/
-                        {String(mes + 1).padStart(2, '0')}/
-                        {anio}
+                        {String(dia.dia).padStart(2, '0')}/{String(mes + 1).padStart(2, '0')}/{anio}
                       </td>
 
-                      <td>
-                        {dia.cantidad}
-                      </td>
+                      <td>{dia.cantidad}</td>
 
-                      <td>
-                        L {dia.total.toFixed(2)}
-                      </td>
+                      <td>L {dia.total.toFixed(2)}</td>
 
                       <td>
                         {dia.cantidad > 0 && (
@@ -377,15 +327,11 @@ export default function HistorialVentas() {
 
                     {diaExpandido === dia.dia && (
                       <tr>
-                        <td
-                          colSpan={4}
-                          style={{ padding: 0 }}
-                        >
+                        <td colSpan={4} style={{ padding: 0 }}>
                           <div
                             style={{
                               padding: '12px 16px',
-                              background:
-                                'rgba(0,0,0,0.03)',
+                              background: 'rgba(0,0,0,0.03)',
                             }}
                           >
                             {dia.ordenes.map((orden) => (
@@ -394,15 +340,13 @@ export default function HistorialVentas() {
                                 style={{
                                   marginBottom: 14,
                                   paddingBottom: 10,
-                                  borderBottom:
-                                    '1px solid rgba(0,0,0,0.08)',
+                                  borderBottom: '1px solid rgba(0,0,0,0.08)',
                                 }}
                               >
                                 <div
                                   style={{
                                     display: 'flex',
-                                    justifyContent:
-                                      'space-between',
+                                    justifyContent: 'space-between',
                                     alignItems: 'center',
                                     gap: 10,
                                   }}
@@ -412,8 +356,7 @@ export default function HistorialVentas() {
                                       fontSize: 13,
                                     }}
                                   >
-                                    {orden.numero_orden ||
-                                      `Orden #${orden.id}`}
+                                    {orden.numero_orden || `Orden #${orden.id}`}
                                   </strong>
 
                                   <strong
@@ -421,10 +364,7 @@ export default function HistorialVentas() {
                                       fontSize: 13,
                                     }}
                                   >
-                                    L{' '}
-                                    {Number(
-                                      orden.total || 0
-                                    ).toFixed(2)}
+                                    L {Number(orden.total || 0).toFixed(2)}
                                   </strong>
                                 </div>
 
@@ -433,33 +373,24 @@ export default function HistorialVentas() {
                                     marginTop: 6,
                                   }}
                                 >
-                                  {(orden.items || []).map(
-                                    (item, idx) => (
-                                      <div
-                                        key={`${orden.id}-${idx}`}
-                                        style={{
-                                          display: 'flex',
-                                          justifyContent:
-                                            'space-between',
-                                          fontSize: 13,
-                                          padding: '2px 0',
-                                          gap: 12,
-                                        }}
-                                      >
-                                        <span>
-                                          {item.cantidad}×{' '}
-                                          {item.nombre}
-                                        </span>
+                                  {(orden.items || []).map((item, idx) => (
+                                    <div
+                                      key={`${orden.id}-${idx}`}
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        fontSize: 13,
+                                        padding: '2px 0',
+                                        gap: 12,
+                                      }}
+                                    >
+                                      <span>
+                                        {item.cantidad}× {item.nombre}
+                                      </span>
 
-                                        <span>
-                                          L{' '}
-                                          {Number(
-                                            item.subtotal || 0
-                                          ).toFixed(2)}
-                                        </span>
-                                      </div>
-                                    )
-                                  )}
+                                      <span>L {Number(item.subtotal || 0).toFixed(2)}</span>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             ))}

@@ -12,7 +12,6 @@ export default function Navbar() {
   return (
     <nav className="pc-navbar">
       <div className="pc-container pc-navbar-inner">
-
         <Link to="/" className="pc-brand">
           <span className="pc-brand-badge">
             <Monitor size={22} />
@@ -23,35 +22,19 @@ export default function Navbar() {
         <div className="pc-nav-links">
           <Link to="/">Inicio</Link>
 
-          <Link to="/tienda">
-            Tienda
-          </Link>
+          <Link to="/tienda">Tienda</Link>
 
-          {usuario && (
-            <Link to="/mis-ordenes">
-              Mis órdenes
-            </Link>
-          )}
+          {usuario && <Link to="/mis-ordenes">Mis órdenes</Link>}
 
-          {esStaff && (
-            <Link to="/admin">
-              Administración
-            </Link>
-          )}
+          {esStaff && <Link to="/admin">Administración</Link>}
         </div>
 
         <div className="pc-nav-actions">
-
-          <Link
-            to="/carrito"
-            className="pc-cart-button"
-          >
+          <Link to="/carrito" className="pc-cart-button">
             <ShoppingCart size={20} />
             <span>Carrito</span>
 
-            {cantidadTotal > 0 && (
-              <b>{cantidadTotal}</b>
-            )}
+            {cantidadTotal > 0 && <b>{cantidadTotal}</b>}
           </Link>
 
           <Link
@@ -80,14 +63,9 @@ export default function Navbar() {
                 }}
               />
             ) : (
-              (
-                usuario?.nombre?.[0] ||
-                usuario?.email?.[0] ||
-                'U'
-              ).toUpperCase()
+              (usuario?.nombre?.[0] || usuario?.email?.[0] || 'U').toUpperCase()
             )}
           </Link>
-
         </div>
       </div>
     </nav>

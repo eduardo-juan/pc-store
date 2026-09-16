@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 
 const AuthContext = createContext()
@@ -29,7 +24,11 @@ export const AuthProvider = ({ children }) => {
       return null
     }
     try {
-      const { data: perfil, error: perfilError } = await supabase.from('usuarios').select('*').eq('id', authUser.id).maybeSingle()
+      const { data: perfil, error: perfilError } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', authUser.id)
+        .maybeSingle()
       if (perfilError) {
         console.error('[AUTH] Error cargando perfil:', perfilError)
         setUsuario({ ...authUser })
@@ -57,7 +56,10 @@ export const AuthProvider = ({ children }) => {
     let activo = true
     const iniciarAuth = async () => {
       try {
-        const { data: { session: sesionActual }, error: sessionError } = await supabase.auth.getSession()
+        const {
+          data: { session: sesionActual },
+          error: sessionError,
+        } = await supabase.auth.getSession()
         if (!activo) return
         if (sessionError) {
           console.error('[AUTH] Error obteniendo sesión:', sessionError)
@@ -78,7 +80,9 @@ export const AuthProvider = ({ children }) => {
       }
     }
     iniciarAuth()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nuevaSesion) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, nuevaSesion) => {
       if (!activo) return
       console.log('[AUTH]', event, 'sesión:', !!nuevaSesion)
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
@@ -103,29 +107,38 @@ export const AuthProvider = ({ children }) => {
       await cargarPerfil(session.user)
     }
     cargar()
-    return () => { activo = false }
+    return () => {
+      activo = false
+    }
   }, [session])
 
   const registro = async (email, password, nombre, apellido, teléfono) => {
     try {
       setError(null)
-      const { data: { user }, error: authError } = await supabase.auth.signUp({ email, password })
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.signUp({ email, password })
       if (authError) throw authError
       if (!user) throw new Error('No se pudo crear el usuario')
 
-      const { error: perfilError } = await supabase.from('usuarios').insert([{
-        id: user.id,
-        email,
-        nombre,
-        apellido,
-        teléfono,
-        rol: 'user',
-        bloqueado: false,
-        activo: true,
-      }])
+      const { error: perfilError } = await supabase.from('usuarios').insert([
+        {
+          id: user.id,
+          email,
+          nombre,
+          apellido,
+          teléfono,
+          rol: 'user',
+          bloqueado: false,
+          activo: true,
+        },
+      ])
       if (perfilError) throw perfilError
 
-      const { data: { session: nuevaSesion } } = await supabase.auth.getSession()
+      const {
+        data: { session: nuevaSesion },
+      } = await supabase.auth.getSession()
       if (nuevaSesion) {
         setSession(nuevaSesion)
         await cargarPerfil(user)
@@ -141,10 +154,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null)
-      const { data: { session: nuevaSesion, user }, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+      const {
+        data: { session: nuevaSesion, user },
+        error: loginError,
+      } = await supabase.auth.signInWithPassword({ email, password })
       if (loginError) throw loginError
       if (!user || !nuevaSesion) throw new Error('No se pudo iniciar sesión')
-      const { data: perfil, error: perfilError } = await supabase.from('usuarios').select('*').eq('id', user.id).maybeSingle()
+      const { data: perfil, error: perfilError } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle()
       if (perfilError) {
         console.error('[AUTH] Error cargando perfil después del login:', perfilError)
         setSession(nuevaSesion)
@@ -188,7 +208,25 @@ export const AuthProvider = ({ children }) => {
   const esEmpleado = usuario?.rol === 'empleado'
   const esStaff = esAdmin || esEmpleado
 
-  return <AuthContext.Provider value={{ usuario, perfil: usuario, session, cargando, error, registro, login, logout, esAdmin, esEmpleado, esStaff }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider
+      value={{
+        usuario,
+        perfil: usuario,
+        session,
+        cargando,
+        error,
+        registro,
+        login,
+        logout,
+        esAdmin,
+        esEmpleado,
+        esStaff,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => {

@@ -15,18 +15,14 @@ export default function ProductCard({ producto }) {
       <img src={producto.imagen_url} alt={producto.nombre} />
       <h3>{producto.nombre}</h3>
       <p>{producto.marca}</p>
-      <div className="pc-price">
-        L {Number(producto.precio).toFixed(2)}
-      </div>
+      <div className="pc-price">L {Number(producto.precio).toFixed(2)}</div>
       <input
         type="number"
         min="1"
         value={cantidad}
         onChange={(e) => setCantidad(parseInt(e.target.value))}
       />
-      <button onClick={handleAgregar}>
-        Agregar al carrito
-      </button>
+      <button onClick={handleAgregar}>Agregar al carrito</button>
     </div>
   )
 }
