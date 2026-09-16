@@ -287,6 +287,19 @@ export default function Login() {
                 : 'Iniciar sesión'}
             </button>
 
+            {/* RECUPERACIÓN DE CONTRASEÑA */}
+
+            <div
+              style={{
+                textAlign: 'center',
+                marginTop: 4,
+              }}
+            >
+              <Link to="/recuperar-password">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
           </form>
 
           {/* REGISTRO */}
