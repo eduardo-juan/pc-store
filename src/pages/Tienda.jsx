@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+
 import {
   Cpu,
   Monitor,
@@ -9,13 +10,15 @@ import {
   Keyboard,
   SlidersHorizontal,
   ShoppingCart,
-  Search
-} from 'lucide-react'
+  Search,
+} from "lucide-react";
 
-import { supabase } from '../supabaseClient'
-import { useCarrito } from '../context/CarritoContext'
-import BotonAtras from '../components/BotonAtras'
-import { obtenerImagenProducto } from '../utils/imagenesProductos'
+import { supabase } from "../supabaseClient";
+import { useCarrito } from "../context/CarritoContext";
+import { useAuth } from "../context/AuthContext";
+
+import BotonAtras from "../components/BotonAtras";
+import { obtenerImagenProducto } from "../utils/imagenesProductos";
 
 const iconosCategoria = [
   Cpu,
@@ -23,173 +26,244 @@ const iconosCategoria = [
   MemoryStick,
   HardDrive,
   Mouse,
-  Keyboard
-]
+  Keyboard,
+];
 
-const limpiarBusqueda = (valor = '', max = 100) =>
+const limpiarBusqueda = (valor = "", max = 100) =>
   String(valor)
-    .replace(
-      /[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9\s_-]/g,
-      ''
-    )
-    .slice(0, max)
+    .replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9\s_-]/g, "")
+    .slice(0, max);
 
 export default function Tienda() {
-  const [productos, setProductos] = useState([])
-  const [categorias, setCategorias] = useState([])
-  const [busqueda, setBusqueda] = useState('')
-  const [categoriaId, setCategoriaId] = useState('')
-  const [marcas, setMarcas] = useState([])
-  const [precioMax, setPrecioMax] = useState(15000)
-  const [orden, setOrden] = useState('recientes')
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [categoriaId, setCategoriaId] = useState("");
+  const [marcas, setMarcas] = useState([]);
+  const [precioMax, setPrecioMax] = useState(15000);
+  const [orden, setOrden] = useState("recientes");
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
 
-  const { agregarProducto } = useCarrito()
+  const { agregarProducto } = useCarrito();
+  const { usuario } = useAuth();
+
+  const autenticado = Boolean(usuario);
 
   useEffect(() => {
-    cargarTienda()
-  }, [])
+    cargarTienda();
+  }, []);
+
+  useEffect(() => {
+    if (!autenticado) {
+      setPrecioMax(15000);
+
+      if (orden === "precio-asc" || orden === "precio-desc") {
+        setOrden("recientes");
+      }
+    }
+  }, [autenticado, orden]);
 
   const cargarTienda = async () => {
-    setCargando(true)
-    setError('')
+    setCargando(true);
+    setError("");
 
-    const {
-      data: productosData,
-      error: productosError
-    } = await supabase
-      .from('productos')
-      .select('*, categorias(id, nombre)')
-      .eq('activo', true)
-      .order('id')
+    const { data: productosData, error: productosError } =
+      await supabase
+        .from("productos")
+        .select("*, categorias(id, nombre)")
+        .eq("activo", true)
+        .order("id");
 
     if (productosError) {
-      setError(productosError.message)
-      setCargando(false)
-      return
+      setError(productosError.message);
+      setCargando(false);
+      return;
     }
 
-    const {
-      data: categoriasData,
-      error: categoriasError
-    } = await supabase
-      .from('categorias')
-      .select('id, nombre')
-      .order('nombre')
+    const { data: categoriasData, error: categoriasError } =
+      await supabase
+        .from("categorias")
+        .select("id, nombre")
+        .order("nombre");
 
     if (categoriasError) {
-      setError(categoriasError.message)
-      setCargando(false)
-      return
+      setError(categoriasError.message);
+      setCargando(false);
+      return;
     }
 
-    setProductos(productosData || [])
-    setCategorias(categoriasData || [])
-    setCargando(false)
-  }
+    setProductos(productosData || []);
+    setCategorias(categoriasData || []);
+    setCargando(false);
+  };
 
   const marcasDisponibles = useMemo(() => {
     return [
       ...new Set(
         productos
           .map((producto) => producto.marca)
-          .filter(Boolean)
-      )
-    ].sort()
-  }, [productos])
+          .filter(Boolean),
+      ),
+    ].sort();
+  }, [productos]);
 
   const productosFiltrados = useMemo(() => {
-    const texto = busqueda.trim().toLowerCase()
+    const texto = busqueda.trim().toLowerCase();
 
     const filtrados = productos.filter((producto) => {
       const coincideTexto =
-        texto === '' ||
+        texto === "" ||
         producto.nombre?.toLowerCase().includes(texto) ||
         producto.marca?.toLowerCase().includes(texto) ||
-        producto.modelo?.toLowerCase().includes(texto)
+        producto.modelo?.toLowerCase().includes(texto);
 
       const coincideCategoria =
-        categoriaId === '' ||
-        String(producto.categoria_id) === String(categoriaId)
+        categoriaId === "" ||
+        String(producto.categoria_id) === String(categoriaId);
 
       const coincideMarca =
         marcas.length === 0 ||
-        marcas.includes(producto.marca)
+        marcas.includes(producto.marca);
 
       const precio = Number(
         producto.precio_descuento ||
           producto.precio ||
-          0
-      )
+          0,
+      );
+
+      const coincidePrecio =
+        !autenticado || precio <= precioMax;
 
       return (
         coincideTexto &&
         coincideCategoria &&
         coincideMarca &&
-        precio <= precioMax
-      )
-    })
+        coincidePrecio
+      );
+    });
 
     return [...filtrados].sort((a, b) => {
       const precioA = Number(
-        a.precio_descuento || a.precio || 0
-      )
+        a.precio_descuento || a.precio || 0,
+      );
 
       const precioB = Number(
-        b.precio_descuento || b.precio || 0
-      )
+        b.precio_descuento || b.precio || 0,
+      );
 
-      if (orden === 'precio-asc') {
-        return precioA - precioB
+      if (autenticado && orden === "precio-asc") {
+        return precioA - precioB;
       }
 
-      if (orden === 'precio-desc') {
-        return precioB - precioA
+      if (autenticado && orden === "precio-desc") {
+        return precioB - precioA;
       }
 
-      return Number(b.id) - Number(a.id)
-    })
+      return Number(b.id) - Number(a.id);
+    });
   }, [
     productos,
     busqueda,
     categoriaId,
     marcas,
     precioMax,
-    orden
-  ])
+    orden,
+    autenticado,
+  ]);
 
   const alternarMarca = (marca) => {
     setMarcas((actuales) =>
       actuales.includes(marca)
         ? actuales.filter((item) => item !== marca)
-        : [...actuales, marca]
-    )
-  }
+        : [...actuales, marca],
+    );
+  };
+
+  const limpiarFiltros = () => {
+    setCategoriaId("");
+    setMarcas([]);
+    setPrecioMax(15000);
+    setBusqueda("");
+    setOrden("recientes");
+  };
+
+  const renderPrecio = (producto) => {
+    if (!autenticado) {
+      return (
+        <div className="pc-price-login">
+          <span>
+            Inicia sesión para consultar el precio
+          </span>
+
+          <Link to="/login">Iniciar sesión</Link>
+        </div>
+      );
+    }
+
+    if (producto.precio_descuento) {
+      return (
+        <>
+          <span className="pc-price">
+            L{" "}
+            {Number(
+              producto.precio_descuento,
+            ).toFixed(2)}
+          </span>
+
+          <span className="pc-old-price">
+            L {Number(producto.precio).toFixed(2)}
+          </span>
+        </>
+      );
+    }
+
+    return (
+      <span className="pc-price">
+        L {Number(producto.precio || 0).toFixed(2)}
+      </span>
+    );
+  };
+
+  const manejarAgregarCarrito = (producto) => {
+    if (!autenticado) {
+      setMensaje("Debes iniciar sesión para comprar.");
+
+      setTimeout(() => setMensaje(""), 2200);
+
+      return;
+    }
+
+    const resultado = agregarProducto(producto);
+
+    setMensaje(resultado.message);
+
+    setTimeout(() => setMensaje(""), 2200);
+  };
 
   if (cargando) {
     return (
       <main
         className="pc-page"
         style={{
-          background: '#ffffff',
-          color: '#171717'
+          background: "#ffffff",
+          color: "#171717",
         }}
       >
         <div className="pc-container">
           Cargando productos...
         </div>
       </main>
-    )
+    );
   }
 
   return (
     <main
       className="pc-page pc-store-page"
       style={{
-        background: '#ffffff',
-        color: '#171717'
+        background: "#ffffff",
+        color: "#171717",
       }}
     >
       <style>
@@ -197,6 +271,22 @@ export default function Tienda() {
           .pc-store-page,
           .pc-store-page * {
             color-scheme: light;
+          }
+
+          .pc-price-login {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #666 !important;
+          }
+
+          .pc-price-login a {
+            width: fit-content;
+            color: #a67c00 !important;
+            font-weight: 800;
+            text-decoration: underline !important;
           }
 
           .pc-store-page {
@@ -341,12 +431,15 @@ export default function Tienda() {
 
         <div className="pc-store-heading">
           <div>
-            <span className="pc-kicker">PC STORE</span>
+            <span className="pc-kicker">
+              PC STORE
+            </span>
 
             <h1>Tienda</h1>
 
             <p>
-              Componentes para construir, actualizar y potenciar tu PC.
+              Componentes para construir, actualizar y
+              potenciar tu PC.
             </p>
           </div>
 
@@ -366,9 +459,9 @@ export default function Tienda() {
               <button
                 type="button"
                 className={`pc-category-item ${
-                  categoriaId === '' ? 'active' : ''
+                  categoriaId === "" ? "active" : ""
                 }`}
-                onClick={() => setCategoriaId('')}
+                onClick={() => setCategoriaId("")}
               >
                 <span>Todos los productos</span>
                 <b>{productos.length}</b>
@@ -378,13 +471,13 @@ export default function Tienda() {
                 const Icono =
                   iconosCategoria[
                     index % iconosCategoria.length
-                  ]
+                  ];
 
                 const cantidad = productos.filter(
                   (producto) =>
                     String(producto.categoria_id) ===
-                    String(categoria.id)
-                ).length
+                    String(categoria.id),
+                ).length;
 
                 return (
                   <button
@@ -393,8 +486,8 @@ export default function Tienda() {
                     className={`pc-category-item ${
                       String(categoriaId) ===
                       String(categoria.id)
-                        ? 'active'
-                        : ''
+                        ? "active"
+                        : ""
                     }`}
                     onClick={() =>
                       setCategoriaId(String(categoria.id))
@@ -407,7 +500,7 @@ export default function Tienda() {
 
                     <b>{cantidad}</b>
                   </button>
-                )
+                );
               })}
             </div>
 
@@ -416,29 +509,33 @@ export default function Tienda() {
                 <strong>Filtros</strong>
               </div>
 
-              <label
-                className="pc-filter-label"
-                htmlFor="precio-max"
-              >
-                Precio máximo
+              {autenticado && (
+                <>
+                  <label
+                    className="pc-filter-label"
+                    htmlFor="precio-max"
+                  >
+                    Precio máximo{" "}
+                    <span>
+                      L{" "}
+                      {precioMax.toLocaleString("es-HN")}
+                    </span>
+                  </label>
 
-                <span>
-                  L {precioMax.toLocaleString('es-HN')}
-                </span>
-              </label>
-
-              <input
-                id="precio-max"
-                className="pc-price-range"
-                type="range"
-                min="500"
-                max="15000"
-                step="100"
-                value={precioMax}
-                onChange={(e) =>
-                  setPrecioMax(Number(e.target.value))
-                }
-              />
+                  <input
+                    id="precio-max"
+                    className="pc-price-range"
+                    type="range"
+                    min="500"
+                    max="15000"
+                    step="100"
+                    value={precioMax}
+                    onChange={(e) =>
+                      setPrecioMax(Number(e.target.value))
+                    }
+                  />
+                </>
+              )}
 
               <div className="pc-filter-group">
                 <strong>Marca</strong>
@@ -451,7 +548,9 @@ export default function Tienda() {
                     <input
                       type="checkbox"
                       checked={marcas.includes(marca)}
-                      onChange={() => alternarMarca(marca)}
+                      onChange={() =>
+                        alternarMarca(marca)
+                      }
                     />
 
                     <span>{marca}</span>
@@ -462,12 +561,7 @@ export default function Tienda() {
               <button
                 type="button"
                 className="pc-filter-reset"
-                onClick={() => {
-                  setCategoriaId('')
-                  setMarcas([])
-                  setPrecioMax(15000)
-                  setBusqueda('')
-                }}
+                onClick={limpiarFiltros}
               >
                 Limpiar filtros
               </button>
@@ -485,7 +579,7 @@ export default function Tienda() {
                   value={busqueda}
                   onChange={(e) =>
                     setBusqueda(
-                      limpiarBusqueda(e.target.value)
+                      limpiarBusqueda(e.target.value),
                     )
                   }
                 />
@@ -494,20 +588,26 @@ export default function Tienda() {
               <select
                 className="pc-store-sort"
                 value={orden}
-                onChange={(e) => setOrden(e.target.value)}
+                onChange={(e) =>
+                  setOrden(e.target.value)
+                }
                 aria-label="Ordenar productos"
               >
                 <option value="recientes">
                   Más recientes
                 </option>
 
-                <option value="precio-asc">
-                  Precio: menor a mayor
-                </option>
+                {autenticado && (
+                  <>
+                    <option value="precio-asc">
+                      Precio: menor a mayor
+                    </option>
 
-                <option value="precio-desc">
-                  Precio: mayor a menor
-                </option>
+                    <option value="precio-desc">
+                      Precio: mayor a menor
+                    </option>
+                  </>
+                )}
               </select>
             </div>
 
@@ -546,7 +646,7 @@ export default function Tienda() {
                   <div className="pc-product-body">
                     <div className="pc-product-category">
                       {producto.categorias?.nombre ||
-                        'Sin categoría'}
+                        "Sin categoría"}
                     </div>
 
                     <h3 className="pc-product-name">
@@ -557,64 +657,43 @@ export default function Tienda() {
                       {producto.descripción?.substring(0, 90)}
 
                       {producto.descripción?.length > 90
-                        ? '...'
-                        : ''}
+                        ? "..."
+                        : ""}
                     </p>
 
                     <div className="pc-price-row">
-                      {producto.precio_descuento ? (
-                        <>
-                          <span className="pc-price">
-                            L{' '}
-                            {Number(
-                              producto.precio_descuento
-                            ).toFixed(2)}
-                          </span>
-
-                          <span className="pc-old-price">
-                            L{' '}
-                            {Number(
-                              producto.precio
-                            ).toFixed(2)}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="pc-price">
-                          L{' '}
-                          {Number(
-                            producto.precio
-                          ).toFixed(2)}
-                        </span>
-                      )}
+                      {renderPrecio(producto)}
                     </div>
 
                     <div className="pc-stock-badge">
                       {producto.stock > 0
-                        ? 'En stock'
-                        : 'Agotado'}
+                        ? "En stock"
+                        : "Agotado"}
                     </div>
 
-                    <button
-                      type="button"
-                      className="pc-btn pc-btn-primary pc-store-cart-btn"
-                      disabled={producto.stock <= 0}
-                      onClick={() => {
-                        const resultado =
-                          agregarProducto(producto)
+                    {autenticado ? (
+                      <button
+                        type="button"
+                        className="pc-btn pc-btn-primary pc-store-cart-btn"
+                        disabled={producto.stock <= 0}
+                        onClick={() =>
+                          manejarAgregarCarrito(producto)
+                        }
+                      >
+                        <ShoppingCart size={17} />
 
-                        setMensaje(resultado.message)
-
-                        setTimeout(() => {
-                          setMensaje('')
-                        }, 2200)
-                      }}
-                    >
-                      <ShoppingCart size={17} />
-
-                      {producto.stock > 0
-                        ? 'Agregar al carrito'
-                        : 'Agotado'}
-                    </button>
+                        {producto.stock > 0
+                          ? "Agregar al carrito"
+                          : "Agotado"}
+                      </button>
+                    ) : (
+                      <Link
+                        to="/login"
+                        className="pc-btn pc-btn-primary pc-store-cart-btn"
+                      >
+                        Inicia sesión para comprar
+                      </Link>
+                    )}
                   </div>
                 </article>
               ))}
@@ -629,5 +708,5 @@ export default function Tienda() {
         </div>
       </div>
     </main>
-  )
+  );
 }

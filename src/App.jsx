@@ -61,17 +61,17 @@ export default function App() {
               <AdminTableTools />
 
               <Routes>
-                <Route
-                  path="/"
-                  element={<Home />}
-                />
-
-                {/* Tienda pública: no requiere cuenta */}
-                <Route
+{/* Inicio: público o personalizado */}
+<Route
   path="/"
   element={<Inicio />}
 />
 
+{/* Tienda pública */}
+<Route
+  path="/tienda"
+  element={<Tienda />}
+/>
                 {/* Detalles públicos: no requiere cuenta */}
                 <Route
                   path="/producto/:id"

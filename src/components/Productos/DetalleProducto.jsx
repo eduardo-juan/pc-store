@@ -1,131 +1,170 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ExternalLink } from 'lucide-react'
-import { supabase } from '../../supabaseClient'
-import { useCarrito } from '../../context/CarritoContext'
-import { useAuth } from '../../hooks/useAuth'
-import { obtenerProveedorProducto } from '../../services/productosService'
-import { obtenerImagenProducto } from '../../utils/imagenesProductos'
-import BotonAtras from '../../components/BotonAtras'
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ExternalLink, Star } from "lucide-react";
+import { supabase } from "../../supabaseClient";
+import { useCarrito } from "../../context/CarritoContext";
+import { useAuth } from "../../hooks/useAuth";
+import { obtenerProveedorProducto } from "../../services/productosService";
+import { obtenerImagenProducto } from "../../utils/imagenesProductos";
+import BotonAtras from "../../components/BotonAtras";
 
 export default function DetalleProducto() {
-  const { id } = useParams()
-  const { usuario, esAdmin } = useAuth()
-  const { agregarProducto } = useCarrito()
+  const { id } = useParams();
+  const { usuario, esAdmin } = useAuth();
+  const { agregarProducto } = useCarrito();
 
-  const [producto, setProducto] = useState(null)
-  const [proveedor, setProveedor] = useState(null)
-  const [resenas, setResenas] = useState([])
-  const [cantidad, setCantidad] = useState(1)
-  const [calificacion, setCalificacion] = useState(5)
-  const [comentario, setComentario] = useState('')
-  const [imagenSeleccionada, setImagenSeleccionada] = useState('')
-  const [cargando, setCargando] = useState(true)
-  const [mensaje, setMensaje] = useState('')
+  const autenticado = Boolean(usuario);
+
+  const [producto, setProducto] = useState(null);
+  const [proveedor, setProveedor] = useState(null);
+  const [resenas, setResenas] = useState([]);
+  const [cantidad, setCantidad] = useState(1);
+  const [calificacion, setCalificacion] = useState(5);
+  const [comentario, setComentario] = useState("");
+  const [imagenSeleccionada, setImagenSeleccionada] = useState("");
+  const [cargando, setCargando] = useState(true);
+  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
-    cargarProducto()
-  }, [id, esAdmin])
+    cargarProducto();
+  }, [id, esAdmin]);
 
   const cargarProducto = async () => {
-    setCargando(true)
+    setCargando(true);
+    setMensaje("");
 
     const { data, error } = await supabase
-      .from('productos')
-      .select('*, categorias(nombre)')
-      .eq('id', id)
-      .single()
+      .from("productos")
+      .select("*, categorias(nombre)")
+      .eq("id", id)
+      .eq("activo", true)
+      .single();
 
     if (error) {
-      setMensaje(error.message)
-      setCargando(false)
-      return
+      setMensaje(error.message);
+      setCargando(false);
+      return;
     }
 
     const { data: resenasData } = await supabase
-      .from('reseñas')
-      .select('*')
-      .eq('producto_id', id)
-      .order('created_at', { ascending: false })
+      .from("reseñas")
+      .select("*")
+      .eq("producto_id", id)
+      .order("created_at", { ascending: false });
 
     if (esAdmin) {
-      const proveedorResultado = await obtenerProveedorProducto(id)
-      if (proveedorResultado.success) setProveedor(proveedorResultado.data)
+      const proveedorResultado = await obtenerProveedorProducto(id);
+
+      if (proveedorResultado.success) {
+        setProveedor(proveedorResultado.data);
+      }
     } else {
-      setProveedor(null)
+      setProveedor(null);
     }
 
-    setProducto(data)
-    setImagenSeleccionada(obtenerImagenProducto(data))
-    setResenas(resenasData || [])
-    setCargando(false)
-  }
+    setProducto(data);
+    setImagenSeleccionada(obtenerImagenProducto(data));
+    setResenas(resenasData || []);
+    setCargando(false);
+  };
 
   const limpiarImagenRota = async (url) => {
-    if (!url || !producto) return
+    if (!url || !producto) return;
 
-    const esPrincipal = producto.imagen_principal === url
-    const adicionales = Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []
-    const nuevosAdicionales = adicionales.filter((imagen) => imagen !== url)
-    const cambios = {}
+    const esPrincipal = producto.imagen_principal === url;
 
-    if (esPrincipal) cambios.imagen_principal = null
-    if (nuevosAdicionales.length !== adicionales.length) cambios.imágenes_adicionales = nuevosAdicionales
-    if (Object.keys(cambios).length === 0) return
+    const adicionales = Array.isArray(producto.imágenes_adicionales)
+      ? producto.imágenes_adicionales
+      : [];
 
-    const { error } = await supabase.from('productos').update(cambios).eq('id', producto.id)
-    if (!error) {
-      const actualizado = { ...producto, ...cambios }
-      setProducto(actualizado)
-      setImagenSeleccionada(obtenerImagenProducto(actualizado))
+    const nuevosAdicionales = adicionales.filter((imagen) => imagen !== url);
+
+    const cambios = {};
+
+    if (esPrincipal) cambios.imagen_principal = null;
+
+    if (nuevosAdicionales.length !== adicionales.length) {
+      cambios.imágenes_adicionales = nuevosAdicionales;
     }
-  }
+
+    if (Object.keys(cambios).length === 0) return;
+
+    const { error } = await supabase
+      .from("productos")
+      .update(cambios)
+      .eq("id", producto.id);
+
+    if (!error) {
+      const actualizado = { ...producto, ...cambios };
+
+      setProducto(actualizado);
+      setImagenSeleccionada(obtenerImagenProducto(actualizado));
+    }
+  };
 
   const agregar = () => {
-    const cantidadNumerica = Number(cantidad)
-    if (!Number.isInteger(cantidadNumerica) || cantidadNumerica < 1 || cantidadNumerica > producto.stock) {
-      setMensaje('Selecciona una cantidad válida.')
-      return
+    if (!autenticado) {
+      setMensaje("Debes iniciar sesión para comprar.");
+      return;
     }
-    const resultado = agregarProducto(producto, cantidadNumerica)
-    setMensaje(resultado.message)
-  }
+
+    const cantidadNumerica = Number(cantidad);
+
+    if (
+      !Number.isInteger(cantidadNumerica) ||
+      cantidadNumerica < 1 ||
+      cantidadNumerica > producto.stock
+    ) {
+      setMensaje("Selecciona una cantidad válida.");
+      return;
+    }
+
+    const resultado = agregarProducto(producto, cantidadNumerica);
+    setMensaje(resultado.message);
+  };
 
   const guardarResena = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+
     if (!usuario) {
-      setMensaje('Debes iniciar sesión para publicar una reseña.')
-      return
-    }
-    if (!comentario.trim()) {
-      setMensaje('Escribe un comentario antes de publicar.')
-      return
+      setMensaje("Debes iniciar sesión para publicar una reseña.");
+      return;
     }
 
-    const { error } = await supabase.from('reseñas').insert([{
-      producto_id: producto.id,
-      usuario_id: usuario.id,
-      calificación: Number(calificacion),
-      comentario: comentario.trim(),
-    }])
+    if (!comentario.trim()) {
+      setMensaje("Escribe un comentario antes de publicar.");
+      return;
+    }
+
+    const { error } = await supabase.from("reseñas").insert([
+      {
+        producto_id: producto.id,
+        usuario_id: usuario.id,
+        calificación: Number(calificacion),
+        comentario: comentario.trim(),
+      },
+    ]);
 
     if (error) {
-      setMensaje(error.message)
-      return
+      setMensaje(error.message);
+      return;
     }
 
-    setComentario('')
-    setCalificacion(5)
-    setMensaje('Reseña publicada.')
-    await cargarProducto()
-  }
+    setComentario("");
+    setCalificacion(5);
+    setMensaje("Reseña publicada.");
+
+    await cargarProducto();
+  };
 
   if (cargando) {
     return (
       <main className="pc-page">
-        <div className="pc-container"><div className="pc-loader" /></div>
+        <div className="pc-container">
+          <div className="pc-loader" />
+        </div>
       </main>
-    )
+    );
   }
 
   if (!producto) {
@@ -137,14 +176,22 @@ export default function DetalleProducto() {
           <Link to="/tienda">Regresar</Link>
         </div>
       </main>
-    )
+    );
   }
 
-  const precioActual = Number(producto.precio_descuento || producto.precio)
+  const precioActual = Number(
+    producto.precio_descuento || producto.precio || 0,
+  );
+
   const imagenesProducto = [
     obtenerImagenProducto(producto),
-    ...(Array.isArray(producto.imágenes_adicionales) ? producto.imágenes_adicionales : []),
-  ].filter(Boolean).filter((url, index, lista) => lista.indexOf(url) === index).slice(0, 2)
+    ...(Array.isArray(producto.imágenes_adicionales)
+      ? producto.imágenes_adicionales
+      : []),
+  ]
+    .filter(Boolean)
+    .filter((url, index, lista) => lista.indexOf(url) === index)
+    .slice(0, 2);
 
   return (
     <main className="pc-page">
@@ -158,30 +205,50 @@ export default function DetalleProducto() {
                 src={imagenSeleccionada || imagenesProducto[0]}
                 alt={producto.nombre}
                 onError={(e) => {
-                  const urlFallida = e.currentTarget.src
-                  e.currentTarget.style.display = 'none'
-                  limpiarImagenRota(urlFallida)
+                  const urlFallida = e.currentTarget.src;
+                  e.currentTarget.style.display = "none";
+                  limpiarImagenRota(urlFallida);
                 }}
               />
             </div>
+
             {imagenesProducto.length > 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: 10,
+                  marginTop: 12,
+                }}
+              >
                 {imagenesProducto.map((url, index) => (
                   <button
                     key={url}
                     type="button"
                     onClick={() => setImagenSeleccionada(url)}
                     aria-label={`Ver imagen ${index + 1}`}
-                    style={{ padding: 5, border: `2px solid ${imagenSeleccionada === url ? '#d4af37' : '#e0e0e0'}`, borderRadius: 10, background: '#fff', cursor: 'pointer' }}
+                    style={{
+                      padding: 5,
+                      border: `2px solid ${
+                        imagenSeleccionada === url ? "#d4af37" : "#e0e0e0"
+                      }`,
+                      borderRadius: 10,
+                      background: "#fff",
+                      cursor: "pointer",
+                    }}
                   >
                     <img
                       src={url}
                       alt={`${producto.nombre} vista ${index + 1}`}
                       onError={(e) => {
-                        e.currentTarget.parentElement?.remove()
-                        limpiarImagenRota(url)
+                        e.currentTarget.parentElement?.remove();
+                        limpiarImagenRota(url);
                       }}
-                      style={{ width: '100%', height: 90, objectFit: 'contain' }}
+                      style={{
+                        width: "100%",
+                        height: 90,
+                        objectFit: "contain",
+                      }}
                     />
                   </button>
                 ))}
@@ -191,30 +258,59 @@ export default function DetalleProducto() {
 
           <section>
             <span className="pc-kicker">{producto.categorias?.nombre}</span>
+
             <h1>{producto.nombre}</h1>
+
             <p className="pc-detail-brand">
-              {producto.marca}{producto.modelo ? ` · ${producto.modelo}` : ''}
+              {producto.marca}
+              {producto.modelo ? ` · ${producto.modelo}` : ""}
             </p>
+
             <p className="pc-detail-description">{producto.descripción}</p>
 
-            <div className="pc-price-row">
-              <span className="pc-price pc-price-large">L {precioActual.toFixed(2)}</span>
-              {producto.precio_descuento && (
-                <span className="pc-old-price">L {Number(producto.precio).toFixed(2)}</span>
-              )}
-            </div>
+            {autenticado ? (
+              <div className="pc-price-row">
+                <span className="pc-price pc-price-large">
+                  L {precioActual.toFixed(2)}
+                </span>
+
+                {producto.precio_descuento && (
+                  <span className="pc-old-price">
+                    L {Number(producto.precio).toFixed(2)}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="pc-price-login">
+                <span>Inicia sesión para consultar el precio</span>
+                <Link to="/login">Iniciar sesión</Link>
+              </div>
+            )}
 
             <p className="pc-stock">
-              {producto.stock > 0 ? `${producto.stock} unidades disponibles` : 'Producto agotado'}
+              {producto.stock > 0
+                ? `${producto.stock} unidades disponibles`
+                : "Producto agotado"}
             </p>
 
             {esAdmin && proveedor?.activo && (
-              <div className="pc-card" style={{ margin: '18px 0', padding: 16 }}>
+              <div
+                className="pc-card"
+                style={{ margin: "18px 0", padding: 16 }}
+              >
                 <strong>🚚 Dropshipping</strong>
-                <p style={{ margin: '6px 0 12px' }}>
-                  Proveedor: {proveedor.proveedor} · Costo: L {Number(proveedor.costo).toFixed(2)}
+
+                <p style={{ margin: "6px 0 12px" }}>
+                  Proveedor: {proveedor.proveedor} · Costo: L{" "}
+                  {Number(proveedor.costo).toFixed(2)}
                 </p>
-                <a href={proveedor.url_compra} target="_blank" rel="noopener noreferrer" className="pc-btn pc-btn-light">
+
+                <a
+                  href={proveedor.url_compra}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pc-btn pc-btn-light"
+                >
                   <ExternalLink size={16} />
                   Comprar al proveedor
                 </a>
@@ -222,8 +318,33 @@ export default function DetalleProducto() {
             )}
 
             <div className="pc-buy-row">
-              <input type="number" min="1" max={producto.stock} className="pc-input pc-qty" value={cantidad} onChange={(e) => setCantidad(e.target.value === '' ? '' : Number(e.target.value))} />
-              <button type="button" className="pc-btn pc-btn-primary" disabled={producto.stock <= 0} onClick={agregar}>Agregar al carrito</button>
+              <input
+                type="number"
+                min="1"
+                max={producto.stock}
+                className="pc-input pc-qty"
+                value={cantidad}
+                onChange={(e) =>
+                  setCantidad(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
+                }
+              />
+
+              {autenticado ? (
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-primary"
+                  disabled={producto.stock <= 0}
+                  onClick={agregar}
+                >
+                  Agregar al carrito
+                </button>
+              ) : (
+                <Link to="/login" className="pc-btn pc-btn-primary">
+                  Inicia sesión para comprar
+                </Link>
+              )}
             </div>
 
             {mensaje && <div className="pc-message">{mensaje}</div>}
@@ -232,34 +353,76 @@ export default function DetalleProducto() {
 
         <section className="pc-section">
           <h2 className="pc-section-title">Reseñas</h2>
+
           {usuario ? (
             <form className="pc-card pc-review-form" onSubmit={guardarResena}>
-              <select className="pc-select" value={calificacion} onChange={(e) => setCalificacion(Number(e.target.value))}>
-                <option value="5">⭐⭐⭐⭐⭐ 5</option>
-                <option value="4">⭐⭐⭐⭐ 4</option>
-                <option value="3">⭐⭐⭐ 3</option>
-                <option value="2">⭐⭐ 2</option>
-                <option value="1">⭐ 1</option>
+              <select
+                className="pc-select"
+                value={calificacion}
+                onChange={(e) => setCalificacion(Number(e.target.value))}
+              >
+                <option value="5">5 estrellas</option>
+                <option value="4">4 estrellas</option>
+                <option value="3">3 estrellas</option>
+                <option value="2">2 estrellas</option>
+                <option value="1">1 estrella</option>
               </select>
-              <textarea className="pc-textarea" rows="4" placeholder="Cuéntanos tu experiencia..." value={comentario} onChange={(e) => setComentario(e.target.value)} required />
-              <button type="submit" className="pc-btn pc-btn-primary">Publicar reseña</button>
+
+              <textarea
+                className="pc-textarea"
+                rows="4"
+                placeholder="Cuéntanos tu experiencia..."
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+                required
+              />
+
+              <button type="submit" className="pc-btn pc-btn-primary">
+                Publicar reseña
+              </button>
             </form>
           ) : (
-            <p><Link to="/login">Inicia sesión</Link> para publicar una reseña.</p>
+            <p>
+              <Link to="/login">Inicia sesión</Link> para publicar una reseña.
+            </p>
           )}
 
           <div className="pc-review-list">
             {resenas.map((resena) => (
               <article key={resena.id} className="pc-card pc-review">
-                <strong>{'⭐'.repeat(resena.calificación)}</strong>
+                <div
+                  className="pc-review-stars"
+                  aria-label={`${resena.calificación} de 5 estrellas`}
+                  style={{ display: "flex", gap: 4 }}
+                >
+                  {[1, 2, 3, 4, 5].map((estrella) => (
+                    <Star
+                      key={estrella}
+                      size={18}
+                      fill={
+                        estrella <= resena.calificación ? "#d4af37" : "none"
+                      }
+                      color={
+                        estrella <= resena.calificación ? "#d4af37" : "#a0a0a0"
+                      }
+                    />
+                  ))}
+                </div>
+
                 <p>{resena.comentario}</p>
+
                 <span>{new Date(resena.created_at).toLocaleDateString()}</span>
               </article>
             ))}
-            {resenas.length === 0 && <div className="pc-empty-small">Este producto todavía no tiene reseñas.</div>}
+
+            {resenas.length === 0 && (
+              <div className="pc-empty-small">
+                Este producto todavía no tiene reseñas.
+              </div>
+            )}
           </div>
         </section>
       </div>
     </main>
-  )
+  );
 }
