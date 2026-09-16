@@ -69,7 +69,7 @@ export default function AuditoriaAccesos() {
 
   const registrosOrdenados = useMemo(
     () => [...registros].sort((a, b) => new Date(b.fecha_acceso) - new Date(a.fecha_acceso)),
-    [registros],
+    [registros]
   )
 
   const irAlDia = (cantidad) => {
@@ -91,7 +91,9 @@ export default function AuditoriaAccesos() {
 
         <div className="pc-page-heading">
           <div>
-            <span className="pc-kicker" style={{ color: '#171717' }}>Seguridad</span>
+            <span className="pc-kicker" style={{ color: '#171717' }}>
+              Seguridad
+            </span>
             <h1 style={{ color: '#171717' }}>Historial diario de accesos</h1>
             <p style={{ color: '#171717' }}>
               Consulta los inicios de sesión exitosos registrados por día.
@@ -110,7 +112,15 @@ export default function AuditoriaAccesos() {
         </div>
 
         <div className="pc-card" style={{ padding: 18, marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
             <button
               className="pc-btn pc-btn-light"
               onClick={() => irAlDia(-1)}
@@ -161,7 +171,8 @@ export default function AuditoriaAccesos() {
                 {formatearDia(fechaSeleccionada)}
               </h2>
               <p style={{ margin: '6px 0 0', color: '#666' }}>
-                {registrosOrdenados.length} {registrosOrdenados.length === 1 ? 'acceso registrado' : 'accesos registrados'}
+                {registrosOrdenados.length}{' '}
+                {registrosOrdenados.length === 1 ? 'acceso registrado' : 'accesos registrados'}
               </p>
             </div>
 
@@ -182,7 +193,9 @@ export default function AuditoriaAccesos() {
                     <td>{registro.nombre || '-'}</td>
                     <td>{registro.email || '-'}</td>
                     <td style={{ textTransform: 'capitalize' }}>{registro.rol}</td>
-                    <td style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{registro.usuario_id}</td>
+                    <td style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>
+                      {registro.usuario_id}
+                    </td>
                   </tr>
                 ))}
                 {registrosOrdenados.length === 0 && (

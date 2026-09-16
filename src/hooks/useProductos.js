@@ -13,7 +13,7 @@ export const useProductos = (categoria = null) => {
     setCargando(true)
     let query = supabase.from('productos').select('*')
     if (categoria) query = query.eq('categoria_id', categoria)
-    
+
     const { data } = await query
     setProductos(data || [])
     setCargando(false)

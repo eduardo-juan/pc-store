@@ -1,15 +1,6 @@
 import { useState } from 'react'
-import {
-  Link,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom'
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  ArrowLeft,
-} from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
@@ -33,25 +24,16 @@ export default function Login() {
     setCargando(true)
 
     try {
-      const resultado = await login(
-        email.trim(),
-        password
-      )
+      const resultado = await login(email.trim(), password)
 
       if (resultado.success) {
         // Regresa a la página que intentaba visitar
         navigate(paginaOrigen, { replace: true })
       } else {
-        setError(
-          resultado.error ||
-            'No se pudo iniciar sesión.'
-        )
+        setError(resultado.error || 'No se pudo iniciar sesión.')
       }
     } catch (err) {
-      setError(
-        err.message ||
-          'Ocurrió un error al iniciar sesión.'
-      )
+      setError(err.message || 'Ocurrió un error al iniciar sesión.')
     } finally {
       setCargando(false)
     }
@@ -60,7 +42,6 @@ export default function Login() {
   return (
     <main className="pc-page">
       <div className="pc-container">
-
         {/* ENCABEZADO */}
 
         <div
@@ -72,9 +53,7 @@ export default function Login() {
         >
           <h1>PC Store</h1>
 
-          <p>
-            Inicia sesión para acceder a tu cuenta.
-          </p>
+          <p>Inicia sesión para acceder a tu cuenta.</p>
         </div>
 
         {/* TARJETA */}
@@ -87,7 +66,6 @@ export default function Login() {
             padding: 28,
           }}
         >
-
           {/* ICONO Y TÍTULO */}
 
           <div
@@ -108,10 +86,7 @@ export default function Login() {
                 justifyContent: 'center',
               }}
             >
-              <Lock
-                size={30}
-                strokeWidth={1.8}
-              />
+              <Lock size={30} strokeWidth={1.8} />
             </div>
 
             <h2
@@ -161,7 +136,6 @@ export default function Login() {
               gap: 18,
             }}
           >
-
             {/* EMAIL */}
 
             <div>
@@ -182,9 +156,7 @@ export default function Login() {
                 type="email"
                 placeholder="correo@ejemplo.com"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
               />
@@ -212,16 +184,10 @@ export default function Login() {
                 <input
                   id="login-password"
                   className="pc-input"
-                  type={
-                    mostrarPassword
-                      ? 'text'
-                      : 'password'
-                  }
+                  type={mostrarPassword ? 'text' : 'password'}
                   placeholder="Ingresa tu contraseña"
                   value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
                   style={{
@@ -231,17 +197,12 @@ export default function Login() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setMostrarPassword(
-                      !mostrarPassword
-                    )
-                  }
+                  onClick={() => setMostrarPassword(!mostrarPassword)}
                   style={{
                     position: 'absolute',
                     right: 10,
                     top: '50%',
-                    transform:
-                      'translateY(-50%)',
+                    transform: 'translateY(-50%)',
                     border: 'none',
                     background: 'transparent',
                     cursor: 'pointer',
@@ -250,22 +211,10 @@ export default function Login() {
                     justifyContent: 'center',
                     padding: 6,
                   }}
-                  title={
-                    mostrarPassword
-                      ? 'Ocultar contraseña'
-                      : 'Mostrar contraseña'
-                  }
-                  aria-label={
-                    mostrarPassword
-                      ? 'Ocultar contraseña'
-                      : 'Mostrar contraseña'
-                  }
+                  title={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
-                  {mostrarPassword ? (
-                    <EyeOff size={20} />
-                  ) : (
-                    <Eye size={20} />
-                  )}
+                  {mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
@@ -282,11 +231,8 @@ export default function Login() {
                 fontWeight: 700,
               }}
             >
-              {cargando
-                ? 'Iniciando sesión...'
-                : 'Iniciar sesión'}
+              {cargando ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
-
           </form>
 
           {/* REGISTRO */}
@@ -344,7 +290,6 @@ export default function Login() {
               Volver al inicio
             </button>
           </div>
-
         </div>
       </div>
     </main>

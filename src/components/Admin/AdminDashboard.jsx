@@ -16,26 +16,40 @@ import BotonAtras from '../../components/BotonAtras'
 
 export default function AdminDashboard() {
   const { perfil } = useAuth()
-  const [metricas, setMetricas] = useState({ productos: 0, usuarios: 0, ordenes: 0, ventas: 0, bajoStock: 0 })
+  const [metricas, setMetricas] = useState({
+    productos: 0,
+    usuarios: 0,
+    ordenes: 0,
+    ventas: 0,
+    bajoStock: 0,
+  })
 
-  useEffect(() => { cargarMetricas() }, [])
+  useEffect(() => {
+    cargarMetricas()
+  }, [])
 
   const cargarMetricas = async () => {
     const [productosResult, usuariosResult, ordenesResult, bajoStockResult] = await Promise.all([
       supabase.from('productos').select('id', { count: 'exact', head: true }),
       supabase.from('usuarios').select('id', { count: 'exact', head: true }),
       supabase.from('ordenes').select('id, total, estado, created_at'),
-      supabase.from('productos').select('id', { count: 'exact', head: true }).lte('stock', 3).eq('activo', true),
+      supabase
+        .from('productos')
+        .select('id', { count: 'exact', head: true })
+        .lte('stock', 3)
+        .eq('activo', true),
     ])
 
     const hoy = new Date()
     const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
     const finHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1)
     const ordenes = ordenesResult.data || []
-    const ventasHoy = ordenes.filter((orden) => {
-      const fecha = orden.created_at ? new Date(orden.created_at) : null
-      return orden.estado === 'pagada' && fecha && fecha >= inicioHoy && fecha < finHoy
-    }).reduce((total, orden) => total + Number(orden.total || 0), 0)
+    const ventasHoy = ordenes
+      .filter((orden) => {
+        const fecha = orden.created_at ? new Date(orden.created_at) : null
+        return orden.estado === 'pagada' && fecha && fecha >= inicioHoy && fecha < finHoy
+      })
+      .reduce((total, orden) => total + Number(orden.total || 0), 0)
 
     setMetricas({
       productos: productosResult.count || 0,
@@ -63,7 +77,9 @@ export default function AdminDashboard() {
         <BotonAtras />
         <div className="pc-page-heading">
           <div>
-            <span className="pc-kicker" style={{ color: '#171717' }}>Administración</span>
+            <span className="pc-kicker" style={{ color: '#171717' }}>
+              Administración
+            </span>
             <h1 style={{ color: '#171717' }}>Hola, {perfil?.nombre || 'Administrador'}</h1>
             <p style={{ color: '#171717' }}>Resumen general de PC Store.</p>
           </div>
@@ -84,11 +100,15 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <h2 className="pc-section-title" style={{ color: '#171717' }}>Gestión</h2>
+        <h2 className="pc-section-title" style={{ color: '#171717' }}>
+          Gestión
+        </h2>
         <div className="pc-admin-grid">
           {opciones.map(({ icono: Icono, titulo, ruta }) => (
             <Link key={ruta} to={ruta} className="pc-card pc-admin-option">
-              <div className="pc-admin-option-icon"><Icono size={30} strokeWidth={2} /></div>
+              <div className="pc-admin-option-icon">
+                <Icono size={30} strokeWidth={2} />
+              </div>
               <h3 style={{ color: '#171717' }}>{titulo}</h3>
               <p style={{ color: '#171717' }}>Abrir módulo de {titulo.toLowerCase()}.</p>
             </Link>

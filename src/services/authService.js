@@ -16,5 +16,5 @@ export const authService = {
   async getCurrentUser() {
     const { data } = await supabase.auth.getUser()
     return data?.user
-  }
+  },
 }

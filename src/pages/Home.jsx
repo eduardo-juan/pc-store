@@ -1,8 +1,19 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
-  Monitor, Cpu, CircuitBoard, HardDrive, MemoryStick, Headphones,
-  ShieldCheck, Truck, Headset, ArrowRight, Box, Fan, Zap,
+  Monitor,
+  Cpu,
+  CircuitBoard,
+  HardDrive,
+  MemoryStick,
+  Headphones,
+  ShieldCheck,
+  Truck,
+  Headset,
+  ArrowRight,
+  Box,
+  Fan,
+  Zap,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 
@@ -23,7 +34,9 @@ export default function Home() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
 
-  useEffect(() => { cargarVistazo() }, [])
+  useEffect(() => {
+    cargarVistazo()
+  }, [])
 
   const cargarVistazo = async () => {
     setCargando(true)
@@ -40,7 +53,8 @@ export default function Home() {
   const imagenPorCategoria = {}
   productos.forEach((producto) => {
     const categoria = producto.categorias?.nombre
-    if (categoria && !imagenPorCategoria[categoria]) imagenPorCategoria[categoria] = producto.imagen_principal
+    if (categoria && !imagenPorCategoria[categoria])
+      imagenPorCategoria[categoria] = producto.imagen_principal
   })
 
   const heroImages = productos.slice(0, 4).filter((producto) => producto.imagen_principal)
@@ -51,24 +65,66 @@ export default function Home() {
         <div className="pc-container pc-home-hero-grid">
           <div className="pc-home-hero-copy">
             <span className="pc-home-eyebrow">PC STORE · COMPONENTES</span>
-            <h1>Rendimiento<br /><span>sin límites</span></h1>
-            <p>Componentes para construir una PC potente, equilibrada y preparada para lo que necesites.</p>
-            <Link to="/tienda" className="pc-home-main-btn">Ver productos <ArrowRight size={18} /></Link>
-            <div className="pc-home-dots"><i /><i /><i /></div>
+            <h1>
+              Rendimiento
+              <br />
+              <span>sin límites</span>
+            </h1>
+            <p>
+              Componentes para construir una PC potente, equilibrada y preparada para lo que
+              necesites.
+            </p>
+            <Link to="/tienda" className="pc-home-main-btn">
+              Ver productos <ArrowRight size={18} />
+            </Link>
+            <div className="pc-home-dots">
+              <i />
+              <i />
+              <i />
+            </div>
           </div>
 
           <div className="pc-home-hero-visual">
             <div className="pc-home-hero-glow" />
-            {heroImages[0] && <img className="pc-home-hero-main-image" src={heroImages[0].imagen_principal} alt={heroImages[0].nombre} />}
+            {heroImages[0] && (
+              <img
+                className="pc-home-hero-main-image"
+                src={heroImages[0].imagen_principal}
+                alt={heroImages[0].nombre}
+              />
+            )}
             {heroImages.slice(1, 4).map((producto, index) => (
-              <img key={producto.id} className={`pc-home-float-image pc-home-float-${index + 1}`} src={producto.imagen_principal} alt="" />
+              <img
+                key={producto.id}
+                className={`pc-home-float-image pc-home-float-${index + 1}`}
+                src={producto.imagen_principal}
+                alt=""
+              />
             ))}
           </div>
 
           <div className="pc-home-trust">
-            <div><Truck /><section><strong>Envíos rápidos</strong><span>A toda Honduras</span></section></div>
-            <div><ShieldCheck /><section><strong>Garantía oficial</strong><span>En todos los productos</span></section></div>
-            <div><Headset /><section><strong>Soporte especializado</strong><span>Te ayudamos siempre</span></section></div>
+            <div>
+              <Truck />
+              <section>
+                <strong>Envíos rápidos</strong>
+                <span>A toda Honduras</span>
+              </section>
+            </div>
+            <div>
+              <ShieldCheck />
+              <section>
+                <strong>Garantía oficial</strong>
+                <span>En todos los productos</span>
+              </section>
+            </div>
+            <div>
+              <Headset />
+              <section>
+                <strong>Soporte especializado</strong>
+                <span>Te ayudamos siempre</span>
+              </section>
+            </div>
           </div>
         </div>
       </section>
@@ -76,8 +132,13 @@ export default function Home() {
       <section className="pc-home-categories">
         <div className="pc-container">
           <div className="pc-home-section-intro">
-            <div><span>ENCUENTRA LO QUE NECESITAS</span><h2>Explora por categoría</h2></div>
-            <Link to="/tienda" className="pc-home-outline-btn">Ver tienda <ArrowRight size={17} /></Link>
+            <div>
+              <span>ENCUENTRA LO QUE NECESITAS</span>
+              <h2>Explora por categoría</h2>
+            </div>
+            <Link to="/tienda" className="pc-home-outline-btn">
+              Ver tienda <ArrowRight size={17} />
+            </Link>
           </div>
           <div className="pc-home-category-grid">
             {categoriasBase.map((categoria) => {
@@ -86,7 +147,11 @@ export default function Home() {
               return (
                 <Link key={categoria.nombre} to="/tienda" className="pc-home-category-card">
                   <div className="pc-home-category-image">
-                    {imagen ? <img src={imagen} alt={categoria.nombre} /> : <Icono size={40} strokeWidth={1.35} />}
+                    {imagen ? (
+                      <img src={imagen} alt={categoria.nombre} />
+                    ) : (
+                      <Icono size={40} strokeWidth={1.35} />
+                    )}
                   </div>
                   <div className="pc-home-category-info">
                     <span>{categoria.nombre}</span>
@@ -103,21 +168,38 @@ export default function Home() {
       <section className="pc-section pc-home-products">
         <div className="pc-container">
           <div className="pc-home-section-intro">
-            <div><span>SELECCIÓN PC STORE</span><h2>Productos destacados</h2></div>
-            <Link to="/tienda" className="pc-home-outline-btn">Ver todos <ArrowRight size={17} /></Link>
+            <div>
+              <span>SELECCIÓN PC STORE</span>
+              <h2>Productos destacados</h2>
+            </div>
+            <Link to="/tienda" className="pc-home-outline-btn">
+              Ver todos <ArrowRight size={17} />
+            </Link>
           </div>
 
-          {cargando ? <div className="pc-home-loading">Cargando productos...</div> : (
+          {cargando ? (
+            <div className="pc-home-loading">Cargando productos...</div>
+          ) : (
             <div className="pc-home-product-grid">
               {productos.slice(0, 6).map((producto) => (
-                <Link key={producto.id} to={`/producto/${producto.id}`} className="pc-home-product-card">
+                <Link
+                  key={producto.id}
+                  to={`/producto/${producto.id}`}
+                  className="pc-home-product-card"
+                >
                   <div className="pc-home-product-image">
-                    {producto.imagen_principal ? <img src={producto.imagen_principal} alt={producto.nombre} /> : <Monitor size={64} strokeWidth={1.2} />}
+                    {producto.imagen_principal ? (
+                      <img src={producto.imagen_principal} alt={producto.nombre} />
+                    ) : (
+                      <Monitor size={64} strokeWidth={1.2} />
+                    )}
                   </div>
                   <div className="pc-home-product-info">
                     <span>{producto.categorias?.nombre || 'Componente'}</span>
                     <h3>{producto.nombre}</h3>
-                    <div className="pc-home-product-link">Ver producto <ArrowRight size={14} /></div>
+                    <div className="pc-home-product-link">
+                      Ver producto <ArrowRight size={14} />
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -129,10 +211,34 @@ export default function Home() {
       <section className="pc-home-benefits">
         <div className="pc-container">
           <div className="pc-home-benefits-grid">
-            <div className="pc-home-benefit"><ShieldCheck /><div><h3>Productos de calidad</h3><p>Las mejores marcas del mercado</p></div></div>
-            <div className="pc-home-benefit"><Truck /><div><h3>Envíos rápidos</h3><p>Recibe tu pedido en 24-48h</p></div></div>
-            <div className="pc-home-benefit"><ShieldCheck /><div><h3>Pago seguro</h3><p>Tus datos siempre protegidos</p></div></div>
-            <div className="pc-home-benefit"><Headset /><div><h3>Atención personalizada</h3><p>Estamos para ayudarte</p></div></div>
+            <div className="pc-home-benefit">
+              <ShieldCheck />
+              <div>
+                <h3>Productos de calidad</h3>
+                <p>Las mejores marcas del mercado</p>
+              </div>
+            </div>
+            <div className="pc-home-benefit">
+              <Truck />
+              <div>
+                <h3>Envíos rápidos</h3>
+                <p>Recibe tu pedido en 24-48h</p>
+              </div>
+            </div>
+            <div className="pc-home-benefit">
+              <ShieldCheck />
+              <div>
+                <h3>Pago seguro</h3>
+                <p>Tus datos siempre protegidos</p>
+              </div>
+            </div>
+            <div className="pc-home-benefit">
+              <Headset />
+              <div>
+                <h3>Atención personalizada</h3>
+                <p>Estamos para ayudarte</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

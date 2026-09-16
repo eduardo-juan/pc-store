@@ -1,5 +1,10 @@
 :root {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
     sans-serif;
 
   color: #171717;
@@ -267,17 +272,8 @@ img {
   color: #ffffff;
 
   background:
-    radial-gradient(
-      circle at 85% 20%,
-      rgba(212, 175, 55, 0.15),
-      transparent 30%
-    ),
-    linear-gradient(
-      120deg,
-      #0b0b0b 0%,
-      #171717 65%,
-      #2b2410 100%
-    );
+    radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.15), transparent 30%),
+    linear-gradient(120deg, #0b0b0b 0%, #171717 65%, #2b2410 100%);
 }
 
 .pc-hero-grid {
@@ -1165,11 +1161,7 @@ img {
   display: grid;
   place-items: center;
   margin: 0 auto 18px;
-  background: linear-gradient(
-    135deg,
-    var(--pc-primary),
-    var(--pc-primary-dark)
-  );
+  background: linear-gradient(135deg, var(--pc-primary), var(--pc-primary-dark));
   color: #0b0b0b;
   border-radius: 28px;
   font-size: 2.7rem;
@@ -1539,14 +1531,13 @@ img {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(8, 8, 8, 0.98) 0%,
-      rgba(8, 8, 8, 0.92) 35%,
-      rgba(8, 8, 8, 0.58) 70%,
-      rgba(8, 8, 8, 0.82) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(8, 8, 8, 0.98) 0%,
+    rgba(8, 8, 8, 0.92) 35%,
+    rgba(8, 8, 8, 0.58) 70%,
+    rgba(8, 8, 8, 0.82) 100%
+  );
 }
 
 .pc-home-hero-content {
@@ -1767,12 +1758,7 @@ img {
   justify-content: center;
   padding: 22px;
 
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(212, 175, 55, 0.09),
-      transparent 65%
-    );
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.09), transparent 65%);
 
   color: #d4af37;
 }
@@ -1845,13 +1831,12 @@ img {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(8, 8, 8, 0.98) 0%,
-      rgba(8, 8, 8, 0.88) 45%,
-      rgba(8, 8, 8, 0.28) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(8, 8, 8, 0.98) 0%,
+    rgba(8, 8, 8, 0.88) 45%,
+    rgba(8, 8, 8, 0.28) 100%
+  );
 }
 
 .pc-home-banner-content {
@@ -2069,7 +2054,7 @@ body,
 }
 
 .pc-home::after {
-  content: "";
+  content: '';
   display: block;
   width: 100%;
   height: 0;
@@ -2342,13 +2327,7 @@ body,
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(212, 175, 55, 0.12),
-      transparent 38%
-    ),
-    #080808;
+  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12), transparent 38%), #080808;
 }
 
 .pc-access-container {
@@ -2423,14 +2402,9 @@ body,
   box-sizing: border-box;
   padding: 48px 42px 38px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.075),
-      rgba(255, 255, 255, 0.025)
-    );
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -2447,12 +2421,7 @@ body,
   right: 15%;
   height: 2px;
   border-radius: 0 0 10px 10px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #d4af37,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
 }
 
 /* =========================================
@@ -2473,14 +2442,9 @@ body,
   align-items: center;
   justify-content: center;
   border-radius: 24px;
-  background: linear-gradient(
-    145deg,
-    #d4af37,
-    #a88418
-  );
+  background: linear-gradient(145deg, #d4af37, #a88418);
   color: #080808;
-  box-shadow:
-    0 12px 35px rgba(212, 175, 55, 0.20);
+  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.2);
 }
 
 .pc-access-sparkle {
@@ -2573,8 +2537,7 @@ body,
 .pc-access-primary:hover {
   transform: translateY(-2px);
   background: #e0bd4b;
-  box-shadow:
-    0 10px 28px rgba(212, 175, 55, 0.20);
+  box-shadow: 0 10px 28px rgba(212, 175, 55, 0.2);
 }
 
 .pc-access-secondary {

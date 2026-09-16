@@ -1,10 +1,5 @@
 import { Link } from 'react-router-dom'
-import {
-  Package,
-  Tags,
-  Boxes,
-  ClipboardList,
-} from 'lucide-react'
+import { Package, Tags, Boxes, ClipboardList } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
 export default function Sidebar() {

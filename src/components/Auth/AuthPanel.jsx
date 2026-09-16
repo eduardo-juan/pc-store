@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 export default function AuthPanel() {
-
   const { login, registro } = useAuth()
   const navigate = useNavigate()
 
@@ -24,22 +23,17 @@ export default function AuthPanel() {
     confirmar: '',
   })
 
-
   const cambiarModo = (nuevoModo) => {
     setModo(nuevoModo)
     setMensaje('')
   }
-
 
   const enviarLogin = async (e) => {
     e.preventDefault()
     setMensaje('')
     setCargando(true)
 
-    const resultado = await login(
-      loginForm.email,
-      loginForm.password
-    )
+    const resultado = await login(loginForm.email, loginForm.password)
 
     setCargando(false)
 
@@ -49,7 +43,6 @@ export default function AuthPanel() {
       setMensaje(resultado.error || 'No se pudo iniciar sesión.')
     }
   }
-
 
   const enviarRegistro = async (e) => {
     e.preventDefault()
@@ -83,7 +76,6 @@ export default function AuthPanel() {
     }
   }
 
-
   const estiloLabel = {
     display: 'flex',
     flexDirection: 'column',
@@ -98,23 +90,16 @@ export default function AuthPanel() {
     gap: '12px',
   }
 
-
   return (
     <div
       className="pc-hero-panel"
       style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}
     >
-
       <div style={{ display: 'flex', gap: '8px' }}>
-
         <button
           type="button"
           onClick={() => cambiarModo('login')}
-          className={
-            modo === 'login'
-              ? 'pc-btn pc-btn-primary'
-              : 'pc-btn pc-btn-light'
-          }
+          className={modo === 'login' ? 'pc-btn pc-btn-primary' : 'pc-btn pc-btn-light'}
           style={{ flex: 1 }}
         >
           Iniciar sesión
@@ -123,26 +108,18 @@ export default function AuthPanel() {
         <button
           type="button"
           onClick={() => cambiarModo('registro')}
-          className={
-            modo === 'registro'
-              ? 'pc-btn pc-btn-primary'
-              : 'pc-btn pc-btn-light'
-          }
+          className={modo === 'registro' ? 'pc-btn pc-btn-primary' : 'pc-btn pc-btn-light'}
           style={{ flex: 1 }}
         >
           Crear cuenta
         </button>
-
       </div>
 
-
       {modo === 'login' ? (
-
         <form
           onSubmit={enviarLogin}
           style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
         >
-
           <label style={estiloLabel}>
             Correo electrónico
             <input
@@ -175,11 +152,7 @@ export default function AuthPanel() {
             />
           </label>
 
-          {mensaje && (
-            <div className="pc-message">
-              {mensaje}
-            </div>
-          )}
+          {mensaje && <div className="pc-message">{mensaje}</div>}
 
           <button
             type="submit"
@@ -189,18 +162,13 @@ export default function AuthPanel() {
           >
             {cargando ? 'Entrando...' : 'Entrar'}
           </button>
-
         </form>
-
       ) : (
-
         <form
           onSubmit={enviarRegistro}
           style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
         >
-
           <div style={estiloFila}>
-
             <label style={estiloLabel}>
               Nombre
               <input
@@ -230,7 +198,6 @@ export default function AuthPanel() {
                 }
               />
             </label>
-
           </div>
 
           <label style={estiloLabel}>
@@ -250,7 +217,6 @@ export default function AuthPanel() {
           </label>
 
           <div style={estiloFila}>
-
             <label style={estiloLabel}>
               Contraseña
               <input
@@ -282,14 +248,9 @@ export default function AuthPanel() {
                 }
               />
             </label>
-
           </div>
 
-          {mensaje && (
-            <div className="pc-message">
-              {mensaje}
-            </div>
-          )}
+          {mensaje && <div className="pc-message">{mensaje}</div>}
 
           <button
             type="submit"
@@ -299,11 +260,8 @@ export default function AuthPanel() {
           >
             {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
-
         </form>
-
       )}
-
     </div>
   )
 }

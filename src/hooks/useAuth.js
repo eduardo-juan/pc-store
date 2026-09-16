@@ -10,7 +10,6 @@ export const useAuth = () => {
 
   useEffect(() => {
     const cargarPerfil = async () => {
-
       if (!auth.usuario) {
         setPerfil(null)
         setEsAdmin(false)
