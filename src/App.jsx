@@ -66,31 +66,22 @@ export default function App() {
                   element={<Home />}
                 />
 
+                {/* Tienda pública: no requiere cuenta */}
                 <Route
                   path="/tienda"
-                  element={
-                    <ProtectedRoute>
-                      <Tienda />
-                    </ProtectedRoute>
-                  }
+                  element={<Tienda />}
                 />
 
+                {/* Detalles públicos: no requiere cuenta */}
                 <Route
                   path="/producto/:id"
-                  element={
-                    <ProtectedRoute>
-                      <DetalleProducto />
-                    </ProtectedRoute>
-                  }
+                  element={<DetalleProducto />}
                 />
 
+                {/* Carrito público; el checkout sí requiere autenticación */}
                 <Route
                   path="/carrito"
-                  element={
-                    <ProtectedRoute>
-                      <Carrito />
-                    </ProtectedRoute>
-                  }
+                  element={<Carrito />}
                 />
 
                 <Route
@@ -103,6 +94,7 @@ export default function App() {
                   element={<Registro />}
                 />
 
+                {/* Para crear una orden, el usuario debe iniciar sesión */}
                 <Route
                   path="/checkout"
                   element={

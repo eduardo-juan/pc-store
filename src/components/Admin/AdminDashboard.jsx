@@ -14,6 +14,13 @@ import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
+const ESTADOS_VENTA_VALIDOS = [
+  'pagada',
+  'enviada',
+  'entregada',
+  'completada',
+]
+
 export default function AdminDashboard() {
   const { perfil } = useAuth()
 
@@ -55,6 +62,13 @@ export default function AdminDashboard() {
         .eq('activo', true),
     ])
 
+    if (ordenesResult.error) {
+      console.error(
+        'Error cargando las órdenes del dashboard:',
+        ordenesResult.error,
+      )
+    }
+
     const hoy = new Date()
 
     const inicioHoy = new Date(
@@ -78,7 +92,9 @@ export default function AdminDashboard() {
           : null
 
         return (
-          orden.estado === 'pagada' &&
+          ESTADOS_VENTA_VALIDOS.includes(
+            String(orden.estado || '').toLowerCase(),
+          ) &&
           fecha &&
           fecha >= inicioHoy &&
           fecha < finHoy

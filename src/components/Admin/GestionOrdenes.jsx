@@ -148,11 +148,6 @@ export default function GestionOrdenes() {
       return
     }
 
-    if (actual === 'pagada') {
-      setError('Una orden pagada está cerrada y ya no puede modificarse.')
-      return
-    }
-
     const datos = { estado: nuevoEstado }
 
     if (esEmpleado) {
@@ -592,16 +587,26 @@ export default function GestionOrdenes() {
                       }}
                     >
                       {ESTADOS.filter(([valor]) =>
-                        estado === 'pagada' || estado === 'cancelada'
+                        estado === 'cancelada'
                           ? valor === estado
-                          : true,
+                          : estado === 'pagada'
+                            ? ['pagada', 'enviada'].includes(valor)
+                            : estado === 'enviada'
+                              ? ['enviada', 'entregada'].includes(valor)
+                              : estado === 'entregada'
+                                ? valor === 'entregada'
+                                : true,
                       ).map(([valor, texto]) => {
                         const esCancelacion = valor === 'cancelada'
                         const deshabilitado =
                           estado === 'cancelada' ||
-                          estado === 'pagada' ||
                           (!esAdmin && esCancelacion) ||
-                          (esCancelacion && estado !== 'pendiente')
+                          (esCancelacion && estado !== 'pendiente') ||
+                          (estado === 'pagada' &&
+                            !['pagada', 'enviada'].includes(valor)) ||
+                          (estado === 'enviada' &&
+                            !['enviada', 'entregada'].includes(valor)) ||
+                          (estado === 'entregada' && valor !== 'entregada')
 
                         return (
                           <button
@@ -638,7 +643,7 @@ export default function GestionOrdenes() {
                           color: '#666',
                         }}
                       >
-                        La orden pagada queda cerrada según las reglas actuales.
+                        La orden pagada puede avanzar a enviada.
                       </div>
                     )}
                   </div>

@@ -62,7 +62,12 @@ export default function HistorialVentas() {
         items,
         created_at
       `)
-      .eq('estado', 'pagada')
+      .in('estado', [
+          'pagada',
+          'enviada',
+          'entregada',
+          'completada',
+  ])
       .gte('created_at', inicioMes.toISOString())
       .lt('created_at', inicioSiguienteMes.toISOString())
       .order('created_at', { ascending: true })

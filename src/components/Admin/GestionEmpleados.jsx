@@ -8,13 +8,13 @@ import {
   X,
   CircleCheck,
   CircleX,
+  Trash2,
 } from 'lucide-react'
 import BotonAtras from '../../components/BotonAtras'
 import { supabase } from '../../supabaseClient'
 
 export default function GestionEmpleados() {
   const navigate = useNavigate()
-
   const [usuarios, setUsuarios] = useState([])
   const [busqueda, setBusqueda] = useState('')
   const [error, setError] = useState('')
@@ -22,6 +22,9 @@ export default function GestionEmpleados() {
   const [maxOrdenes, setMaxOrdenes] = useState(5)
   const [comision, setComision] = useState(5)
   const [guardandoConfig, setGuardandoConfig] = useState(false)
+  const [empleadoEliminar, setEmpleadoEliminar] = useState(null)
+  const [passwordEliminar, setPasswordEliminar] = useState('')
+  const [eliminando, setEliminando] = useState(false)
 
   useEffect(() => {
     cargarUsuarios()
@@ -37,11 +40,8 @@ export default function GestionEmpleados() {
       .select('*')
       .order('created_at', { ascending: false })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      setUsuarios(data || [])
-    }
+    if (error) setError(error.message)
+    else setUsuarios(data || [])
 
     setCargando(false)
   }
@@ -49,34 +49,22 @@ export default function GestionEmpleados() {
   const cargarConfig = async () => {
     const { data, error } = await supabase
       .from('configuracion_empleados')
-      .select(
-        'max_ordenes_activas,comision_porcentaje',
-      )
+      .select('max_ordenes_activas,comision_porcentaje')
       .eq('id', true)
       .single()
 
     if (error) {
       setError(error.message)
-    } else {
-      setMaxOrdenes(
-        Number(data.max_ordenes_activas) || 5,
-      )
-      setComision(
-        Number(data.comision_porcentaje) || 5,
-      )
+      return
     }
+
+    setMaxOrdenes(Number(data.max_ordenes_activas) || 5)
+    setComision(Number(data.comision_porcentaje) || 5)
   }
 
   const guardarConfig = async () => {
-    const limite = Math.min(
-      100,
-      Math.max(1, Number(maxOrdenes) || 5),
-    )
-
-    const porcentaje = Math.min(
-      100,
-      Math.max(0, Number(comision) || 0),
-    )
+    const limite = Math.min(100, Math.max(1, Number(maxOrdenes) || 5))
+    const porcentaje = Math.min(100, Math.max(0, Number(comision) || 0))
 
     setGuardandoConfig(true)
     setError('')
@@ -90,9 +78,8 @@ export default function GestionEmpleados() {
       })
       .eq('id', true)
 
-    if (error) {
-      setError(error.message)
-    } else {
+    if (error) setError(error.message)
+    else {
       setMaxOrdenes(limite)
       setComision(porcentaje)
     }
@@ -101,11 +88,7 @@ export default function GestionEmpleados() {
   }
 
   const quitarEmpleado = async (id) => {
-    if (
-      !window.confirm(
-        '¿Quieres quitar el rol de empleado y devolver esta cuenta a cliente?',
-      )
-    ) {
+    if (!window.confirm('¿Quitar el rol de empleado y devolver esta cuenta a cliente?')) {
       return
     }
 
@@ -119,45 +102,66 @@ export default function GestionEmpleados() {
       })
       .eq('id', id)
 
-    if (error) {
-      setError(error.message)
-    } else {
-      await cargarUsuarios()
-    }
+    if (error) setError(error.message)
+    else await cargarUsuarios()
   }
 
-  const textoBusqueda = busqueda.trim().toLowerCase()
+  const eliminarEmpleado = async () => {
+    if (!empleadoEliminar || !passwordEliminar.trim() || eliminando) {
+      setError('Introduce la contraseña del administrador.')
+      return
+    }
+
+    if (!window.confirm(
+      `Esta acción eliminará permanentemente a ${empleadoEliminar.email}. ¿Continuar?`,
+    )) {
+      return
+    }
+
+    setEliminando(true)
+    setError('')
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        'eliminar_cuenta_pc_store',
+        {
+          body: {
+            password: passwordEliminar,
+            target_user_id: empleadoEliminar.id,
+          },
+        },
+      )
+
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
+
+      setEmpleadoEliminar(null)
+      setPasswordEliminar('')
+      await cargarUsuarios()
+    } catch (err) {
+      setError(err.message || 'No se pudo eliminar el empleado.')
+    } finally {
+      setEliminando(false)
+    }
+  }
 
   const empleados = usuarios
     .filter((usuario) => usuario.rol === 'empleado')
     .filter((usuario) => {
-      if (!textoBusqueda) return true
+      const texto = busqueda.trim().toLowerCase()
+      if (!texto) return true
 
-      return `${usuario.nombre || ''} ${
-        usuario.apellido || ''
-      } ${usuario.email || ''} ${
-        usuario.ciudad || ''
-      }`
+      return `${usuario.nombre || ''} ${usuario.apellido || ''} ${usuario.email || ''} ${usuario.ciudad || ''}`
         .toLowerCase()
-        .includes(textoBusqueda)
+        .includes(texto)
     })
 
-  const totalEmpleados = usuarios.filter(
-    (usuario) => usuario.rol === 'empleado',
+  const totalEmpleados = usuarios.filter((u) => u.rol === 'empleado').length
+  const totalActivos = usuarios.filter(
+    (u) => u.rol === 'empleado' && u.activo === true && u.bloqueado !== true,
   ).length
-
-  const totalEmpleadosActivos = usuarios.filter(
-    (usuario) =>
-      usuario.rol === 'empleado' &&
-      usuario.activo === true &&
-      usuario.bloqueado !== true,
-  ).length
-
-  const totalEmpleadosFueraServicio = usuarios.filter(
-    (usuario) =>
-      usuario.rol === 'empleado' &&
-      (usuario.activo === false ||
-        usuario.bloqueado === true),
+  const totalFuera = usuarios.filter(
+    (u) => u.rol === 'empleado' && (u.activo === false || u.bloqueado === true),
   ).length
 
   return (
@@ -167,97 +171,51 @@ export default function GestionEmpleados() {
 
         <div className="pc-admin-header">
           <h1>Gestión de Empleados</h1>
-          <p>
-            Administra las cuentas y el sistema de
-            asignación de entregas.
-          </p>
+          <p>Administra las cuentas y el sistema de asignación de entregas.</p>
         </div>
 
         {error && (
-          <div
-            className="pc-card"
-            style={{
-              padding: 16,
-              marginBottom: 20,
-              color: '#dc2626',
-            }}
-          >
+          <div className="pc-card" style={{ padding: 16, marginBottom: 20, color: '#dc2626' }}>
             {error}
           </div>
         )}
 
-        <div
-          className="pc-metrics-grid"
-          style={{ marginBottom: 30 }}
-        >
+        <div className="pc-metrics-grid" style={{ marginBottom: 30 }}>
           <article className="pc-card pc-metric">
-            <span style={{ color: '#171717' }}>
-              Empleados
-            </span>
-            <strong style={{ color: '#171717' }}>
-              {totalEmpleados}
-            </strong>
+            <span>Empleados</span>
+            <strong>{totalEmpleados}</strong>
           </article>
-
           <article className="pc-card pc-metric">
-            <span style={{ color: '#171717' }}>
-              Activos
-            </span>
-            <strong style={{ color: '#16a34a' }}>
-              {totalEmpleadosActivos}
-            </strong>
+            <span>Activos</span>
+            <strong style={{ color: '#16a34a' }}>{totalActivos}</strong>
           </article>
-
           <article className="pc-card pc-metric">
-            <span style={{ color: '#171717' }}>
-              Fuera de servicio
-            </span>
-            <strong style={{ color: '#6b7280' }}>
-              {totalEmpleadosFueraServicio}
-            </strong>
+            <span>Fuera de servicio</span>
+            <strong style={{ color: '#6b7280' }}>{totalFuera}</strong>
           </article>
         </div>
 
-        <section
-          className="pc-card"
-          style={{
-            padding: 20,
-            marginBottom: 30,
-          }}
-        >
-          <h2
-            style={{
-              marginTop: 0,
-              color: '#171717',
-            }}
-          >
-            Reglas de entregas
-          </h2>
-
+        <section className="pc-card" style={{ padding: 20, marginBottom: 30 }}>
+          <h2 style={{ marginTop: 0 }}>Reglas de entregas</h2>
           <p className="pc-muted">
-            Estos valores se aplican globalmente. El límite
-            se valida en el servidor al aceptar una orden.
+            Estos valores se aplican globalmente y se validan en el servidor.
           </p>
 
           <div className="pc-form-grid">
             <label>
               Máximo de órdenes activas por empleado
-
               <input
                 className="pc-input"
                 type="number"
                 min="1"
                 max="100"
                 value={maxOrdenes}
-                onChange={(e) =>
-                  setMaxOrdenes(e.target.value)
-                }
+                onChange={(e) => setMaxOrdenes(e.target.value)}
               />
             </label>
 
             <label>
               Comisión por entrega (%)
-
               <input
                 className="pc-input"
                 type="number"
@@ -265,9 +223,7 @@ export default function GestionEmpleados() {
                 max="100"
                 step="0.01"
                 value={comision}
-                onChange={(e) =>
-                  setComision(e.target.value)
-                }
+                onChange={(e) => setComision(e.target.value)}
               />
             </label>
           </div>
@@ -278,9 +234,7 @@ export default function GestionEmpleados() {
             onClick={guardarConfig}
             disabled={guardandoConfig}
           >
-            {guardandoConfig
-              ? 'Guardando...'
-              : 'Guardar configuración'}
+            {guardandoConfig ? 'Guardando...' : 'Guardar configuración'}
           </button>
         </section>
 
@@ -291,48 +245,22 @@ export default function GestionEmpleados() {
           </div>
         ) : (
           <>
-            <div
-              className="pc-card"
-              style={{
-                padding: 16,
-                marginBottom: 30,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  position: 'relative',
-                }}
-              >
-                <Search
-                  size={20}
-                  style={{
-                    color: '#666',
-                    flexShrink: 0,
-                  }}
-                />
-
+            <div className="pc-card" style={{ padding: 16, marginBottom: 30 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
+                <Search size={20} style={{ color: '#666' }} />
                 <input
                   type="text"
                   className="pc-input"
                   value={busqueda}
-                  onChange={(e) =>
-                    setBusqueda(e.target.value)
-                  }
+                  onChange={(e) => setBusqueda(e.target.value)}
                   placeholder="Buscar por nombre, apellido, email o ciudad..."
-                  style={{
-                    width: '100%',
-                    paddingRight: busqueda ? 42 : 12,
-                  }}
+                  style={{ width: '100%', paddingRight: busqueda ? 42 : 12 }}
                 />
 
                 {busqueda && (
                   <button
                     type="button"
                     onClick={() => setBusqueda('')}
-                    title="Limpiar búsqueda"
                     aria-label="Limpiar búsqueda"
                     style={{
                       position: 'absolute',
@@ -341,10 +269,7 @@ export default function GestionEmpleados() {
                       transform: 'translateY(-50%)',
                       border: 'none',
                       background: 'transparent',
-                      color: '#666',
                       cursor: 'pointer',
-                      display: 'flex',
-                      padding: 4,
                     }}
                   >
                     <X size={18} />
@@ -352,63 +277,33 @@ export default function GestionEmpleados() {
                 )}
               </div>
 
-              {busqueda && (
-                <p
-                  style={{
-                    margin: '10px 0 0',
-                    color: '#666',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  {empleados.length} resultado(s)
-                  encontrado(s).
-                </p>
-              )}
+              {busqueda && <p>{empleados.length} resultado(s) encontrado(s).</p>}
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 16,
-                marginBottom: 12,
-                flexWrap: 'wrap',
-              }}
-            >
-              <h2
-                className="pc-section-title"
-                style={{
-                  color: '#171717',
-                  margin: 0,
-                }}
-              >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              marginBottom: 12,
+              flexWrap: 'wrap',
+            }}>
+              <h2 className="pc-section-title" style={{ margin: 0 }}>
                 Empleados actuales
               </h2>
 
               <button
                 type="button"
                 className="pc-btn pc-btn-primary"
-                onClick={() =>
-                  navigate('/admin/empleados/nuevo')
-                }
+                onClick={() => navigate('/admin/empleados/nuevo')}
                 title="Crear cuenta de empleado"
-                aria-label="Crear cuenta de empleado"
-                style={{
-                  width: 44,
-                  height: 44,
-                  padding: 0,
-                  borderRadius: 12,
-                }}
+                style={{ width: 44, height: 44, padding: 0, borderRadius: 12 }}
               >
                 <Plus size={23} />
               </button>
             </div>
 
-            <div
-              className="pc-card pc-table-wrapper"
-              style={{ marginBottom: 40 }}
-            >
+            <div className="pc-card pc-table-wrapper" style={{ marginBottom: 40 }}>
               <table className="pc-table">
                 <thead>
                   <tr>
@@ -424,98 +319,50 @@ export default function GestionEmpleados() {
 
                 <tbody>
                   {empleados.map((empleado, indice) => {
-                    const activo =
-                      empleado.activo === true &&
-                      empleado.bloqueado !== true
+                    const activo = empleado.activo === true && empleado.bloqueado !== true
 
                     return (
                       <tr key={empleado.id}>
-                        <td>
-                          <strong>{indice + 1}</strong>
-                        </td>
-
-                        <td>
-                          {empleado.nombre || ''}{' '}
-                          {empleado.apellido || ''}
-                        </td>
-
+                        <td><strong>{indice + 1}</strong></td>
+                        <td>{empleado.nombre || ''} {empleado.apellido || ''}</td>
                         <td>{empleado.email}</td>
-
                         <td>{empleado.ciudad || '-'}</td>
-
                         <td>
-                          {empleado.bloqueado === true ? (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                fontWeight: 700,
-                                color: '#dc2626',
-                              }}
-                            >
-                              <CircleX size={16} />
-                              Bloqueado
-                            </span>
-                          ) : activo ? (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                fontWeight: 700,
-                                color: '#16a34a',
-                              }}
-                            >
-                              <CircleCheck size={16} />
-                              Activo
-                            </span>
-                          ) : (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                fontWeight: 700,
-                                color: '#6b7280',
-                              }}
-                            >
-                              <CircleX size={16} />
-                              Fuera de servicio
-                            </span>
-                          )}
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontWeight: 700,
+                            color: empleado.bloqueado ? '#dc2626' : activo ? '#16a34a' : '#6b7280',
+                          }}>
+                            {activo ? <CircleCheck size={16} /> : <CircleX size={16} />}
+                            {empleado.bloqueado ? 'Bloqueado' : activo ? 'Activo' : 'Fuera de servicio'}
+                          </span>
                         </td>
-
                         <td>
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 6,
-                              fontWeight: 700,
-                              color: '#171717',
-                            }}
-                          >
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
                             <UserCheck size={16} />
                             Empleado
                           </span>
                         </td>
-
                         <td>
-                          <button
-                            className="pc-btn pc-btn-light"
-                            onClick={() =>
-                              quitarEmpleado(empleado.id)
-                            }
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 7,
-                            }}
-                          >
-                            <UserRound size={16} />
-                            Quitar empleado
-                          </button>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <button
+                              className="pc-btn pc-btn-light"
+                              onClick={() => quitarEmpleado(empleado.id)}
+                            >
+                              <UserRound size={16} />
+                              Quitar rol
+                            </button>
+
+                            <button
+                              className="pc-btn pc-btn-danger"
+                              onClick={() => setEmpleadoEliminar(empleado)}
+                            >
+                              <Trash2 size={16} />
+                              Eliminar
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -523,13 +370,7 @@ export default function GestionEmpleados() {
 
                   {empleados.length === 0 && (
                     <tr>
-                      <td
-                        colSpan="7"
-                        style={{
-                          textAlign: 'center',
-                          padding: 30,
-                        }}
-                      >
+                      <td colSpan="7" style={{ textAlign: 'center', padding: 30 }}>
                         {busqueda
                           ? 'No se encontraron empleados con esa búsqueda.'
                           : 'No hay empleados registrados.'}
@@ -540,6 +381,54 @@ export default function GestionEmpleados() {
               </table>
             </div>
           </>
+        )}
+
+        {empleadoEliminar && (
+          <div className="pc-modal-backdrop">
+            <div className="pc-card pc-modal" style={{ padding: 24 }}>
+              <h2>Eliminar empleado</h2>
+              <p>
+                Vas a eliminar permanentemente la cuenta de{' '}
+                <strong>{empleadoEliminar.email}</strong>.
+              </p>
+
+              <label>
+                Contraseña del administrador
+                <input
+                  className="pc-input"
+                  type="password"
+                  autoComplete="current-password"
+                  value={passwordEliminar}
+                  onChange={(e) => setPasswordEliminar(e.target.value)}
+                  placeholder="Contraseña actual"
+                />
+              </label>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-danger"
+                  onClick={eliminarEmpleado}
+                  disabled={eliminando}
+                >
+                  <Trash2 size={17} />
+                  {eliminando ? 'Eliminando...' : 'Confirmar eliminación'}
+                </button>
+
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-light"
+                  onClick={() => {
+                    setEmpleadoEliminar(null)
+                    setPasswordEliminar('')
+                  }}
+                  disabled={eliminando}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </main>
