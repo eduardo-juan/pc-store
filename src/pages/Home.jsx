@@ -85,7 +85,7 @@ export default function Home() {
         <div><Truck /><h3>Envíos rápidos</h3><p>A toda Honduras</p></div>
         <div><ShieldCheck /><h3>Compra segura</h3><p>Protección en cada pedido</p></div>
         <div><Headset /><h3>Soporte real</h3><p>Asesoría especializada</p></div>
-        <div><ShoppingBag /><h3>Compra sin cuenta</h3><p>Regístrate al finalizar</p></div>
+        <div><ShoppingBag /><h3>Para comprar registrar</h3><p>Disfruta de nuestros productos</p></div>
       </section>
 
       <style>{`

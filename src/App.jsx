@@ -11,7 +11,7 @@ import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
 import './responsive.js'
 
-import Home from './pages/Home'
+import Inicio from './pages/Inicio'
 import Tienda from './pages/Tienda'
 import Checkout from './pages/Checkout'
 import MisOrdenes from './pages/MisOrdenes'
@@ -68,9 +68,9 @@ export default function App() {
 
                 {/* Tienda pública: no requiere cuenta */}
                 <Route
-                  path="/tienda"
-                  element={<Tienda />}
-                />
+  path="/"
+  element={<Inicio />}
+/>
 
                 {/* Detalles públicos: no requiere cuenta */}
                 <Route
