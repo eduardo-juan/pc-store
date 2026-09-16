@@ -21,6 +21,8 @@ import NotFound from './pages/NotFound'
 
 import Login from './components/Auth/Login'
 import Registro from './components/Auth/Registro'
+import RecuperarPassword from './components/Auth/RecuperarPassword'
+import RestablecerPassword from './components/Auth/RestablecerPassword'
 import Carrito from './components/Productos/Carrito'
 import DetalleProducto from './components/Productos/DetalleProducto'
 
@@ -61,38 +63,22 @@ export default function App() {
               <AdminTableTools />
 
               <Routes>
-{/* Inicio: público o personalizado */}
-<Route
-  path="/"
-  element={<Inicio />}
-/>
+                {/* Inicio: público o personalizado */}
+                <Route path="/" element={<Inicio />} />
 
-{/* Tienda pública */}
-<Route
-  path="/tienda"
-  element={<Tienda />}
-/>
+                {/* Tienda pública */}
+                <Route path="/tienda" element={<Tienda />} />
+
                 {/* Detalles públicos: no requiere cuenta */}
-                <Route
-                  path="/producto/:id"
-                  element={<DetalleProducto />}
-                />
+                <Route path="/producto/:id" element={<DetalleProducto />} />
 
                 {/* Carrito público; el checkout sí requiere autenticación */}
-                <Route
-                  path="/carrito"
-                  element={<Carrito />}
-                />
+                <Route path="/carrito" element={<Carrito />} />
 
-                <Route
-                  path="/login"
-                  element={<Login />}
-                />
-
-                <Route
-                  path="/registro"
-                  element={<Registro />}
-                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<Registro />} />
+                <Route path="/recuperar-password" element={<RecuperarPassword />} />
+                <Route path="/restablecer-password" element={<RestablecerPassword />} />
 
                 {/* Para crear una orden, el usuario debe iniciar sesión */}
                 <Route
@@ -140,100 +126,18 @@ export default function App() {
                   }
                 />
 
-                <Route
-                  path="/admin/productos"
-                  element={
-                    <ProtectedRoute requiereStaff>
-                      <GestionProductos />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/admin/productos" element={<ProtectedRoute requiereStaff><GestionProductos /></ProtectedRoute>} />
+                <Route path="/admin/inventario" element={<ProtectedRoute requiereStaff><GestionInventario /></ProtectedRoute>} />
+                <Route path="/admin/categorias" element={<ProtectedRoute requiereStaff><GestionCategorias /></ProtectedRoute>} />
+                <Route path="/admin/ordenes" element={<ProtectedRoute requiereStaff><GestionOrdenes /></ProtectedRoute>} />
+                <Route path="/admin/empleado/comisiones" element={<ProtectedRoute requiereEmpleado><HistorialComisionesEmpleado /></ProtectedRoute>} />
+                <Route path="/admin/usuarios" element={<ProtectedRoute requiereAdmin><GestionUsuarios /></ProtectedRoute>} />
+                <Route path="/admin/empleados" element={<ProtectedRoute requiereAdmin><GestionEmpleados /></ProtectedRoute>} />
+                <Route path="/admin/empleados/nuevo" element={<ProtectedRoute requiereAdmin><RegistroEmpleado /></ProtectedRoute>} />
+                <Route path="/admin/ventas" element={<ProtectedRoute requiereAdmin><HistorialVentas /></ProtectedRoute>} />
+                <Route path="/admin/auditoria" element={<ProtectedRoute requiereAdmin><AuditoriaAccesos /></ProtectedRoute>} />
 
-                <Route
-                  path="/admin/inventario"
-                  element={
-                    <ProtectedRoute requiereStaff>
-                      <GestionInventario />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/categorias"
-                  element={
-                    <ProtectedRoute requiereStaff>
-                      <GestionCategorias />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/ordenes"
-                  element={
-                    <ProtectedRoute requiereStaff>
-                      <GestionOrdenes />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/empleado/comisiones"
-                  element={
-                    <ProtectedRoute requiereEmpleado>
-                      <HistorialComisionesEmpleado />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/usuarios"
-                  element={
-                    <ProtectedRoute requiereAdmin>
-                      <GestionUsuarios />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/empleados"
-                  element={
-                    <ProtectedRoute requiereAdmin>
-                      <GestionEmpleados />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/empleados/nuevo"
-                  element={
-                    <ProtectedRoute requiereAdmin>
-                      <RegistroEmpleado />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/ventas"
-                  element={
-                    <ProtectedRoute requiereAdmin>
-                      <HistorialVentas />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/admin/auditoria"
-                  element={
-                    <ProtectedRoute requiereAdmin>
-                      <AuditoriaAccesos />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="*"
-                  element={<NotFound />}
-                />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
 
