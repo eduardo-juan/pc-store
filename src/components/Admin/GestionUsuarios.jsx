@@ -86,16 +86,22 @@ export default function GestionUsuarios() {
 
     if (usuarioSeleccionado.rol === 'admin') {
       setError(
-        'No puedes eliminar un administrador desde este módulo.'
+        'No puedes eliminar un administrador desde este módulo.',
       )
       return
     }
 
-    const nombre =
-      `${usuarioSeleccionado.nombre || ''} ${usuarioSeleccionado.apellido || ''}`.trim()
+    const nombre = [
+      usuarioSeleccionado.nombre || '',
+      usuarioSeleccionado.apellido || '',
+    ]
+      .join(' ')
+      .trim()
 
     const confirmar = window.confirm(
-      `¿Estás seguro de que deseas eliminar a ${nombre || 'este usuario'}? Esta acción no se puede deshacer.`
+      `¿Estás seguro de que deseas eliminar a ${
+        nombre || 'este usuario'
+      }? Esta acción no se puede deshacer.`,
     )
 
     if (!confirmar) return
@@ -107,7 +113,7 @@ export default function GestionUsuarios() {
       'eliminar_usuario_pc_store',
       {
         p_usuario_id: usuarioSeleccionado.id,
-      }
+      },
     )
 
     if (error) {
@@ -162,6 +168,7 @@ export default function GestionUsuarios() {
   const obtenerRol = (rol) => {
     if (rol === 'admin') return 'Administrador'
     if (rol === 'empleado') return 'Empleado'
+
     return 'Cliente'
   }
 
@@ -173,7 +180,8 @@ export default function GestionUsuarios() {
         <div className="pc-admin-header">
           <h1>Gestión de Usuarios</h1>
           <p>
-            Administra los usuarios registrados, su acceso y sus cuentas.
+            Administra los usuarios registrados, su acceso y sus
+            cuentas.
           </p>
         </div>
 
@@ -191,10 +199,18 @@ export default function GestionUsuarios() {
         )}
 
         {!cargando && (
-          <div className="pc-metrics-grid" style={{ marginBottom: 30 }}>
+          <div
+            className="pc-metrics-grid"
+            style={{ marginBottom: 30 }}
+          >
             <article className="pc-card pc-metric">
-              <span style={{ color: '#171717' }}>Usuarios registrados</span>
-              <strong style={{ color: '#171717' }}>{usuarios.length}</strong>
+              <span style={{ color: '#171717' }}>
+                Usuarios registrados
+              </span>
+
+              <strong style={{ color: '#171717' }}>
+                {usuarios.length}
+              </strong>
             </article>
           </div>
         )}
@@ -303,7 +319,9 @@ export default function GestionUsuarios() {
 
                   return (
                     <tr key={usuarioItem.id}>
-                      <td><strong>{indice + 1}</strong></td>
+                      <td>
+                        <strong>{indice + 1}</strong>
+                      </td>
 
                       <td>
                         <strong>
@@ -325,7 +343,6 @@ export default function GestionUsuarios() {
                       </td>
 
                       <td>{usuarioItem.email || '-'}</td>
-
                       <td>{usuarioItem.ciudad || '-'}</td>
 
                       <td>

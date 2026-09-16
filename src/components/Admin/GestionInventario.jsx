@@ -17,6 +17,7 @@ const obtenerFechaLocal = (fecha = new Date()) => {
   const year = fecha.getFullYear()
   const month = String(fecha.getMonth() + 1).padStart(2, '0')
   const day = String(fecha.getDate()).padStart(2, '0')
+
   return `${year}-${month}-${day}`
 }
 
@@ -30,6 +31,7 @@ export default function GestionInventario() {
   const [operacion, setOperacion] = useState('entrada')
   const [fechaFiltro, setFechaFiltro] = useState('')
   const [pagina, setPagina] = useState(1)
+
   const registrosPorPagina = 10
 
   useEffect(() => {
@@ -39,11 +41,13 @@ export default function GestionInventario() {
   const cargarDatos = async () => {
     setCargando(true)
 
-    const { data: productosData, error: productosError } =
-      await supabase
-        .from('productos')
-        .select('id, nombre, stock, marca')
-        .order('nombre')
+    const {
+      data: productosData,
+      error: productosError,
+    } = await supabase
+      .from('productos')
+      .select('id, nombre, stock, marca')
+      .order('nombre')
 
     if (productosError) {
       console.error('Error cargando productos:', productosError)
@@ -52,12 +56,14 @@ export default function GestionInventario() {
 
     setProductos(productosData || [])
 
-    const { data: historialData, error: historialError } =
-      await supabase
-        .from('inventario_historial')
-        .select('*, productos(nombre)')
-        .order('created_at', { ascending: false })
-        .limit(50)
+    const {
+      data: historialData,
+      error: historialError,
+    } = await supabase
+      .from('inventario_historial')
+      .select('*, productos(nombre)')
+      .order('created_at', { ascending: false })
+      .limit(50)
 
     if (historialError) {
       console.error('Error cargando historial:', historialError)
@@ -98,24 +104,29 @@ export default function GestionInventario() {
     } else if (razon === 'devolución') {
       nuevoStock = producto.stock + cantidadNum
     } else {
-      nuevoStock = operacion === 'entrada'
-        ? producto.stock + cantidadNum
-        : producto.stock - cantidadNum
+      nuevoStock =
+        operacion === 'entrada'
+          ? producto.stock + cantidadNum
+          : producto.stock - cantidadNum
     }
 
     if (nuevoStock < 0) {
-      alert(`No puedes reducir el stock por debajo de 0. Stock actual: ${producto.stock}`)
+      alert(
+        `No puedes reducir el stock por debajo de 0. Stock actual: ${producto.stock}`,
+      )
       return
     }
 
     const { error: historialError } = await supabase
       .from('inventario_historial')
-      .insert([{
-        producto_id: productoId,
-        cantidad_anterior: producto.stock,
-        cantidad_nueva: nuevoStock,
-        razón: razon,
-      }])
+      .insert([
+        {
+          producto_id: productoId,
+          cantidad_anterior: producto.stock,
+          cantidad_nueva: nuevoStock,
+          razón: razon,
+        },
+      ])
 
     if (historialError) {
       console.error('Error registrando historial:', historialError)
@@ -134,7 +145,10 @@ export default function GestionInventario() {
       return
     }
 
-    alert(`Inventario actualizado correctamente.\n\nStock anterior: ${producto.stock}\nStock nuevo: ${nuevoStock}`)
+    alert(
+      `Inventario actualizado correctamente.\n\nStock anterior: ${producto.stock}\nStock nuevo: ${nuevoStock}`,
+    )
+
     resetFormulario()
     await cargarDatos()
     setPagina(1)
@@ -152,19 +166,29 @@ export default function GestionInventario() {
 
     return historial.filter((item) => {
       if (!item.created_at) return false
+
       return obtenerFechaLocal(new Date(item.created_at)) === fechaFiltro
     })
   }, [historial, fechaFiltro])
 
-  const totalPaginas = Math.max(1, Math.ceil(historialFiltrado.length / registrosPorPagina))
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(historialFiltrado.length / registrosPorPagina),
+  )
 
   const historialPaginado = useMemo(() => {
     const inicio = (pagina - 1) * registrosPorPagina
-    return historialFiltrado.slice(inicio, inicio + registrosPorPagina)
+
+    return historialFiltrado.slice(
+      inicio,
+      inicio + registrosPorPagina,
+    )
   }, [historialFiltrado, pagina])
 
   useEffect(() => {
-    setPagina((paginaActual) => Math.min(paginaActual, totalPaginas))
+    setPagina((paginaActual) =>
+      Math.min(paginaActual, totalPaginas),
+    )
   }, [totalPaginas])
 
   const cambiarFechaFiltro = (valor) => {
@@ -193,49 +217,153 @@ export default function GestionInventario() {
           <p>Ajusta el stock y revisa el historial de movimientos.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24, alignItems: 'start' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 2fr',
+            gap: 24,
+            alignItems: 'start',
+          }}
+        >
           <div className="pc-card" style={{ padding: 22 }}>
             <h2 style={{ marginBottom: 16 }}>Ajustar Stock</h2>
 
-            <form onSubmit={handleAjustarInventario} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <select className="pc-select" value={productoSeleccionado} onChange={(e) => setProductoSeleccionado(e.target.value)} required>
+            <form
+              onSubmit={handleAjustarInventario}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+              }}
+            >
+              <select
+                className="pc-select"
+                value={productoSeleccionado}
+                onChange={(e) =>
+                  setProductoSeleccionado(e.target.value)
+                }
+                required
+              >
                 <option value="">Seleccionar producto</option>
+
                 {productos.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nombre} (Stock: {p.stock})</option>
+                  <option key={p.id} value={p.id}>
+                    {p.nombre} (Stock: {p.stock})
+                  </option>
                 ))}
               </select>
 
-              <input type="number" min="1" placeholder="Cantidad" className="pc-input" value={cantidad} onChange={(e) => setCantidad(e.target.value)} required />
+              <input
+                type="number"
+                min="1"
+                placeholder="Cantidad"
+                className="pc-input"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
+                required
+              />
 
-              <select className="pc-select" value={razon} onChange={(e) => setRazon(e.target.value)}>
+              <select
+                className="pc-select"
+                value={razon}
+                onChange={(e) => setRazon(e.target.value)}
+              >
                 <option value="venta">Venta</option>
                 <option value="ajuste">Ajuste</option>
                 <option value="devolución">Devolución</option>
               </select>
 
               {razon === 'ajuste' && (
-                <select className="pc-select" value={operacion} onChange={(e) => setOperacion(e.target.value)}>
-                  <option value="entrada">Entrada (+) — Agregar stock</option>
-                  <option value="salida">Salida (-) — Reducir stock</option>
+                <select
+                  className="pc-select"
+                  value={operacion}
+                  onChange={(e) => setOperacion(e.target.value)}
+                >
+                  <option value="entrada">
+                    Entrada (+) — Agregar stock
+                  </option>
+                  <option value="salida">
+                    Salida (-) — Reducir stock
+                  </option>
                 </select>
               )}
 
-              <div className="pc-card" style={{ padding: 12, fontSize: 13, background: 'rgba(0,0,0,0.03)' }}>
+              <div
+                className="pc-card"
+                style={{
+                  padding: 12,
+                  fontSize: 13,
+                  background: 'rgba(0,0,0,0.03)',
+                }}
+              >
                 {razon === 'venta' && (
-                  <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}><ShoppingCart size={17} />La venta reducirá el stock en <strong>{cantidad || 0}</strong>.</p>
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <ShoppingCart size={17} />
+                    La venta reducirá el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
                 )}
+
                 {razon === 'devolución' && (
-                  <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}><RotateCcw size={17} />La devolución aumentará el stock en <strong>{cantidad || 0}</strong>.</p>
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <RotateCcw size={17} />
+                    La devolución aumentará el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
                 )}
+
                 {razon === 'ajuste' && operacion === 'entrada' && (
-                  <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}><ArrowDownToLine size={17} />La entrada aumentará el stock en <strong>{cantidad || 0}</strong>.</p>
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <ArrowDownToLine size={17} />
+                    La entrada aumentará el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
                 )}
+
                 {razon === 'ajuste' && operacion === 'salida' && (
-                  <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}><ArrowUpFromLine size={17} />La salida reducirá el stock en <strong>{cantidad || 0}</strong>.</p>
+                  <p
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <ArrowUpFromLine size={17} />
+                    La salida reducirá el stock en{' '}
+                    <strong>{cantidad || 0}</strong>.
+                  </p>
                 )}
               </div>
 
-              <button type="submit" className="pc-btn pc-btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <button
+                type="submit"
+                className="pc-btn pc-btn-primary"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
                 <RefreshCw size={17} />
                 Actualizar
               </button>
@@ -243,11 +371,28 @@ export default function GestionInventario() {
           </div>
 
           <div className="pc-card" style={{ padding: 22 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                flexWrap: 'wrap',
+                marginBottom: 16,
+              }}
+            >
               <h2 style={{ margin: 0 }}>Historial de Cambios</h2>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
                 <CalendarDays size={18} />
+
                 <input
                   type="date"
                   className="pc-input"
@@ -258,60 +403,140 @@ export default function GestionInventario() {
                 />
 
                 {fechaFiltro && (
-                  <button type="button" className="pc-btn pc-btn-light" onClick={() => cambiarFechaFiltro('')} style={{ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 0 }} title="Borrar filtro" aria-label="Borrar filtro">
+                  <button
+                    type="button"
+                    className="pc-btn pc-btn-light"
+                    onClick={() => cambiarFechaFiltro('')}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0,
+                    }}
+                    title="Borrar filtro"
+                    aria-label="Borrar filtro"
+                  >
                     <X size={18} />
                   </button>
                 )}
               </div>
             </div>
 
-            <p style={{ margin: '0 0 12px', fontSize: 13, opacity: 0.65 }}>
+            <p
+              style={{
+                margin: '0 0 12px',
+                fontSize: 13,
+                opacity: 0.65,
+              }}
+            >
               {fechaFiltro
-                ? `${historialFiltrado.length} movimiento(s) del ${new Date(`${fechaFiltro}T00:00:00`).toLocaleDateString('es-HN')}.`
+                ? `${historialFiltrado.length} movimiento(s) del ${new Date(
+                    `${fechaFiltro}T00:00:00`,
+                  ).toLocaleDateString('es-HN')}.`
                 : `${historialFiltrado.length} movimiento(s) registrados.`}
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
               {historialPaginado.length === 0 && (
                 <p style={{ opacity: 0.6 }}>
-                  {fechaFiltro ? 'No hay movimientos registrados en ese día.' : 'No hay movimientos registrados.'}
+                  {fechaFiltro
+                    ? 'No hay movimientos registrados en ese día.'
+                    : 'No hay movimientos registrados.'}
                 </p>
               )}
 
               {historialPaginado.map((item) => (
-                <div key={item.id} className="pc-card" style={{ padding: 12, borderLeft: '4px solid #1e3a8a' }}>
-                  <p style={{ fontWeight: 700 }}>{item.productos?.nombre || 'Producto desconocido'}</p>
+                <div
+                  key={item.id}
+                  className="pc-card"
+                  style={{
+                    padding: 12,
+                    borderLeft: '4px solid #1e3a8a',
+                  }}
+                >
+                  <p style={{ fontWeight: 700 }}>
+                    {item.productos?.nombre || 'Producto desconocido'}
+                  </p>
+
                   <p style={{ fontSize: 13, opacity: 0.75 }}>
                     {item.cantidad_anterior} → {item.cantidad_nueva}
-                    <span style={{ marginLeft: 8, color: '#1e3a8a', fontWeight: 700 }}>({item.razón})</span>
+
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: '#1e3a8a',
+                        fontWeight: 700,
+                      }}
+                    >
+                      ({item.razón})
+                    </span>
                   </p>
-                  <p style={{ fontSize: 11, opacity: 0.5 }}>{new Date(item.created_at).toLocaleDateString('es-HN')}</p>
+
+                  <p style={{ fontSize: 11, opacity: 0.5 }}>
+                    {new Date(item.created_at).toLocaleDateString('es-HN')}
+                  </p>
                 </div>
               ))}
             </div>
 
             {historialFiltrado.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 18 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 12,
+                  marginTop: 18,
+                }}
+              >
                 <button
                   type="button"
                   className="pc-btn pc-btn-light"
-                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  onClick={() =>
+                    setPagina((p) => Math.max(1, p - 1))
+                  }
                   disabled={pagina === 1}
-                  style={{ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                  }}
                   title="Página anterior"
                   aria-label="Página anterior"
                 >
                   <ChevronLeft size={18} />
                 </button>
 
-                <span style={{ fontSize: 13, fontWeight: 600 }}>Página {pagina} de {totalPaginas}</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>
+                  Página {pagina} de {totalPaginas}
+                </span>
 
                 <button
                   type="button"
                   className="pc-btn pc-btn-light"
-                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  onClick={() =>
+                    setPagina((p) => Math.min(totalPaginas, p + 1))
+                  }
                   disabled={pagina === totalPaginas}
-                  style={{ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                  }}
                   title="Página siguiente"
                   aria-label="Página siguiente"
                 >
