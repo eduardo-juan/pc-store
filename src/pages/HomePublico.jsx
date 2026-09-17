@@ -244,8 +244,8 @@ export default function HomePublico() {
 
         <div>
           <ShoppingBag />
-          <h3>Compra sin cuenta</h3>
-          <p>Regístrate al finalizar</p>
+          <h3>Inicia sesion para Comprar</h3>
+          <p>Disfruta de nuestros productos</p>
         </div>
       </section>
 

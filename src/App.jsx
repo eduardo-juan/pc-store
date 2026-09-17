@@ -16,6 +16,7 @@ import Tienda from './pages/Tienda'
 import Checkout from './pages/Checkout'
 import MisOrdenes from './pages/MisOrdenes'
 import Perfil from './pages/Perfil'
+import Favoritos from './pages/Favoritos'
 import OrdenConfirmada from './pages/OrdenConfirmada'
 import NotFound from './pages/NotFound'
 
@@ -116,6 +117,15 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                
+                <Route
+  path="/favoritos"
+  element={
+    <ProtectedRoute>
+      <Favoritos />
+    </ProtectedRoute>
+  }
+/>
 
                 <Route
                   path="/admin"

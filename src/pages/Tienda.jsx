@@ -77,10 +77,14 @@ export default function Tienda() {
         .order("id");
 
     if (productosError) {
-      setError(productosError.message);
-      setCargando(false);
-      return;
-    }
+  console.error("Error cargando productos:", productosError);
+
+  setError("No se pudieron cargar los productos.");
+  setProductos([]);
+  setCargando(false);
+
+  return;
+}
 
     const { data: categoriasData, error: categoriasError } =
       await supabase
@@ -611,14 +615,18 @@ export default function Tienda() {
               </select>
             </div>
 
-            {error && (
-              <div
-                className="pc-card"
-                style={{ padding: 18 }}
-              >
-                Error: {error}
-              </div>
-            )}
+           {error && (
+  <div
+    className="pc-card"
+    style={{
+      padding: 18,
+      color: "#92400e",
+      background: "#fff7ed",
+    }}
+  >
+    {error}
+  </div>
+)}
 
             {mensaje && (
               <div className="pc-toast">

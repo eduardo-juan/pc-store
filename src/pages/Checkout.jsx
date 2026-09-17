@@ -43,8 +43,56 @@ export default function Checkout() {
   const [procesando, setProcesando] = useState(false)
   const [error, setError] = useState('')
 
+  const [cupon, setCupon] = useState('')
+  const [cuponAplicado, setCuponAplicado] = useState(null)
+  const [validandoCupon, setValidandoCupon] = useState(false)
+
   const subtotalNumerico = Number(subtotal) || 0
-  const total = subtotalNumerico + COSTO_ENVIO
+  const descuento = cuponAplicado?.descuento || 0
+  const total = subtotalNumerico + COSTO_ENVIO - descuento
+
+  const validarCupon = async () => {
+    if (!cupon.trim()) {
+      setError('Escribe un cupón.')
+      return
+    }
+
+    setValidandoCupon(true)
+    setError('')
+
+    const { data, error: rpcError } = await supabase.rpc(
+      'validar_cupon_pc_store',
+      {
+        p_codigo: cupon.trim(),
+        p_subtotal: subtotalNumerico
+      }
+    )
+
+    setValidandoCupon(false)
+
+    if (rpcError) {
+      setCuponAplicado(null)
+      setError(rpcError.message)
+      return
+    }
+
+    const resultado = data?.[0]
+
+    if (!resultado?.valido) {
+      setCuponAplicado(null)
+      setError(resultado?.mensaje || 'Cupón no válido.')
+      return
+    }
+
+    setCuponAplicado(resultado)
+    setError('')
+  }
+
+  const quitarCupon = () => {
+    setCuponAplicado(null)
+    setCupon('')
+    setError('')
+  }
 
   const finalizarCompra = async (e) => {
     e.preventDefault()
@@ -322,6 +370,60 @@ export default function Checkout() {
               </div>
             </div>
 
+            <h2>Cupón de descuento</h2>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                marginBottom: '12px'
+              }}
+            >
+              <input
+                className="pc-input"
+                type="text"
+                placeholder="Código de cupón"
+                value={cupon}
+                onChange={(e) =>
+                  setCupon(e.target.value.toUpperCase())
+                }
+                disabled={!!cuponAplicado}
+              />
+
+              {cuponAplicado ? (
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-light"
+                  onClick={quitarCupon}
+                >
+                  Quitar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-light"
+                  disabled={validandoCupon}
+                  onClick={validarCupon}
+                >
+                  {validandoCupon ? 'Validando...' : 'Aplicar'}
+                </button>
+              )}
+            </div>
+
+            {cuponAplicado && (
+              <div
+                className="pc-alert"
+                style={{
+                  background: '#dcfce7',
+                  color: '#166534',
+                  marginBottom: '20px'
+                }}
+              >
+                Cupón {cuponAplicado.codigo} aplicado: -L{' '}
+                {descuento.toFixed(2)}
+              </div>
+            )}
+
             <h2>Método de pago</h2>
 
             <select
@@ -410,6 +512,13 @@ export default function Checkout() {
                 L {COSTO_ENVIO.toFixed(2)}
               </strong>
             </div>
+
+            {descuento > 0 && (
+              <div className="pc-summary-total">
+                <span>Descuento</span>
+                <strong>-L {descuento.toFixed(2)}</strong>
+              </div>
+            )}
 
             <div
               className="pc-summary-total"
