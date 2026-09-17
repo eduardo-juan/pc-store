@@ -3,23 +3,29 @@ import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, RefreshCw } fro
 import { supabase } from '../../supabaseClient'
 import BotonAtras from '../../components/BotonAtras'
 
+const ZONA_HONDURAS = 'America/Tegucigalpa'
+
 const obtenerFechaLocal = (fecha = new Date()) => {
-  const year = fecha.getFullYear()
-  const month = String(fecha.getMonth() + 1).padStart(2, '0')
-  const day = String(fecha.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: ZONA_HONDURAS,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(fecha)
+  const valores = Object.fromEntries(partes.map(({ type, value }) => [type, value]))
+  return `${valores.year}-${valores.month}-${valores.day}`
 }
 
 const cambiarDia = (fecha, cantidad) => {
   const [year, month, day] = fecha.split('-').map(Number)
-  const nuevaFecha = new Date(year, month - 1, day)
-  nuevaFecha.setDate(nuevaFecha.getDate() + cantidad)
-  return obtenerFechaLocal(nuevaFecha)
+  const nuevaFecha = new Date(Date.UTC(year, month - 1, day + cantidad, 12))
+  return nuevaFecha.toISOString().slice(0, 10)
 }
 
 const formatearDia = (fecha) => {
   const [year, month, day] = fecha.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('es-HN', {
+  return new Date(Date.UTC(year, month - 1, day, 12)).toLocaleDateString('es-HN', {
+    timeZone: ZONA_HONDURAS,
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -29,8 +35,8 @@ const formatearDia = (fecha) => {
 
 const obtenerRangoUTC = (fecha) => {
   const [year, month, day] = fecha.split('-').map(Number)
-  const inicio = new Date(year, month - 1, day)
-  const fin = new Date(year, month - 1, day + 1)
+  const inicio = new Date(Date.UTC(year, month - 1, day, 6, 0, 0))
+  const fin = new Date(Date.UTC(year, month - 1, day + 1, 6, 0, 0))
   return { inicio: inicio.toISOString(), fin: fin.toISOString() }
 }
 
@@ -73,15 +79,16 @@ export default function AuditoriaAccesos() {
   )
 
   const irAlDia = (cantidad) => {
-    const nuevaFecha = cambiarDia(fechaSeleccionada, cantidad)
-    setFechaSeleccionada(nuevaFecha)
+    setFechaSeleccionada(cambiarDia(fechaSeleccionada, cantidad))
   }
 
   const formatearHora = (fecha) =>
     new Date(fecha).toLocaleTimeString('es-HN', {
+      timeZone: ZONA_HONDURAS,
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
+      hour12: false,
     })
 
   return (
@@ -93,106 +100,50 @@ export default function AuditoriaAccesos() {
           <div>
             <span className="pc-kicker" style={{ color: '#171717' }}>Seguridad</span>
             <h1 style={{ color: '#171717' }}>Historial diario de accesos</h1>
-            <p style={{ color: '#171717' }}>
-              Consulta los inicios de sesión exitosos registrados por día.
-            </p>
+            <p style={{ color: '#171717' }}>Consulta los inicios de sesión exitosos registrados por día.</p>
           </div>
-
-          <button
-            className="pc-btn pc-btn-light"
-            onClick={() => cargarRegistros()}
-            disabled={cargando}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-          >
-            <RefreshCw size={17} />
-            Actualizar
+          <button className="pc-btn pc-btn-light" onClick={() => cargarRegistros()} disabled={cargando} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <RefreshCw size={17} /> Actualizar
           </button>
         </div>
 
         <div className="pc-card" style={{ padding: 18, marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <button
-              className="pc-btn pc-btn-light"
-              onClick={() => irAlDia(-1)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              <ChevronLeft size={18} />
-              Día anterior
+            <button className="pc-btn pc-btn-light" onClick={() => irAlDia(-1)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <ChevronLeft size={18} /> Día anterior
             </button>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <CalendarDays size={19} />
-              <input
-                type="date"
-                value={fechaSeleccionada}
-                max={hoy}
-                onChange={(e) => setFechaSeleccionada(e.target.value)}
-                style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d4d4d4' }}
-              />
+              <input type="date" value={fechaSeleccionada} max={hoy} onChange={(e) => setFechaSeleccionada(e.target.value)} style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d4d4d4' }} />
             </div>
-
-            <button
-              className="pc-btn pc-btn-light"
-              onClick={() => irAlDia(1)}
-              disabled={fechaSeleccionada >= hoy}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              Día siguiente
-              <ChevronRight size={18} />
+            <button className="pc-btn pc-btn-light" onClick={() => irAlDia(1)} disabled={fechaSeleccionada >= hoy} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              Día siguiente <ChevronRight size={18} />
             </button>
           </div>
         </div>
 
-        {error && (
-          <div className="pc-card" style={{ padding: 16, marginBottom: 20, color: '#dc2626' }}>
-            {error}
-          </div>
-        )}
+        {error && <div className="pc-card" style={{ padding: 16, marginBottom: 20, color: '#dc2626' }}>{error}</div>}
 
         {cargando ? (
-          <div className="pc-loading">
-            <div className="pc-loader" />
-            <p>Cargando historial del día...</p>
-          </div>
+          <div className="pc-loading"><div className="pc-loader" /><p>Cargando historial del día...</p></div>
         ) : (
           <div className="pc-card pc-table-wrapper">
             <div style={{ padding: '20px 20px 10px' }}>
-              <h2 style={{ margin: 0, color: '#171717', textTransform: 'capitalize' }}>
-                {formatearDia(fechaSeleccionada)}
-              </h2>
-              <p style={{ margin: '6px 0 0', color: '#666' }}>
-                {registrosOrdenados.length} {registrosOrdenados.length === 1 ? 'acceso registrado' : 'accesos registrados'}
-              </p>
+              <h2 style={{ margin: 0, color: '#171717', textTransform: 'capitalize' }}>{formatearDia(fechaSeleccionada)}</h2>
+              <p style={{ margin: '6px 0 0', color: '#666' }}>{registrosOrdenados.length} {registrosOrdenados.length === 1 ? 'acceso registrado' : 'accesos registrados'}</p>
             </div>
-
             <table className="pc-table">
-              <thead>
-                <tr>
-                  <th>Hora</th>
-                  <th>Nombre</th>
-                  <th>Email</th>
-                  <th>Rol</th>
-                  <th>ID de usuario</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Hora</th><th>Nombre</th><th>Email</th><th>Rol</th><th>ID de usuario</th></tr></thead>
               <tbody>
                 {registrosOrdenados.map((registro) => (
                   <tr key={registro.id}>
                     <td style={{ whiteSpace: 'nowrap' }}>{formatearHora(registro.fecha_acceso)}</td>
-                    <td>{registro.nombre || '-'}</td>
-                    <td>{registro.email || '-'}</td>
+                    <td>{registro.nombre || '-'}</td><td>{registro.email || '-'}</td>
                     <td style={{ textTransform: 'capitalize' }}>{registro.rol}</td>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{registro.usuario_id}</td>
                   </tr>
                 ))}
-                {registrosOrdenados.length === 0 && (
-                  <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: 35 }}>
-                      <ClipboardList size={28} style={{ margin: '0 auto 8px' }} />
-                      No hay accesos registrados en este día.
-                    </td>
-                  </tr>
-                )}
+                {registrosOrdenados.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', padding: 35 }}><ClipboardList size={28} style={{ margin: '0 auto 8px' }} />No hay accesos registrados en este día.</td></tr>}
               </tbody>
             </table>
           </div>
