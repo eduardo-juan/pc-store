@@ -17,7 +17,7 @@ export default function SeccionResenas({ productoId }) {
   async function cargar() {
     const { data, error } = await supabase
       .from('reseñas')
-      .select('id, producto_id, usuario_id, calificación, comentario, útil_count, created_at, usuarios(nombre)')
+      .select('id, producto_id, usuario_id, calificación, comentario, útil_count, created_at, usuarios(nombre, avatar_url)')
       .eq('producto_id', productoId)
       .order('created_at', { ascending: false })
     if (!error) setResenas(data || [])
@@ -111,7 +111,14 @@ export default function SeccionResenas({ productoId }) {
 
       <div className="pc-reviews-list-store">
         {resenas.map(r => <article key={r.id} className="pc-card pc-review-store">
-          <div className="pc-review-user-store"><div className="pc-review-avatar-store pc-review-avatar-fallback">{(r.usuarios?.nombre || 'C').charAt(0).toUpperCase()}</div><div><strong>{r.usuarios?.nombre || 'Cliente'}</strong><span>{new Date(r.created_at).toLocaleDateString()}</span></div></div>
+          <div className="pc-review-user-store">
+            {r.usuarios?.avatar_url ? (
+              <img className="pc-review-avatar-store" src={r.usuarios.avatar_url} alt={`Perfil de ${r.usuarios?.nombre || 'cliente'}`} />
+            ) : (
+              <div className="pc-review-avatar-store pc-review-avatar-fallback">{(r.usuarios?.nombre || 'C').charAt(0).toUpperCase()}</div>
+            )}
+            <div><strong>{r.usuarios?.nombre || 'Cliente'}</strong><span>{new Date(r.created_at).toLocaleDateString()}</span></div>
+          </div>
           <div className="pc-review-stars">{[1,2,3,4,5].map(n => <Star key={n} size={18} fill={n <= Number(r.calificación) ? '#d4af37' : 'none'} />)}</div>
           <p className="pc-review-comment-store">{r.comentario}</p>
           <div className="pc-review-footer-store"><button type="button" className={`pc-review-useful ${votos.has(r.id) ? 'is-voted' : ''}`} onClick={() => marcarUtil(r)} disabled={votos.has(r.id)}><ThumbsUp size={15}/> Útil ({Number(r.útil_count || 0)})</button>{usuario?.id === r.usuario_id && <><button type="button" className="pc-review-action-store" onClick={() => { setEditando(r.id); setCalificacion(Number(r.calificación)); setComentario(r.comentario); window.scrollTo({ top: document.querySelector('.pc-review-form-store')?.getBoundingClientRect().top + window.scrollY - 100 || 0, behavior: 'smooth' }) }}><Pencil size={15}/> Editar</button><button type="button" className="pc-review-action-store danger" onClick={() => eliminar(r.id)}><Trash2 size={15}/> Eliminar</button></>}</div>
