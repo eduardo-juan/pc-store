@@ -1,59 +1,15 @@
 /* ============================================================
    PC STORE - APP.CSS
    Estilos generales de la aplicación
-   Paleta: Dorado / Negro / Gris / Blanco
    ============================================================ */
-
-#root { min-height: 100vh; width: 100%; }
-.pc-app { min-height: 100vh; display: flex; flex-direction: column; }
-.pc-app-content { flex: 1; width: 100%; }
-::selection { background: #d4af37; color: #0b0b0b; }
-::-webkit-scrollbar { width: 9px; }
-::-webkit-scrollbar-track { background: #eeeeee; }
-::-webkit-scrollbar-thumb { background: #b8941f; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #a67c00; }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; }
-button, a, input, select, textarea { transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.2s ease; }
-.pc-gold { color: #d4af37; }
-.pc-gold-divider { width: 70px; height: 3px; margin: 12px 0 20px; background: #d4af37; border-radius: 999px; }
-
-.pc-global-feedback { position: fixed; top: 82px; right: 20px; z-index: 99999; max-width: min(460px, calc(100vw - 40px)); display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 12px; background: #111; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.22); animation: pc-feedback-in .25s ease-out; }
-.pc-global-feedback-error { border-left: 4px solid #dc2626; }
-.pc-global-feedback button { margin-left: auto; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 3px; }
-@keyframes pc-feedback-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
-[aria-invalid="true"], .pc-field-error, .pc-error, .pc-form-error, [data-error] { scroll-margin-top: 110px; }
-
-.pc-review-summary { display: grid; grid-template-columns: 180px 1fr; gap: 28px; align-items: center; margin-bottom: 22px; }
-.pc-review-average { text-align: center; }
-.pc-review-average strong { display: block; font-size: 42px; line-height: 1; }
-.pc-review-average span { display: block; margin-top: 8px; color: #666; font-size: 14px; }
-.pc-review-bars { display: grid; gap: 9px; }
-.pc-review-bar-row { display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; gap: 10px; color: #555; font-size: 14px; }
-.pc-review-bar-row > div { height: 9px; overflow: hidden; border-radius: 999px; background: #ececec; }
-.pc-review-bar-row i { display: block; height: 100%; border-radius: inherit; background: #d4af37; }
-.pc-review-bar-row small { color: #666; text-align: right; }
-.pc-review-form { display: grid; gap: 14px; margin-bottom: 22px; }
-.pc-review-form h3 { margin: 0; }
-.pc-star-picker { display: flex; gap: 9px; align-items: center; }
-.pc-star-picker button { width: 54px; height: 54px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d7dce3; border-radius: 12px; background: linear-gradient(180deg, #fff, #f7f8fa); color: #7b8490; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,.06); }
-.pc-star-picker button:hover { transform: translateY(-2px); border-color: #d4af37; color: #d4af37; box-shadow: 0 7px 16px rgba(212,175,55,.18); }
-.pc-star-picker button.is-active { border-color: #d4af37; background: linear-gradient(180deg, #fffaf0, #fff3cf); color: #d4af37; box-shadow: 0 5px 14px rgba(212,175,55,.22); }
-.pc-star-picker button:active { transform: translateY(0) scale(.96); }
-.pc-star-picker button svg { filter: drop-shadow(0 1px 1px rgba(0,0,0,.12)); }
-.pc-review-actions, .pc-review-footer { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.pc-review { margin-bottom: 12px; }
-.pc-review-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; }
-.pc-review-head span { color: #777; font-size: 13px; }
-.pc-review p { margin: 10px 0; line-height: 1.55; }
-.pc-review-useful { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 6px 4px; cursor: pointer; color: #555; }
-.pc-review-useful:hover:not(:disabled) { color: #111; }
-.pc-review-useful:disabled { opacity: .6; cursor: default; }
-
-@media (max-width: 680px) {
-  #root { width: 100%; }
-  .pc-global-feedback { top: 70px; right: 12px; left: 12px; max-width: none; }
-  .pc-review-summary { grid-template-columns: 1fr; gap: 18px; }
-  .pc-review-head { flex-direction: column; gap: 3px; }
-  .pc-star-picker { gap: 6px; }
-  .pc-star-picker button { width: 48px; height: 48px; }
-}
+#root{min-height:100vh;width:100%}.pc-app{min-height:100vh;display:flex;flex-direction:column}.pc-app-content{flex:1;width:100%}
+::selection{background:#d4af37;color:#0b0b0b}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #d4af37;outline-offset:2px}button,a,input,select,textarea{transition:.2s ease}
+.pc-global-feedback{position:fixed;top:82px;right:20px;z-index:99999;max-width:min(460px,calc(100vw - 40px));display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:#111;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.22)}
+.pc-global-feedback-error{border-left:4px solid #dc2626}.pc-global-feedback button{margin-left:auto;border:0;background:transparent;color:inherit;cursor:pointer}
+.pc-reviews-modern{max-width:1100px;margin:40px auto;padding:0 16px}.pc-reviews-summary-card,.pc-review-modern-card,.pc-review-form-modern{background:#fff;border:1px solid #e8edf4;border-radius:20px;box-shadow:0 8px 28px rgba(30,55,90,.08)}
+.pc-reviews-summary-card{padding:28px 30px;margin-bottom:20px}.pc-reviews-title{display:flex;align-items:center;gap:12px;color:#132844}.pc-reviews-title svg{color:#1677ff}.pc-reviews-title h2{margin:0;font-size:27px}.pc-reviews-summary-grid{display:grid;grid-template-columns:240px 1fr;gap:40px;align-items:center;margin-top:18px}.pc-review-average-modern{text-align:left}.pc-review-average-modern strong{display:block;font-size:64px;line-height:1;color:#10233d}.pc-review-average-modern span{display:block;color:#63758f;margin-top:5px}.pc-review-average-modern small{display:block;color:#63758f;margin-top:8px}.pc-review-bars-modern{display:grid;gap:10px}.pc-review-bar-row-modern{display:grid;grid-template-columns:24px 1fr 45px;gap:10px;align-items:center;color:#43566f}.pc-review-bar-row-modern>div{height:10px;background:#e9eef5;border-radius:99px;overflow:hidden}.pc-review-bar-row-modern i{display:block;height:100%;background:#1976f3;border-radius:inherit}.pc-review-bar-row-modern small{text-align:right;color:#657790}
+.pc-review-modern-card{display:grid;grid-template-columns:52px 1fr;gap:18px;padding:22px;margin-bottom:16px}.pc-review-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#dcecff;color:#1769c2;font-weight:800;font-size:20px}.pc-review-content{min-width:0}.pc-review-head{margin-bottom:8px}.pc-review-head strong{display:block;color:#142942;font-size:16px}.pc-review-head span{display:block;color:#8a9aae;font-size:13px;margin-top:3px}.pc-review-stars{display:flex;gap:5px;color:#eaa300}.pc-review-star{display:inline-flex}.pc-review-content p{color:#52657d;line-height:1.55;margin:12px 0}.pc-review-footer{display:flex;gap:12px;align-items:center}.pc-useful-button,.pc-review-link{border:0;background:transparent;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;cursor:pointer;color:#168d85}.pc-useful-button{background:#e4f7f1}.pc-useful-button:disabled{opacity:.6;cursor:default}.pc-review-link{color:#168bb4}.pc-review-link.danger{color:#c34b4b}
+.pc-review-empty{padding:24px;text-align:center;margin-bottom:18px}
+.pc-review-form-modern{padding:26px;background:linear-gradient(145deg,#f8fbff,#fff)}.pc-review-form-title{display:flex;gap:12px;align-items:flex-start;margin-bottom:18px}.pc-review-form-title svg{color:#1681ef;margin-top:2px}.pc-review-form-title h3{margin:0;color:#142942;font-size:20px}.pc-review-form-title span{display:block;color:#7b8da4;font-size:13px;margin-top:4px}.pc-star-picker{display:flex;gap:12px;margin:8px 0 18px}.pc-star-button{width:56px;height:56px;border:1px solid #d5dfed;border-radius:14px;background:#fff;color:#50657f;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 8px rgba(35,65,100,.07)}.pc-star-button:hover{transform:translateY(-3px);border-color:#f0aa00;color:#f0aa00;box-shadow:0 8px 18px rgba(240,170,0,.18)}.pc-star-button.is-active{color:#f0a000;border-color:#f0a000;background:#fff8df;box-shadow:0 6px 16px rgba(240,170,0,.2)}.pc-star-button:active{transform:scale(.95)}
+.pc-review-textarea-wrap{position:relative}.pc-review-textarea-wrap textarea{width:100%;box-sizing:border-box;resize:vertical;border:1px solid #d8e2ee;border-radius:13px;padding:15px 15px 30px;background:#fff;color:#203650;font:inherit;min-height:130px}.pc-review-textarea-wrap textarea:focus{border-color:#2385ed;box-shadow:0 0 0 3px rgba(35,133,237,.1);outline:none}.pc-review-textarea-wrap>span{position:absolute;right:12px;bottom:10px;color:#8a9aae;font-size:12px}.pc-review-submit-row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.pc-review-publish{border:0;border-radius:11px;background:#1976f3;color:#fff;padding:11px 17px;font-weight:700;display:inline-flex;align-items:center;gap:7px;cursor:pointer;box-shadow:0 5px 14px rgba(25,118,243,.22)}.pc-review-publish:hover{background:#0d67df;transform:translateY(-1px)}.pc-review-cancel{border:1px solid #d5dfed;background:#fff;border-radius:11px;padding:11px 15px;cursor:pointer}.pc-message{padding:10px 12px;border-radius:9px;background:#eef6ff;color:#27567f}
+@media(max-width:680px){.pc-reviews-summary-grid{grid-template-columns:1fr;gap:22px}.pc-reviews-summary-card{padding:22px 18px}.pc-review-modern-card{grid-template-columns:1fr}.pc-star-picker{gap:6px}.pc-star-button{width:48px;height:48px}.pc-review-submit-row{justify-content:stretch;flex-direction:column}.pc-review-publish,.pc-review-cancel{justify-content:center}}
