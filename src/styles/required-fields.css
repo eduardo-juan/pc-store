@@ -1,0 +1,9 @@
+.pc-required-mark,
+.pc-field-required,
+label .required,
+label .obligatorio,
+label [data-required="true"] {
+  color: #dc2626 !important;
+  font-weight: 700;
+  margin-left: 3px;
+}
