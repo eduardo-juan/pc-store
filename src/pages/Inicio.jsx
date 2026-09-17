@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import HomePublico from './HomePublico'
 import HomeUsuario from './HomeUsuario'
+import CuponesPromocion from '../components/CuponesPromocion'
 
 export default function Inicio() {
   const [usuario, setUsuario] = useState(null)
@@ -10,37 +11,32 @@ export default function Inicio() {
   useEffect(() => {
     const comprobarSesion = async () => {
       const { data } = await supabase.auth.getUser()
-
       setUsuario(data.user || null)
       setCargando(false)
     }
 
     comprobarSesion()
 
-    const {
-      data: listener,
-    } = supabase.auth.onAuthStateChange(
-      (_evento, sesion) => {
-        setUsuario(sesion?.user || null)
-      }
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_evento, sesion) => setUsuario(sesion?.user || null)
     )
 
-    return () => {
-      listener.subscription.unsubscribe()
-    }
+    return () => listener.subscription.unsubscribe()
   }, [])
 
   if (cargando) {
-    return (
-      <div style={{ padding: 40 }}>
-        Cargando inicio...
-      </div>
-    )
+    return <div style={{ padding: 40 }}>Cargando inicio...</div>
   }
 
   return usuario ? (
-    <HomeUsuario usuario={usuario} />
+    <>
+      <HomeUsuario usuario={usuario} />
+      <CuponesPromocion />
+    </>
   ) : (
-    <HomePublico />
+    <>
+      <HomePublico />
+      <CuponesPromocion />
+    </>
   )
 }
