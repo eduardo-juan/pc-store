@@ -199,7 +199,7 @@ export default function Perfil() {
       nuevos.teléfono = true
     }
 
-    if (!/^[0-9]{4}-[0-9]{4}-[0-9]{5}$/.test(form.dni)) {
+    if (form.dni && !/^[0-9]{4}-[0-9]{4}-[0-9]{5}$/.test(form.dni)) {
       nuevos.dni = true
     }
 
@@ -217,6 +217,7 @@ export default function Perfil() {
       .from('usuarios')
       .update({
         ...form,
+        dni: form.dni.trim() || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', usuario.id)
@@ -283,12 +284,10 @@ export default function Perfil() {
   }
 
   const et = (label, obligatorio = false) => (
-    <>
+    <span className="pc-field-label">
       {label}
-      {obligatorio && (
-        <span style={{ color: '#dc2626', marginLeft: 3 }}>*</span>
-      )}
-    </>
+      {obligatorio && <span className="pc-required-mark">*</span>}
+    </span>
   )
 
   const estiloCampo = (campo) => ({
@@ -468,7 +467,7 @@ export default function Perfil() {
             </label>
 
             <label>
-              {et('DNI', true)}
+              {et('DNI')}
               <input
                 className="pc-input"
                 inputMode="numeric"
