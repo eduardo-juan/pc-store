@@ -9,6 +9,7 @@ import {
   UserCog,
   TrendingUp,
   ClipboardList,
+  TicketPercent,
 } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
@@ -131,6 +132,11 @@ export default function AdminDashboard() {
       ruta: '/admin/categorias',
     },
     {
+      icono: TicketPercent,
+      titulo: 'Cupones',
+      ruta: '/admin/cupones',
+    },
+    {
       icono: FileText,
       titulo: 'Órdenes',
       ruta: '/admin/ordenes',
@@ -149,6 +155,11 @@ export default function AdminDashboard() {
       icono: TrendingUp,
       titulo: 'Historial de ventas',
       ruta: '/admin/ventas',
+    },
+    {
+      icono: FileText,
+      titulo: 'Reportes',
+      ruta: '/admin/reportes',
     },
     {
       icono: ClipboardList,

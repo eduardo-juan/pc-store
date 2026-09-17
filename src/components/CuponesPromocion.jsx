@@ -1,36 +1,36 @@
-import { useEffect, useState } from 'react'
-import { Copy, Check, Tag, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { supabase } from '../supabaseClient'
+import { useEffect, useState } from "react";
+import { Copy, Check, Tag, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 export default function CuponesPromocion() {
-  const [cupones, setCupones] = useState([])
-  const [copiado, setCopiado] = useState(null)
+  const [cupones, setCupones] = useState([]);
+  const [copiado, setCopiado] = useState(null);
 
   useEffect(() => {
     const cargarCupones = async () => {
-      const { data } = await supabase.rpc('obtener_cupones_activos')
-      setCupones(data || [])
-    }
-    cargarCupones()
-  }, [])
+      const { data } = await supabase.rpc("obtener_cupones_activos");
+      setCupones(data || []);
+    };
+    cargarCupones();
+  }, []);
 
   const copiar = async (codigo) => {
     try {
-      await navigator.clipboard.writeText(codigo)
-      setCopiado(codigo)
-      setTimeout(() => setCopiado(null), 1800)
+      await navigator.clipboard.writeText(codigo);
+      setCopiado(codigo);
+      setTimeout(() => setCopiado(null), 1800);
     } catch {
-      setCopiado(null)
+      setCopiado(null);
     }
-  }
+  };
 
-  if (!cupones.length) return null
+  if (!cupones.length) return null;
 
   const textoDescuento = (cupon) =>
-    cupon.tipo === 'porcentaje'
+    cupon.tipo === "porcentaje"
       ? `${Number(cupon.valor)}% OFF`
-      : `L ${Number(cupon.valor).toLocaleString('es-HN')} OFF`
+      : `L ${Number(cupon.valor).toLocaleString("es-HN")} OFF`;
 
   return (
     <section className="cupones-promocion">
@@ -40,7 +40,9 @@ export default function CuponesPromocion() {
           <h2>Descuentos disponibles</h2>
           <p>Usa estos códigos en el checkout y consigue tu descuento.</p>
         </div>
-        <div className="cupones-tag"><Tag size={18} /> PROMOCIONES</div>
+        <div className="cupones-tag">
+          <Tag size={18} /> PROMOCIONES
+        </div>
       </div>
 
       <div className="cupones-grid">
@@ -49,16 +51,23 @@ export default function CuponesPromocion() {
             <div className="cupon-glow" />
             <div className="cupon-main">
               <span className="cupon-descuento">{textoDescuento(cupon)}</span>
-              <h3>{cupon.descripcion || 'Cupón de descuento'}</h3>
+              <h3>{cupon.descripcion || "Cupón de descuento"}</h3>
               {Number(cupon.compra_minima) > 0 && (
-                <small>Compra mínima: L {Number(cupon.compra_minima).toLocaleString('es-HN')}</small>
+                <small>
+                  Compra mínima: L{" "}
+                  {Number(cupon.compra_minima).toLocaleString("es-HN")}
+                </small>
               )}
             </div>
             <div className="cupon-code-row">
               <div className="cupon-code">{cupon.codigo}</div>
               <button type="button" onClick={() => copiar(cupon.codigo)}>
-                {copiado === cupon.codigo ? <Check size={17} /> : <Copy size={17} />}
-                {copiado === cupon.codigo ? 'Copiado' : 'Copiar'}
+                {copiado === cupon.codigo ? (
+                  <Check size={17} />
+                ) : (
+                  <Copy size={17} />
+                )}
+                {copiado === cupon.codigo ? "Copiado" : "Copiar"}
               </button>
             </div>
           </article>
@@ -93,5 +102,5 @@ export default function CuponesPromocion() {
         @media(max-width:700px){.cupones-head{align-items:start;flex-direction:column}.cupones-grid{grid-template-columns:1fr}.cupon-code-row{flex-direction:column;align-items:stretch}.cupon-code-row button{justify-content:center}}
       `}</style>
     </section>
-  )
+  );
 }
