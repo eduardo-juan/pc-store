@@ -80,18 +80,17 @@ export default function SeccionResenas({ productoId }) {
       <div className="pc-review-summary pc-card">
         <div className="pc-review-average">
           <strong>{resumen.promedio.toFixed(1)}</strong>
-          <div className="pc-review-stars">{[1,2,3,4,5].map(n => <Star key={n} size={20} fill={n <= Math.round(resumen.promedio) ? '#d4af37' : 'none'} />)}</div>
           <span>{resumen.total} reseñas</span>
         </div>
         <div className="pc-review-bars">
-          {estrellas.map(n => <div key={n} className="pc-review-bar-row"><span>{n}★</span><div><i style={{ width: `${resumen.total ? (resumen.conteos[n] / resumen.total) * 100 : 0}%` }} /></div><small>{resumen.conteos[n]}</small></div>)}
+          {estrellas.map(n => <div key={n} className="pc-review-bar-row"><span>{n}</span><div><i style={{ width: `${resumen.total ? (resumen.conteos[n] / resumen.total) * 100 : 0}%` }} /></div><small>{resumen.conteos[n]}</small></div>)}
         </div>
       </div>
 
       {usuario && <form className="pc-card pc-review-form" onSubmit={guardar}>
         <h3>{editando ? 'Editar mi reseña' : 'Escribe una reseña'}</h3>
         <div className="pc-star-picker" role="radiogroup" aria-label="Valoración">
-          {[1,2,3,4,5].map(n => <button key={n} type="button" aria-label={`${n} estrellas`} onClick={() => setCalificacion(n)}><Star size={30} fill={n <= calificacion ? '#d4af37' : 'none'} /></button>)}
+          {[1,2,3,4,5].map(n => <button className={n <= calificacion ? 'is-active' : ''} key={n} type="button" aria-label={`${n} estrellas`} aria-pressed={n === calificacion} onClick={() => setCalificacion(n)}><Star size={28} strokeWidth={2.2} fill={n <= calificacion ? 'currentColor' : 'none'} /></button>)}
         </div>
         <textarea className="pc-textarea" rows="4" placeholder="Cuéntanos tu experiencia..." value={comentario} onChange={e => setComentario(e.target.value)} required />
         {mensaje && <div className="pc-message">{mensaje}</div>}
