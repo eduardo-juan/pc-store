@@ -7,6 +7,7 @@ import Navbar from "./components/Layout/Navbar";
 import Footer from "./components/Layout/Footer";
 import GlobalFeedback from "./components/GlobalFeedback";
 import "./responsive.js";
+import "./App.css";
 
 import Inicio from "./pages/Inicio";
 import Tienda from "./pages/Tienda";
