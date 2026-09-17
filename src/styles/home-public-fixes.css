@@ -1,0 +1,25 @@
+@media (min-width: 901px) {
+  .tc-product-layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .tc-product-1,
+  .tc-product-2,
+  .tc-product-3,
+  .tc-product-4,
+  .tc-product-5,
+  .tc-product-6 {
+    grid-column: span 6 !important;
+    min-width: 0;
+  }
+
+  .tc-product-card {
+    width: 100%;
+    min-height: 360px;
+  }
+
+  .tc-product-image {
+    min-height: 230px;
+  }
+}
