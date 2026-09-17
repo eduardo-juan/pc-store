@@ -4,107 +4,44 @@
    Paleta: Dorado / Negro / Gris / Blanco
    ============================================================ */
 
-#root {
-  min-height: 100vh;
-  width: 100%;
-}
+#root { min-height: 100vh; width: 100%; }
+.pc-app { min-height: 100vh; display: flex; flex-direction: column; }
+.pc-app-content { flex: 1; width: 100%; }
+::selection { background: #d4af37; color: #0b0b0b; }
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #eeeeee; }
+::-webkit-scrollbar-thumb { background: #b8941f; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #a67c00; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; }
+button, a, input, select, textarea { transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease; }
+.pc-gold { color: #d4af37; }
+.pc-gold-divider { width: 70px; height: 3px; margin: 12px 0 20px; background: #d4af37; border-radius: 999px; }
 
-.pc-app {
-  min-height: 100vh;
+.pc-global-feedback {
+  position: fixed;
+  top: 82px;
+  right: 20px;
+  z-index: 99999;
+  max-width: min(460px, calc(100vw - 40px));
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+  animation: pc-feedback-in .25s ease-out;
 }
+.pc-global-feedback-error { border-left: 4px solid #dc2626; }
+.pc-global-feedback button { margin-left: auto; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 3px; }
+@keyframes pc-feedback-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
 
-.pc-app-content {
-  flex: 1;
-  width: 100%;
+[aria-invalid="true"], .pc-field-error, .pc-error, .pc-form-error, [data-error] {
+  scroll-margin-top: 110px;
 }
-
-/* ============================================================
-   SELECCIÓN DE TEXTO
-   ============================================================ */
-
-::selection {
-  background: #d4af37;
-  color: #0b0b0b;
-}
-
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
-
-::-webkit-scrollbar {
-  width: 9px;
-}
-
-::-webkit-scrollbar-track {
-  background: #eeeeee;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #b8941f;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a67c00;
-}
-
-/* ============================================================
-   FOCUS
-   ============================================================ */
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #d4af37;
-  outline-offset: 2px;
-}
-
-/* ============================================================
-   TRANSICIONES GENERALES
-   ============================================================ */
-
-button,
-a,
-input,
-select,
-textarea {
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-/* ============================================================
-   TEXTO DORADO
-   ============================================================ */
-
-.pc-gold {
-  color: #d4af37;
-}
-
-/* ============================================================
-   SEPARADOR DORADO
-   ============================================================ */
-
-.pc-gold-divider {
-  width: 70px;
-  height: 3px;
-  margin: 12px 0 20px;
-  background: #d4af37;
-  border-radius: 999px;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 
 @media (max-width: 680px) {
-  #root {
-    width: 100%;
-  }
+  #root { width: 100%; }
+  .pc-global-feedback { top: 70px; right: 12px; left: 12px; max-width: none; }
 }
