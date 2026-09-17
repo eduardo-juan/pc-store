@@ -38,6 +38,7 @@ import HistorialComisionesEmpleado from "./components/Admin/HistorialComisionesE
 import AuditoriaAccesos from "./components/Admin/AuditoriaAccesos";
 import AdminTableTools from "./components/Admin/AdminTableTools";
 import GestionCupones from "./components/Admin/GestionCupones";
+import GestionResenas from "./components/Admin/GestionResenas";
 import Reportes from "./components/Admin/Reportes";
 
 import { useAuth } from "./hooks/useAuth";
@@ -79,6 +80,7 @@ export default function App() {
                 <Route path="/admin/categorias" element={<ProtectedRoute requiereStaff><GestionCategorias /></ProtectedRoute>} />
                 <Route path="/admin/ordenes" element={<ProtectedRoute requiereStaff><GestionOrdenes /></ProtectedRoute>} />
                 <Route path="/admin/cupones" element={<ProtectedRoute requiereAdmin><GestionCupones /></ProtectedRoute>} />
+                <Route path="/admin/resenas" element={<ProtectedRoute requiereAdmin><GestionResenas /></ProtectedRoute>} />
                 <Route path="/admin/empleado/comisiones" element={<ProtectedRoute requiereEmpleado><HistorialComisionesEmpleado /></ProtectedRoute>} />
                 <Route path="/admin/usuarios" element={<ProtectedRoute requiereAdmin><GestionUsuarios /></ProtectedRoute>} />
                 <Route path="/admin/empleados" element={<ProtectedRoute requiereAdmin><GestionEmpleados /></ProtectedRoute>} />
