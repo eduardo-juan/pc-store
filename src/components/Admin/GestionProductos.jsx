@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   obtenerProductos,
   crearProducto,
@@ -51,6 +51,7 @@ export default function GestionProductos() {
   const [urlProveedor, setUrlProveedor] = useState('')
   const [costoProveedor, setCostoProveedor] = useState('')
   const [dropshippingActivo, setDropshippingActivo] = useState(false)
+  const formularioRef = useRef(null)
 
   useEffect(() => { cargarProductos(); cargarCategorias() }, [])
 
@@ -79,6 +80,18 @@ export default function GestionProductos() {
     } else {
       setProveedor(''); setUrlProveedor(''); setCostoProveedor(''); setDropshippingActivo(false)
     }
+  }
+
+  const desplazarAlFormulario = () => {
+    window.requestAnimationFrame(() => {
+      formularioRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  const abrirNuevoProducto = () => {
+    resetFormulario()
+    setMostrarFormulario(true)
+    desplazarAlFormulario()
   }
 
   const handleSubmit = async (e) => {
@@ -182,6 +195,7 @@ export default function GestionProductos() {
     setCategoriaId(producto.categoria_id || '')
     setImagenes([])
     setMostrarFormulario(true)
+    desplazarAlFormulario()
     await cargarProveedor(producto.id)
   }
 
@@ -203,39 +217,30 @@ export default function GestionProductos() {
         <BotonAtras />
         <div className="pc-admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div><h1>Gestión de Productos</h1><p>Administra el catálogo de componentes.</p></div>
-          <button className="pc-btn pc-btn-primary" onClick={() => { resetFormulario(); setMostrarFormulario(true) }} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Plus size={18} />Nuevo Producto</button>
+          <button className="pc-btn pc-btn-primary" onClick={abrirNuevoProducto} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Plus size={18} />Nuevo Producto</button>
         </div>
 
         {error && <div className="pc-card" style={{ padding: 16, marginBottom: 20 }}>{error}</div>}
 
         {mostrarFormulario && (
-          <div className="pc-card" style={{ padding: 22, marginBottom: 24 }}>
+          <div ref={formularioRef} className="pc-card" style={{ padding: 22, marginBottom: 24, scrollMarginTop: 24 }}>
             <h2 style={{ marginBottom: 16 }}>{editandoId ? 'Editar Producto' : 'Nuevo Producto'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="pc-form-grid">
-                <input type="text" placeholder="Nombre del producto" className="pc-input" value={nombre} onChange={(e) => setNombre(limpiarTextoProducto(e.target.value, 100))} required />
-                <input type="text" placeholder="Marca" className="pc-input" value={marca} onChange={(e) => setMarca(limpiarTextoProducto(e.target.value, 60))} />
-                <input type="text" placeholder="Modelo" className="pc-input" value={modelo} onChange={(e) => setModelo(limpiarTextoProducto(e.target.value, 80))} />
-                <select className="pc-select" value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required>
-                  <option value="">Selecciona una categoría</option>
-                  {categorias.map((categoria) => <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>)}
-                </select>
-                <input type="number" placeholder="Precio normal (Lps)" step="0.01" min="0.01" className="pc-input" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
-                <input type="number" placeholder="Precio de oferta (Lps)" step="0.01" min="0.01" className="pc-input" value={precioDescuento} onChange={(e) => setPrecioDescuento(e.target.value)} />
-                <input type="number" placeholder="Stock" min="0" className="pc-input" value={stock} onChange={(e) => setStock(e.target.value)} required />
+                <label>Nombre del producto <span style={{ color: '#dc2626' }}>*</span><input type="text" className="pc-input" value={nombre} onChange={(e) => setNombre(limpiarTextoProducto(e.target.value, 100))} required /></label>
+                <label>Marca<input type="text" className="pc-input" value={marca} onChange={(e) => setMarca(limpiarTextoProducto(e.target.value, 60))} /></label>
+                <label>Modelo<input type="text" className="pc-input" value={modelo} onChange={(e) => setModelo(limpiarTextoProducto(e.target.value, 80))} /></label>
+                <label>Categoría <span style={{ color: '#dc2626' }}>*</span><select className="pc-select" value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required><option value="">Selecciona una categoría</option>{categorias.map((categoria) => <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>)}</select></label>
+                <label>Precio normal (Lps) <span style={{ color: '#dc2626' }}>*</span><input type="number" step="0.01" min="0.01" className="pc-input" value={precio} onChange={(e) => setPrecio(e.target.value)} required /></label>
+                <label>Precio de oferta (Lps)<input type="number" step="0.01" min="0.01" className="pc-input" value={precioDescuento} onChange={(e) => setPrecioDescuento(e.target.value)} /></label>
+                <label>Stock <span style={{ color: '#dc2626' }}>*</span><input type="number" min="0" className="pc-input" value={stock} onChange={(e) => setStock(e.target.value)} required /></label>
               </div>
 
               <div className="pc-card" style={{ marginTop: 18, padding: 18 }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 0 }}><Tag size={18} />Promoción del producto</h3>
                 <p style={{ marginTop: 0 }}>La oferta es independiente de los cupones. Déjalo vacío para vender al precio normal.</p>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <input type="checkbox" checked={Boolean(precioDescuento)} onChange={(e) => { if (!e.target.checked) setPrecioDescuento('') }} />
-                  Oferta activa
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input type="checkbox" checked={destacado} onChange={(e) => setDestacado(e.target.checked)} />
-                  <Star size={17} /> Producto destacado
-                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}><input type="checkbox" checked={Boolean(precioDescuento)} onChange={(e) => { if (!e.target.checked) setPrecioDescuento('') }} />Oferta activa</label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type="checkbox" checked={destacado} onChange={(e) => setDestacado(e.target.checked)} /><Star size={17} />Producto destacado</label>
               </div>
 
               <div style={{ marginTop: 14 }}>
@@ -245,16 +250,16 @@ export default function GestionProductos() {
                 {imagenes.length > 0 && <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>{imagenes.map((archivo, index) => <div key={`${archivo.name}-${index}`} style={{ padding: 10, border: '1px solid #ddd', borderRadius: 8 }}><div style={{ display: 'flex', alignItems: 'center', gap: 7 }}><ImageIcon size={16} />{index + 1}. {archivo.name}</div></div>)}</div>}
               </div>
 
-              <textarea placeholder="Descripción del producto" className="pc-textarea" rows={4} style={{ marginTop: 14, width: '100%' }} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+              <label style={{ display: 'block', marginTop: 14, fontWeight: 600 }}>Descripción <span style={{ color: '#dc2626' }}>*</span><textarea className="pc-textarea" rows={4} style={{ marginTop: 7, width: '100%' }} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required /></label>
 
               {esAdmin && <div className="pc-card" style={{ marginTop: 18, padding: 18 }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 0 }}><Truck size={18} />Dropshipping</h3>
                 <p style={{ marginTop: 0 }}>Información privada del proveedor. Solo los administradores pueden verla.</p>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}><input type="checkbox" checked={dropshippingActivo} onChange={(e) => setDropshippingActivo(e.target.checked)} />Activar dropshipping para este producto</label>
                 {dropshippingActivo && <div className="pc-form-grid">
-                  <input type="text" placeholder="Proveedor" className="pc-input" value={proveedor} onChange={(e) => setProveedor(limpiarTextoProducto(e.target.value, 100))} required />
-                  <input type="url" placeholder="https://proveedor.com/producto" className="pc-input" value={urlProveedor} onChange={(e) => setUrlProveedor(e.target.value)} required />
-                  <input type="number" placeholder="Costo del proveedor (Lps)" step="0.01" min="0" className="pc-input" value={costoProveedor} onChange={(e) => setCostoProveedor(e.target.value)} required />
+                  <label>Proveedor <span style={{ color: '#dc2626' }}>*</span><input type="text" className="pc-input" value={proveedor} onChange={(e) => setProveedor(limpiarTextoProducto(e.target.value, 100))} required /></label>
+                  <label>URL del proveedor <span style={{ color: '#dc2626' }}>*</span><input type="url" className="pc-input" value={urlProveedor} onChange={(e) => setUrlProveedor(e.target.value)} required /></label>
+                  <label>Costo del proveedor (Lps) <span style={{ color: '#dc2626' }}>*</span><input type="number" step="0.01" min="0" className="pc-input" value={costoProveedor} onChange={(e) => setCostoProveedor(e.target.value)} required /></label>
                 </div>}
               </div>}
 
@@ -276,9 +281,7 @@ export default function GestionProductos() {
                 <td>L {Number(producto.precio).toFixed(2)}</td>
                 <td>{tieneOferta ? `L ${Number(producto.precio_descuento).toFixed(2)}` : '—'}</td>
                 <td>{producto.destacado ? 'Sí' : 'No'}</td><td>{producto.stock}</td>
-                <td><button className="pc-btn pc-btn-light" onClick={() => handleEditar(producto)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Pencil size={16} />Editar</button>
-                  {esAdmin && <button className="pc-btn pc-btn-danger" onClick={() => handleEliminar(producto.id)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 8 }}><Trash2 size={16} />Eliminar</button>}
-                </td>
+                <td><button type="button" className="pc-btn pc-btn-light" onClick={() => handleEditar(producto)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Pencil size={16} />Editar</button>{esAdmin && <button type="button" className="pc-btn pc-btn-danger" onClick={() => handleEliminar(producto.id)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 8 }}><Trash2 size={16} />Eliminar</button>}</td>
               </tr>
             })}</tbody>
           </table>
