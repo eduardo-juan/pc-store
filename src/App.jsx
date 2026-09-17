@@ -40,6 +40,7 @@ import HistorialVentas from './components/Admin/HistorialVentas'
 import HistorialComisionesEmpleado from './components/Admin/HistorialComisionesEmpleado'
 import AuditoriaAccesos from './components/Admin/AuditoriaAccesos'
 import AdminTableTools from './components/Admin/AdminTableTools'
+import GestionCupones from './components/Admin/GestionCupones'
 
 import { useAuth } from './hooks/useAuth'
 
@@ -64,16 +65,9 @@ export default function App() {
               <AdminTableTools />
 
               <Routes>
-                {/* Inicio: público o personalizado */}
                 <Route path="/" element={<Inicio />} />
-
-                {/* Tienda pública */}
                 <Route path="/tienda" element={<Tienda />} />
-
-                {/* Detalles públicos: no requiere cuenta */}
                 <Route path="/producto/:id" element={<DetalleProducto />} />
-
-                {/* Carrito público; el checkout sí requiere autenticación */}
                 <Route path="/carrito" element={<Carrito />} />
 
                 <Route path="/login" element={<Login />} />
@@ -81,65 +75,18 @@ export default function App() {
                 <Route path="/recuperar-password" element={<RecuperarPassword />} />
                 <Route path="/restablecer-password" element={<RestablecerPassword />} />
 
-                {/* Para crear una orden, el usuario debe iniciar sesión */}
-                <Route
-                  path="/checkout"
-                  element={
-                    <ProtectedRoute>
-                      <Checkout />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                <Route path="/orden-confirmada/:id" element={<ProtectedRoute><OrdenConfirmada /></ProtectedRoute>} />
+                <Route path="/mis-ordenes" element={<ProtectedRoute><MisOrdenes /></ProtectedRoute>} />
+                <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+                <Route path="/favoritos" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
 
-                <Route
-                  path="/orden-confirmada/:id"
-                  element={
-                    <ProtectedRoute>
-                      <OrdenConfirmada />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/mis-ordenes"
-                  element={
-                    <ProtectedRoute>
-                      <MisOrdenes />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/perfil"
-                  element={
-                    <ProtectedRoute>
-                      <Perfil />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-  path="/favoritos"
-  element={
-    <ProtectedRoute>
-      <Favoritos />
-    </ProtectedRoute>
-  }
-/>
-
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute requiereStaff>
-                      <DashboardStaff />
-                    </ProtectedRoute>
-                  }
-                />
-
+                <Route path="/admin" element={<ProtectedRoute requiereStaff><DashboardStaff /></ProtectedRoute>} />
                 <Route path="/admin/productos" element={<ProtectedRoute requiereStaff><GestionProductos /></ProtectedRoute>} />
                 <Route path="/admin/inventario" element={<ProtectedRoute requiereStaff><GestionInventario /></ProtectedRoute>} />
                 <Route path="/admin/categorias" element={<ProtectedRoute requiereStaff><GestionCategorias /></ProtectedRoute>} />
                 <Route path="/admin/ordenes" element={<ProtectedRoute requiereStaff><GestionOrdenes /></ProtectedRoute>} />
+                <Route path="/admin/cupones" element={<ProtectedRoute requiereAdmin><GestionCupones /></ProtectedRoute>} />
                 <Route path="/admin/empleado/comisiones" element={<ProtectedRoute requiereEmpleado><HistorialComisionesEmpleado /></ProtectedRoute>} />
                 <Route path="/admin/usuarios" element={<ProtectedRoute requiereAdmin><GestionUsuarios /></ProtectedRoute>} />
                 <Route path="/admin/empleados" element={<ProtectedRoute requiereAdmin><GestionEmpleados /></ProtectedRoute>} />
