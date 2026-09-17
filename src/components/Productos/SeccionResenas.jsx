@@ -16,8 +16,8 @@ export default function SeccionResenas({ productoId }) {
 
   async function cargar() {
     const { data, error } = await supabase
-      .from('reseñas')
-      .select('id, producto_id, usuario_id, calificación, comentario, útil_count, created_at, usuarios(nombre, avatar_url)')
+      .from('resenas_publicas')
+      .select('id, producto_id, usuario_id, calificación, comentario, útil_count, created_at, nombre_usuario, avatar_url')
       .eq('producto_id', productoId)
       .order('created_at', { ascending: false })
     if (!error) setResenas(data || [])
@@ -112,12 +112,12 @@ export default function SeccionResenas({ productoId }) {
       <div className="pc-reviews-list-store">
         {resenas.map(r => <article key={r.id} className="pc-card pc-review-store">
           <div className="pc-review-user-store">
-            {r.usuarios?.avatar_url ? (
-              <img className="pc-review-avatar-store" src={r.usuarios.avatar_url} alt={`Perfil de ${r.usuarios?.nombre || 'cliente'}`} />
+            {r.avatar_url ? (
+              <img className="pc-review-avatar-store" src={r.avatar_url} alt={`Perfil de ${r.nombre_usuario || 'cliente'}`} />
             ) : (
-              <div className="pc-review-avatar-store pc-review-avatar-fallback">{(r.usuarios?.nombre || 'C').charAt(0).toUpperCase()}</div>
+              <div className="pc-review-avatar-store pc-review-avatar-fallback">{(r.nombre_usuario || 'C').charAt(0).toUpperCase()}</div>
             )}
-            <div><strong>{r.usuarios?.nombre || 'Cliente'}</strong><span>{new Date(r.created_at).toLocaleDateString()}</span></div>
+            <div><strong>{r.nombre_usuario || 'Cliente'}</strong><span>{new Date(r.created_at).toLocaleDateString()}</span></div>
           </div>
           <div className="pc-review-stars">{[1,2,3,4,5].map(n => <Star key={n} size={18} fill={n <= Number(r.calificación) ? '#d4af37' : 'none'} />)}</div>
           <p className="pc-review-comment-store">{r.comentario}</p>
