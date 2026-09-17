@@ -14,7 +14,12 @@ const obtenerMensajeError = (error) => {
 
 const esElementoDeError = (elemento) => {
   if (!(elemento instanceof HTMLElement)) return false;
-  if (elemento.matches('[aria-invalid="true"], [data-error], .pc-error, .pc-field-error, .pc-form-error')) return true;
+  if (
+    elemento.matches(
+      '[aria-invalid="true"], [data-error], .pc-error, .pc-field-error, .pc-form-error',
+    )
+  )
+    return true;
   return /error|obligatorio|requerido|inválido|invalido|no se pudo|debes completar/i.test(
     elemento.textContent || "",
   );
@@ -23,10 +28,9 @@ const esElementoDeError = (elemento) => {
 const llevarAlError = (elemento) => {
   if (!(elemento instanceof HTMLElement)) return;
 
-  const objetivo =
-    elemento.matches("input, select, textarea, button")
-      ? elemento
-      : elemento.querySelector("input, select, textarea, button") || elemento;
+  const objetivo = elemento.matches("input, select, textarea, button")
+    ? elemento
+    : elemento.querySelector("input, select, textarea, button") || elemento;
 
   objetivo.scrollIntoView({ behavior: "smooth", block: "center" });
 
@@ -53,7 +57,8 @@ export default function GlobalFeedback() {
     const manejarInvalid = (evento) => {
       evento.preventDefault();
       const campo = evento.target;
-      const mensaje = campo.validationMessage || "Completa este campo correctamente.";
+      const mensaje =
+        campo.validationMessage || "Completa este campo correctamente.";
       mostrar("error", mensaje);
       llevarAlError(campo);
     };
@@ -76,7 +81,12 @@ export default function GlobalFeedback() {
     document.addEventListener("invalid", manejarInvalid, true);
 
     const observer = new MutationObserver(escanearErrores);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["aria-invalid", "data-error"] });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-invalid", "data-error"],
+    });
 
     escanearErrores();
 
@@ -92,10 +102,22 @@ export default function GlobalFeedback() {
   if (!aviso) return null;
 
   return (
-    <div className={`pc-global-feedback pc-global-feedback-${aviso.tipo}`} role="alert" aria-live="assertive">
-      {aviso.tipo === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
+    <div
+      className={`pc-global-feedback pc-global-feedback-${aviso.tipo}`}
+      role="alert"
+      aria-live="assertive"
+    >
+      {aviso.tipo === "error" ? (
+        <AlertCircle size={20} />
+      ) : (
+        <CheckCircle2 size={20} />
+      )}
       <span>{aviso.mensaje}</span>
-      <button type="button" onClick={() => setAviso(null)} aria-label="Cerrar aviso">
+      <button
+        type="button"
+        onClick={() => setAviso(null)}
+        aria-label="Cerrar aviso"
+      >
         <X size={18} />
       </button>
     </div>

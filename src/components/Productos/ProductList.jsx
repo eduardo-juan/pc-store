@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../supabaseClient'
-import ProductCard from './ProductCard'
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import ProductCard from "./ProductCard";
 
 export default function ProductList({ categoria = null }) {
-  const [productos, setProductos] = useState([])
-  const [cargando, setCargando] = useState(true)
+  const [productos, setProductos] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    cargarProductos()
-  }, [categoria])
+    cargarProductos();
+  }, [categoria]);
 
   const cargarProductos = async () => {
-    setCargando(true)
-    let query = supabase.from('productos').select('*')
+    setCargando(true);
+    let query = supabase.from("productos").select("*");
 
     if (categoria) {
-      query = query.eq('categoria_id', categoria)
+      query = query.eq("categoria_id", categoria);
     }
 
-    const { data } = await query
-    setProductos(data || [])
-    setCargando(false)
-  }
+    const { data } = await query;
+    setProductos(data || []);
+    setCargando(false);
+  };
 
-  if (cargando) return <div>Cargando...</div>
+  if (cargando) return <div>Cargando...</div>;
 
   return (
     <div className="pc-product-grid">
@@ -31,5 +31,5 @@ export default function ProductList({ categoria = null }) {
         <ProductCard key={p.id} producto={p} />
       ))}
     </div>
-  )
+  );
 }
