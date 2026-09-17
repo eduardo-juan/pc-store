@@ -9,6 +9,7 @@ import GlobalFeedback from "./components/GlobalFeedback";
 import "./responsive.js";
 import "./App.css";
 import "./styles/required-fields.css";
+import "./styles/home-public-fixes.css";
 
 import Inicio from "./pages/Inicio";
 import Tienda from "./pages/Tienda";
