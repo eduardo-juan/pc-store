@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, Tag, Check } from 'lucide-react'
 
 import { supabase } from '../supabaseClient'
 import { useCarrito } from '../context/CarritoContext'
@@ -32,7 +32,6 @@ export default function Checkout() {
     if (!resultado?.valido) { setCuponAplicado(null); return setError(resultado?.mensaje || 'Cupón no válido.') }
     setCuponAplicado(resultado); setError('')
   }
-  const quitarCupon = () => { setCuponAplicado(null); setCupon(''); setError('') }
 
   const finalizarCompra = async (e) => {
     e.preventDefault(); setError('')
@@ -80,8 +79,20 @@ export default function Checkout() {
           <label>Referencia de entrega <span style={{color:'red'}}>*</span><input className="pc-input" type="text" maxLength={150} value={referencia} onChange={(e)=>setReferencia(e.target.value.slice(0,150))} placeholder="Ej. Casa con portón negro" required /></label>
           <label>Notas adicionales<textarea className="pc-textarea" rows="3" maxLength={500} value={notas} onChange={(e)=>setNotas(e.target.value.slice(0,500))} placeholder="Indicaciones adicionales para la entrega" /></label>
           <h2>Envío</h2><div className="pc-card" style={{padding:'16px',marginBottom:'20px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'12px'}}><div><strong>Envío a domicilio</strong><p className="pc-muted" style={{margin:'4px 0 0'}}>Costo fijo de envío</p></div><strong>L {COSTO_ENVIO.toFixed(2)}</strong></div></div>
-          <h2>Cupón de descuento</h2><div style={{display:'flex',gap:'8px',marginBottom:'12px'}}><input className="pc-input" type="text" placeholder="Código de cupón" value={cupon} onChange={(e)=>setCupon(e.target.value.toUpperCase())} disabled={!!cuponAplicado} />{cuponAplicado ? <button type="button" className="pc-btn pc-btn-light" onClick={quitarCupon}>Quitar</button> : <button type="button" className="pc-btn pc-btn-light" disabled={validandoCupon} onClick={validarCupon}>{validandoCupon?'Validando...':'Aplicar'}</button>}</div>
-          {cuponAplicado && <div className="pc-alert" style={{background:'#dcfce7',color:'#166534',marginBottom:'20px'}}>Cupón {cuponAplicado.codigo} aplicado: -L {descuento.toFixed(2)}</div>}
+          <h2>Cupón de descuento</h2>
+          {cuponAplicado ? (
+            <div style={{display:'flex',alignItems:'center',gap:'10px',padding:'12px 14px',marginBottom:'20px',border:'1px solid #bbf7d0',borderRadius:'10px',background:'#f0fdf4',color:'#166534'}}>
+              <Check size={18} />
+              <div><strong>{cuponAplicado.codigo}</strong><div style={{fontSize:'0.9rem'}}>Descuento aplicado: -L {descuento.toFixed(2)}</div></div>
+            </div>
+          ) : (
+            <div style={{display:'flex',gap:'8px',marginBottom:'20px'}}>
+              <input className="pc-input" type="text" placeholder="Código de cupón" value={cupon} onChange={(e)=>setCupon(e.target.value.toUpperCase())} />
+              <button type="button" className="pc-btn pc-btn-light" disabled={validandoCupon} onClick={validarCupon} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:'7px',whiteSpace:'nowrap'}}>
+                <Tag size={17} />{validandoCupon ? 'Validando...' : 'Aplicar descuento'}
+              </button>
+            </div>
+          )}
           <h2>Método de pago</h2><select className="pc-select" value={metodoPago} onChange={(e)=>setMetodoPago(e.target.value)}><option value="transferencia">Transferencia bancaria</option><option value="contra_entrega">Pago contra entrega</option></select>
           {metodoPago==='transferencia' && <label>Referencia de transferencia<input className="pc-input" type="text" maxLength={150} placeholder="Opcional" value={referenciaTransferencia} onChange={(e)=>setReferenciaTransferencia(e.target.value.slice(0,150))} /></label>}
           {error && <div className="pc-alert pc-alert-error">{error}</div>}
