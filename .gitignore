@@ -3,4 +3,7 @@ node_modules
 dist
 .env
 .env.local
-.env.*.local
+.env.*.local.git-backup/
+
+.git-backup/
+pc-store-cambios.patch

@@ -70,27 +70,166 @@ export default function App() {
                 <Route path="/carrito" element={<Carrito />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/recuperar-password" element={<RecuperarPassword />} />
-                <Route path="/restablecer-password" element={<RestablecerPassword />} />
-                <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                <Route path="/orden-confirmada/:id" element={<ProtectedRoute><OrdenConfirmada /></ProtectedRoute>} />
-                <Route path="/mis-ordenes" element={<ProtectedRoute><MisOrdenes /></ProtectedRoute>} />
-                <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
-                <Route path="/favoritos" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute requiereStaff><DashboardStaff /></ProtectedRoute>} />
-                <Route path="/admin/productos" element={<ProtectedRoute requiereStaff><GestionProductos /></ProtectedRoute>} />
-                <Route path="/admin/inventario" element={<ProtectedRoute requiereStaff><GestionInventario /></ProtectedRoute>} />
-                <Route path="/admin/categorias" element={<ProtectedRoute requiereStaff><GestionCategorias /></ProtectedRoute>} />
-                <Route path="/admin/ordenes" element={<ProtectedRoute requiereStaff><GestionOrdenes /></ProtectedRoute>} />
-                <Route path="/admin/cupones" element={<ProtectedRoute requiereAdmin><GestionCupones /></ProtectedRoute>} />
-                <Route path="/admin/resenas" element={<ProtectedRoute requiereAdmin><GestionResenas /></ProtectedRoute>} />
-                <Route path="/admin/empleado/comisiones" element={<ProtectedRoute requiereEmpleado><HistorialComisionesEmpleado /></ProtectedRoute>} />
-                <Route path="/admin/usuarios" element={<ProtectedRoute requiereAdmin><GestionUsuarios /></ProtectedRoute>} />
-                <Route path="/admin/empleados" element={<ProtectedRoute requiereAdmin><GestionEmpleados /></ProtectedRoute>} />
-                <Route path="/admin/empleados/nuevo" element={<ProtectedRoute requiereAdmin><RegistroEmpleado /></ProtectedRoute>} />
-                <Route path="/admin/ventas" element={<ProtectedRoute requiereAdmin><HistorialVentas /></ProtectedRoute>} />
-                <Route path="/admin/reportes" element={<ProtectedRoute requiereAdmin><Reportes /></ProtectedRoute>} />
-                <Route path="/admin/auditoria" element={<ProtectedRoute requiereAdmin><AuditoriaAccesos /></ProtectedRoute>} />
+                <Route
+                  path="/recuperar-password"
+                  element={<RecuperarPassword />}
+                />
+                <Route
+                  path="/restablecer-password"
+                  element={<RestablecerPassword />}
+                />
+                <Route
+                  path="/checkout"
+                  element={
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orden-confirmada/:id"
+                  element={
+                    <ProtectedRoute>
+                      <OrdenConfirmada />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/mis-ordenes"
+                  element={
+                    <ProtectedRoute>
+                      <MisOrdenes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/perfil"
+                  element={
+                    <ProtectedRoute>
+                      <Perfil />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/favoritos"
+                  element={
+                    <ProtectedRoute>
+                      <Favoritos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute requiereStaff>
+                      <DashboardStaff />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/productos"
+                  element={
+                    <ProtectedRoute requiereStaff>
+                      <GestionProductos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/inventario"
+                  element={
+                    <ProtectedRoute requiereStaff>
+                      <GestionInventario />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/categorias"
+                  element={
+                    <ProtectedRoute requiereStaff>
+                      <GestionCategorias />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/ordenes"
+                  element={
+                    <ProtectedRoute requiereStaff>
+                      <GestionOrdenes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/cupones"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <GestionCupones />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/resenas"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <GestionResenas />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/empleado/comisiones"
+                  element={
+                    <ProtectedRoute requiereEmpleado>
+                      <HistorialComisionesEmpleado />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/usuarios"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <GestionUsuarios />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/empleados"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <GestionEmpleados />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/empleados/nuevo"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <RegistroEmpleado />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/ventas"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <HistorialVentas />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/reportes"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <Reportes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/auditoria"
+                  element={
+                    <ProtectedRoute requiereAdmin>
+                      <AuditoriaAccesos />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>

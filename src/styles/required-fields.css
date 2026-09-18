@@ -1,9 +1,19 @@
-.pc-required-mark,
-.pc-field-required,
-label .required,
-label .obligatorio,
-label [data-required="true"] {
-  color: #dc2626 !important;
-  font-weight: 700;
-  margin-left: 3px;
+/* Estilos para campos obligatorios */
+
+.required-field::after {
+  content: " *";
+  color: #dc2626;
+}
+
+input:required:invalid,
+select:required:invalid,
+textarea:required:invalid {
+  border-color: #d1d5db;
+}
+
+input:required:focus,
+select:required:focus,
+textarea:required:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
 }
