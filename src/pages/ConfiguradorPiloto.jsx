@@ -5,11 +5,13 @@ import {
   analizarCompatibilidadPiloto,
   nombreComponente,
   obtenerOpciones,
+  obtenerResumenPiloto,
 } from '../services/configuradorPilotService'
 
 export default function ConfiguradorPiloto() {
   const [seleccionados, setSeleccionados] = useState({})
   const resultado = useMemo(() => analizarCompatibilidadPiloto(seleccionados), [seleccionados])
+  const resumen = useMemo(() => obtenerResumenPiloto(seleccionados), [seleccionados])
 
   function seleccionar(tipo, id) {
     const opciones = obtenerOpciones(tipo, seleccionados)
@@ -65,11 +67,7 @@ export default function ConfiguradorPiloto() {
                 >
                   <option value=''>Seleccionar {label.toLowerCase()}</option>
                   {opciones.map(({ item, bloqueada }) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                      disabled={bloqueada}
-                    >
+                    <option key={item.id} value={item.id} disabled={bloqueada}>
                       {nombreComponente(item)}{bloqueada ? ' — incompatible' : ''}
                     </option>
                   ))}
@@ -83,20 +81,47 @@ export default function ConfiguradorPiloto() {
         </div>
 
         <aside className='pc-card' style={{ position: 'sticky', top: 20 }}>
-          <h2 style={{ marginTop: 0 }}>Análisis</h2>
-          <p>Componentes: {Object.keys(seleccionados).length}/{TIPOS_PILOTO.length}</p>
+          <h2 style={{ marginTop: 0 }}>Resumen de configuración</h2>
+          <p><strong>Componentes:</strong> {resumen.totalComponentes}/{resumen.totalComponentesDisponibles}</p>
           <p>
-            Estado:{' '}
-            <strong style={{ color: resultado.errores.length ? '#991b1b' : '#166534' }}>
+            <strong>Estado:</strong>{' '}
+            <span style={{ color: resultado.errores.length ? '#991b1b' : '#166534' }}>
               {resultado.errores.length ? 'Incompatible' : 'Sin bloqueo'}
-            </strong>
+            </span>
           </p>
+
+          {resumen.componentes.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              {resumen.componentes.map((componente) => (
+                <div key={componente.tipo} style={{ padding: 8, borderBottom: '1px solid #e2e8f0', fontSize: 13 }}>
+                  <strong>{componente.etiqueta}:</strong> {componente.nombre}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ padding: 12, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 16 }}>
+            <strong>Consumo y fuente</strong>
+            <p style={{ margin: '8px 0 4px' }}>Consumo estimado: <strong>{resumen.consumoEstimado} W</strong></p>
+            <p style={{ margin: '4px 0' }}>PSU recomendada: <strong>{resumen.psuRecomendada} W</strong></p>
+            {resumen.psuSeleccionada != null && (
+              <p style={{ margin: '4px 0' }}>
+                PSU seleccionada: <strong>{resumen.psuSeleccionada} W</strong>
+                {' · '}
+                {resumen.margenPsuW >= 0 ? 'margen disponible' : 'por debajo de la recomendación'}
+              </p>
+            )}
+          </div>
+
+          {resumen.ramGb != null && <p><strong>RAM:</strong> {resumen.ramGb} GB</p>}
+          {resumen.almacenamientoGb != null && <p><strong>Almacenamiento:</strong> {resumen.almacenamientoGb} GB</p>}
 
           <button type='button' className='pc-btn' onClick={() => setSeleccionados({})} style={{ width: '100%' }}>
             Limpiar configuración
           </button>
 
           <div style={{ marginTop: 20 }}>
+            <h3>Relaciones verificadas</h3>
             {resultado.detalles.map((detalle, index) => (
               <div key={index} style={{ padding: 10, marginBottom: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                 <strong>{detalle.relacion}</strong>
