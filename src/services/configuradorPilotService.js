@@ -169,6 +169,37 @@ export function obtenerOpciones(tipo, configuracion = {}) {
   }))
 }
 
+export function obtenerResumenPiloto(configuracion = {}) {
+  const componentes = TIPOS_PILOTO
+    .filter(({ key }) => configuracion[key])
+    .map(({ key, label }) => ({
+      tipo: key,
+      etiqueta: label,
+      nombre: nombreComponente(configuracion[key]),
+    }))
+
+  const cpuW = numero(configuracion.cpu?.tdp_w ?? configuracion.cpu?.consumo_w)
+  const gpuW = numero(configuracion.gpu?.tgp_w ?? configuracion.gpu?.consumo_max_w ?? configuracion.gpu?.consumo_w)
+  const consumoComponentes = (cpuW ?? 0) + (gpuW ?? 0)
+  const consumoEstimado = consumoComponentes + 150
+  const psuRecomendada = Math.ceil(consumoEstimado * 1.2)
+  const psuSeleccionada = numero(configuracion.psu?.wattage_w ?? configuracion.psu?.capacidad_w)
+
+  return {
+    componentes,
+    totalComponentes: componentes.length,
+    totalComponentesDisponibles: TIPOS_PILOTO.length,
+    consumoCpuW: cpuW,
+    consumoGpuW: gpuW,
+    consumoEstimado,
+    psuRecomendada,
+    psuSeleccionada,
+    margenPsuW: psuSeleccionada != null ? psuSeleccionada - psuRecomendada : null,
+    ramGb: numero(configuracion.ram?.capacity_gb),
+    almacenamientoGb: numero(configuracion.storage?.capacity_gb),
+  }
+}
+
 export function nombreComponente(item) {
   return item ? ([item.marca, item.modelo].filter(Boolean).join(' ') || item.id) : 'Componente'
 }
