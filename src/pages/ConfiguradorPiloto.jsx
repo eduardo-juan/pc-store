@@ -27,7 +27,7 @@ export default function ConfiguradorPiloto() {
   }
 
   return (
-    <main className='pc-page' style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px' }}>
+    <main className='pc-page pc-pilot-page'>
       <BotonAtras />
 
       <section className='pc-card' style={{ marginBottom: 24 }}>
@@ -52,8 +52,8 @@ export default function ConfiguradorPiloto() {
         </section>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 24, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <section className='pc-pilot-layout'>
+        <div className='pc-pilot-options'>
           {TIPOS_PILOTO.map(({ key, label }) => {
             const opciones = obtenerOpciones(key, seleccionados)
 
@@ -80,7 +80,7 @@ export default function ConfiguradorPiloto() {
           })}
         </div>
 
-        <aside className='pc-card' style={{ position: 'sticky', top: 20 }}>
+        <aside className='pc-card pc-pilot-summary'>
           <h2 style={{ marginTop: 0 }}>Resumen de configuración</h2>
           <p><strong>Componentes:</strong> {resumen.totalComponentes}/{resumen.totalComponentesDisponibles}</p>
           <p>
