@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 import ProductCard from "./ProductCard";
 
 export default function ProductList({ categoria = null }) {

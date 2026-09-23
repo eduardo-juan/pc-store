@@ -1,0 +1,217 @@
+/* =========================================================
+   CONFIGURADOR — PILOTO
+   Estilo visual sin tocar la lógica de compatibilidad.
+========================================================= */
+
+.configurador-page {
+  max-width: 1440px !important;
+  padding: 28px 24px 64px !important;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(212,175,55,.10), transparent 34%),
+    #f4f5f7 !important;
+}
+
+.configurador-page .pc-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15,23,42,.06);
+}
+
+.configurador-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 30px !important;
+  background: linear-gradient(135deg, #111 0%, #1c1c1c 100%) !important;
+  border-color: #292929 !important;
+  color: #fff;
+}
+
+.configurador-hero::after {
+  content: '';
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  right: -90px;
+  top: -120px;
+  border-radius: 50%;
+  background: rgba(212,175,55,.13);
+}
+
+.configurador-hero h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px !important;
+  font-size: clamp(28px, 4vw, 40px) !important;
+  line-height: 1.08;
+  letter-spacing: -.025em;
+}
+
+.configurador-hero p {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+
+.configurador-hero > div:last-child {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px !important;
+  border: 1px solid rgba(212,175,55,.32) !important;
+  background: rgba(212,175,55,.09) !important;
+  color: #f7e7a9 !important;
+}
+
+.configurador-analysis {
+  padding: 26px !important;
+}
+
+.configurador-analysis h2,
+.configurador-component-card h2,
+.configurador-summary h2 {
+  color: #111827;
+  letter-spacing: -.015em;
+}
+
+.configurador-analysis article {
+  min-width: 0;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.configurador-analysis article:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15,23,42,.06);
+}
+
+.configurador-analysis article > div:first-child {
+  align-items: center !important;
+}
+
+.configurador-analysis article span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.65);
+}
+
+.configurador-analysis article > div:not(:first-child) > div {
+  box-shadow: 0 2px 7px rgba(15,23,42,.04);
+}
+
+.configurador-workspace {
+  grid-template-columns: minmax(0, 1fr) 360px !important;
+  gap: 26px !important;
+}
+
+.configurador-componentes {
+  gap: 14px !important;
+}
+
+.configurador-component-card {
+  padding: 22px !important;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.configurador-component-card:hover {
+  border-color: #d7bd63;
+  box-shadow: 0 12px 28px rgba(15,23,42,.07);
+}
+
+.configurador-component-card > div:first-child {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.configurador-component-card select {
+  min-height: 48px;
+  padding: 12px 42px 12px 14px !important;
+  border: 1px solid #d7dce2 !important;
+  border-radius: 12px !important;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+.configurador-component-card select:hover {
+  border-color: #c5a632 !important;
+}
+
+.configurador-component-card select:focus {
+  border-color: #c5a632 !important;
+  box-shadow: 0 0 0 3px rgba(212,175,55,.14);
+}
+
+.configurador-component-card img {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(15,23,42,.05);
+}
+
+.configurador-summary {
+  padding: 24px !important;
+  border-color: #d9c27a !important;
+  background: #fff !important;
+  box-shadow: 0 14px 35px rgba(15,23,42,.09) !important;
+}
+
+.configurador-summary::before {
+  content: 'TU CONFIGURACIÓN';
+  display: block;
+  margin: -24px -24px 22px;
+  padding: 10px 24px;
+  border-radius: 18px 18px 0 0;
+  background: #111;
+  color: #f7e7a9;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.configurador-summary hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 4px 0;
+}
+
+.configurador-summary .pc-btn-primary {
+  min-height: 50px;
+  border-radius: 13px;
+  font-size: 14px;
+}
+
+@media (max-width: 980px) {
+  .configurador-workspace {
+    grid-template-columns: 1fr !important;
+  }
+
+  .configurador-summary {
+    position: static !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .configurador-page {
+    padding: 18px 12px 42px !important;
+  }
+
+  .configurador-hero,
+  .configurador-analysis,
+  .configurador-component-card,
+  .configurador-summary {
+    padding: 18px !important;
+  }
+
+  .configurador-summary::before {
+    margin: -18px -18px 18px;
+    padding: 9px 18px;
+  }
+
+  .configurador-analysis > div:first-child {
+    align-items: flex-start !important;
+  }
+
+  .configurador-analysis article {
+    padding: 14px !important;
+  }
+}

@@ -66,6 +66,9 @@ export default function GestionProductos() {
   const [stock, setStock] = useState("");
   const [marca, setMarca] = useState("");
   const [modelo, setModelo] = useState("");
+  const [codigoBarras, setCodigoBarras] = useState("");
+  const [buscandoDatosExternos, setBuscandoDatosExternos] = useState(false);
+  const [datosExternos, setDatosExternos] = useState(null);
   const [categoriaId, setCategoriaId] = useState("");
   const [imagenes, setImagenes] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
@@ -124,6 +127,61 @@ export default function GestionProductos() {
     setMostrarFormulario(true);
     desplazarAlFormulario();
   };
+
+  const buscarDatosExternos = async () => {
+    const codigo = codigoBarras.trim();
+    if (!codigo) {
+      setError("Introduce un UPC, EAN o GTIN para buscar.");
+      return;
+    }
+
+    try {
+      setBuscandoDatosExternos(true);
+      setError("");
+      const respuesta = await fetch(
+        `https://api.upcitemdb.com/prod/trial/lookup?upc=${encodeURIComponent(codigo)}`,
+        { headers: { Accept: "application/json" } },
+      );
+
+      const datos = await respuesta.json();
+      if (!respuesta.ok || datos?.code !== "OK" || !datos?.items?.length) {
+        throw new Error(
+          datos?.message || "No encontramos información para ese código.",
+        );
+      }
+
+      const item = datos.items[0];
+      setDatosExternos(item);
+    } catch (err) {
+      setDatosExternos(null);
+      setError(err.message || "No se pudo consultar la fuente externa.");
+    } finally {
+      setBuscandoDatosExternos(false);
+    }
+  };
+
+  const aplicarDatosExternos = () => {
+    if (!datosExternos) return;
+    if (datosExternos.title && !nombre.trim())
+      setNombre(limpiarTextoProducto(datosExternos.title, 100));
+    if (datosExternos.brand && !marca.trim())
+      setMarca(limpiarTextoProducto(datosExternos.brand, 60));
+
+    const actual = {};
+    if (codigoBarras.trim()) actual.codigo_barras = codigoBarras.trim();
+    if (datosExternos.ean) actual.ean = datosExternos.ean;
+    if (datosExternos.upc) actual.upc = datosExternos.upc;
+    if (datosExternos.gtin) actual.gtin = datosExternos.gtin;
+    if (datosExternos.title) actual.fuente_externa_titulo = datosExternos.title;
+    if (datosExternos.brand) actual.fuente_externa_marca = datosExternos.brand;
+    if (Array.isArray(datosExternos.images) && datosExternos.images.length)
+      actual.fuente_externa_imagenes = datosExternos.images;
+
+    setEspecificacionesExternas(actual);
+    setDatosExternos(null);
+  };
+
+  const [especificacionesExternas, setEspecificacionesExternas] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,6 +244,7 @@ export default function GestionProductos() {
         stock: parseInt(stock),
         marca,
         modelo,
+        especificaciones: especificacionesExternas,
         categoria_id: Number(categoriaId),
         ...(imagenPrincipal && { imagen_principal: imagenPrincipal }),
         ...(imagenesAdicionales && {
@@ -257,6 +316,9 @@ export default function GestionProductos() {
     setStock("");
     setMarca("");
     setModelo("");
+    setCodigoBarras("");
+    setDatosExternos(null);
+    setEspecificacionesExternas({});
     setCategoriaId("");
     setImagenes([]);
     setEditandoId(null);
@@ -277,6 +339,8 @@ export default function GestionProductos() {
     setStock(producto.stock ?? "");
     setMarca(producto.marca || "");
     setModelo(producto.modelo || "");
+    setCodigoBarras(producto.especificaciones?.codigo_barras || producto.especificaciones?.ean || producto.especificaciones?.upc || "");
+    setEspecificacionesExternas(producto.especificaciones || {});
     setCategoriaId(producto.categoria_id || "");
     setImagenes([]);
     setMostrarFormulario(true);
@@ -390,6 +454,29 @@ export default function GestionProductos() {
                   />
                 </label>
                 <label>
+                  UPC / EAN / GTIN
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="pc-input"
+                    value={codigoBarras}
+                    onChange={(e) => setCodigoBarras(e.target.value.replace(/\D/g, "").slice(0, 14))}
+                    placeholder="Código de barras"
+                  />
+                </label>
+                <label style={{ display: "flex", alignItems: "end" }}>
+                  <button
+                    type="button"
+                    className="pc-btn pc-btn-secondary"
+                    onClick={buscarDatosExternos}
+                    disabled={buscandoDatosExternos || !codigoBarras.trim()}
+                    style={{ width: "100%" }}
+                  >
+                    {buscandoDatosExternos ? "Buscando..." : "Buscar datos externos"}
+                  </button>
+                </label>
+
+                <label>
                   Categoría <span style={{ color: "#dc2626" }}>*</span>
                   <select
                     className="pc-select"
@@ -441,6 +528,31 @@ export default function GestionProductos() {
                   />
                 </label>
               </div>
+
+              {datosExternos && (
+                <div className="pc-card" style={{ marginTop: 18, padding: 18 }}>
+                  <h3 style={{ marginTop: 0 }}>Datos encontrados</h3>
+                  <p style={{ marginTop: 0 }}>Revisa la información antes de aplicarla al producto.</p>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <strong>{datosExternos.title || "Sin nombre"}</strong>
+                    {datosExternos.brand && <span>Marca: {datosExternos.brand}</span>}
+                    {datosExternos.ean && <span>EAN: {datosExternos.ean}</span>}
+                    {datosExternos.upc && <span>UPC: {datosExternos.upc}</span>}
+                    {datosExternos.gtin && <span>GTIN: {datosExternos.gtin}</span>}
+                    {Array.isArray(datosExternos.images) && datosExternos.images.length > 0 && (
+                      <span>Imágenes encontradas: {datosExternos.images.length}</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="pc-btn pc-btn-primary"
+                    onClick={aplicarDatosExternos}
+                    style={{ marginTop: 12 }}
+                  >
+                    Aplicar datos encontrados
+                  </button>
+                </div>
+              )}
 
               <div className="pc-card" style={{ marginTop: 18, padding: 18 }}>
                 <h3

@@ -4,196 +4,288 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react'
+} from "react";
 
-const CarritoContext = createContext(null)
+const CarritoContext = createContext(null);
 
-const CLAVE_STORAGE = 'pc-store-carrito'
+const CLAVE_STORAGE = "pc-store-carrito";
+const COSTO_ARMADO_PC = 1500;
 
 export function CarritoProvider({ children }) {
-
-  // Cargar carrito al iniciar.
   const [items, setItems] = useState(() => {
     try {
-      const guardado = localStorage.getItem(CLAVE_STORAGE)
-      return guardado ? JSON.parse(guardado) : []
+      const guardado = localStorage.getItem(CLAVE_STORAGE);
+      return guardado ? JSON.parse(guardado) : [];
     } catch {
-      return []
+      return [];
     }
-  })
+  });
 
-
-  // Guardar cada cambio.
   useEffect(() => {
-    localStorage.setItem(
-      CLAVE_STORAGE,
-      JSON.stringify(items)
-    )
-  }, [items])
-
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items));
+  }, [items]);
 
   const agregarProducto = (producto, cantidad = 1) => {
-
     if (!producto || producto.stock <= 0) {
       return {
         success: false,
-        message: 'Producto sin stock',
-      }
+        message: "Producto sin stock",
+      };
+    }
+
+    const cantidadNumero = Number(cantidad);
+
+    if (cantidadNumero <= 0) {
+      return {
+        success: false,
+        message: "Cantidad inválida",
+      };
     }
 
     const precio = Number(
-      producto.precio_descuento || producto.precio
-    )
+      producto.precio_descuento ||
+        producto.precio ||
+        0
+    );
 
     let resultado = {
       success: true,
-      message: 'Producto agregado al carrito',
-    }
-
+      message: "Producto agregado al carrito",
+    };
 
     setItems((actuales) => {
-
       const existente = actuales.find(
-        (item) => item.producto_id === producto.id
-      )
+        (item) =>
+          item.tipo === "producto" &&
+          item.producto_id === producto.id
+      );
 
       if (existente) {
-
         const nuevaCantidad =
-          existente.cantidad + cantidad
+          existente.cantidad + cantidadNumero;
 
         if (nuevaCantidad > producto.stock) {
           resultado = {
             success: false,
-            message: 'No hay suficiente stock',
-          }
+            message: "No hay suficiente stock",
+          };
 
-          return actuales
+          return actuales;
         }
 
-
         return actuales.map((item) =>
-          item.producto_id === producto.id
+          item === existente
             ? {
                 ...item,
                 cantidad: nuevaCantidad,
                 stock: producto.stock,
               }
             : item
-        )
+        );
       }
-
 
       return [
         ...actuales,
         {
+          tipo: "producto",
           producto_id: producto.id,
           nombre: producto.nombre,
           imagen_principal: producto.imagen_principal,
           precio,
-          cantidad,
+          cantidad: cantidadNumero,
           stock: producto.stock,
         },
-      ]
-    })
+      ];
+    });
 
+    return resultado;
+  };
 
-    return resultado
-  }
+  const agregarConfiguracion = (seleccionados) => {
+    const componentes = Object.values(
+      seleccionados || {}
+    ).filter(
+      (componente) => componente?.producto
+    );
 
+    if (componentes.length === 0) {
+      return {
+        success: false,
+        message: "Selecciona al menos un componente",
+      };
+    }
 
-  const cambiarCantidad = (productoId, cantidad) => {
+    const sinStock = componentes.find(
+      (componente) =>
+        Number(componente.producto.stock) <= 0
+    );
 
-    const cantidadNumero = Number(cantidad)
+    if (sinStock) {
+      return {
+        success: false,
+        message: `Sin stock: ${sinStock.producto.nombre}`,
+      };
+    }
+
+    const productos = componentes.map(
+      (componente) => componente.producto
+    );
+
+    const precioComponentes = productos.reduce(
+      (total, producto) =>
+        total +
+        Number(
+          producto.precio_descuento ||
+            producto.precio ||
+            0
+        ),
+      0
+    );
+
+    const configuracion = {
+      tipo: "configurador",
+      configuracion_id: crypto.randomUUID(),
+      nombre: "PC Configurada",
+      imagen_principal:
+        productos.find(
+          (producto) => producto.imagen_principal
+        )?.imagen_principal || null,
+      componentes: productos.map((producto) => ({
+        producto_id: producto.id,
+        nombre: producto.nombre,
+        precio: Number(
+          producto.precio_descuento ||
+            producto.precio ||
+            0
+        ),
+        stock: producto.stock,
+        cantidad: 1,
+      })),
+      precio_componentes: precioComponentes,
+      costo_armado: COSTO_ARMADO_PC,
+      precio:
+        precioComponentes + COSTO_ARMADO_PC,
+      cantidad: 1,
+    };
+
+    setItems((actuales) => [
+      ...actuales,
+      configuracion,
+    ]);
+
+    return {
+      success: true,
+      message:
+        "PC configurada agregada al carrito",
+    };
+  };
+
+  const cambiarCantidad = (
+    identificador,
+    cantidad
+  ) => {
+    const cantidadNumero = Number(cantidad);
 
     if (cantidadNumero <= 0) {
-      eliminarProducto(productoId)
-      return
+      eliminarProducto(identificador);
+      return;
     }
 
     setItems((actuales) =>
       actuales.map((item) => {
+        const id =
+          item.tipo === "configurador"
+            ? item.configuracion_id
+            : item.producto_id;
 
-        if (item.producto_id !== productoId) {
-          return item
+        if (id !== identificador) {
+          return item;
         }
 
-        const cantidadFinal = Math.min(
-          cantidadNumero,
-          item.stock
-        )
+        if (item.tipo === "configurador") {
+          return {
+            ...item,
+            cantidad: cantidadNumero,
+          };
+        }
 
         return {
           ...item,
-          cantidad: cantidadFinal,
-        }
+          cantidad: Math.min(
+            cantidadNumero,
+            item.stock
+          ),
+        };
       })
-    )
-  }
+    );
+  };
 
-
-  const eliminarProducto = (productoId) => {
+  const eliminarProducto = (identificador) => {
     setItems((actuales) =>
-      actuales.filter(
-        (item) => item.producto_id !== productoId
-      )
-    )
-  }
+      actuales.filter((item) => {
+        const id =
+          item.tipo === "configurador"
+            ? item.configuracion_id
+            : item.producto_id;
 
+        return id !== identificador;
+      })
+    );
+  };
 
   const vaciarCarrito = () => {
-    setItems([])
-  }
-
+    setItems([]);
+  };
 
   const cantidadTotal = useMemo(
     () =>
       items.reduce(
-        (total, item) => total + item.cantidad,
+        (total, item) =>
+          total + Number(item.cantidad || 0),
         0
       ),
     [items]
-  )
-
+  );
 
   const subtotal = useMemo(
     () =>
       items.reduce(
         (total, item) =>
-          total + item.precio * item.cantidad,
+          total +
+          Number(item.precio || 0) *
+            Number(item.cantidad || 0),
         0
       ),
     [items]
-  )
-
+  );
 
   return (
     <CarritoContext.Provider
       value={{
         items,
         agregarProducto,
+        agregarConfiguracion,
         cambiarCantidad,
         eliminarProducto,
         vaciarCarrito,
         cantidadTotal,
         subtotal,
+        COSTO_ARMADO_PC,
       }}
     >
       {children}
     </CarritoContext.Provider>
-  )
+  );
 }
 
-
 export function useCarrito() {
-
-  const context = useContext(CarritoContext)
+  const context = useContext(CarritoContext);
 
   if (!context) {
     throw new Error(
-      'useCarrito debe usarse dentro de CarritoProvider'
-    )
+      "useCarrito debe usarse dentro de CarritoProvider"
+    );
   }
 
-  return context
+  return context;
 }

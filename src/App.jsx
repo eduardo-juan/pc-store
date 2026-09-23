@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Navbar from "./components/Layout/Navbar";
 import Footer from "./components/Layout/Footer";
 import GlobalFeedback from "./components/GlobalFeedback";
+
 import "./responsive.js";
 import "./App.css";
 import "./styles/required-fields.css";
@@ -13,8 +14,10 @@ import "./styles/home-public-fixes.css";
 
 import Inicio from "./pages/Inicio";
 import Tienda from "./pages/Tienda";
+import Configurador from "./pages/Configurador";
 import Checkout from "./pages/Checkout";
 import MisOrdenes from "./pages/MisOrdenes";
+import DetalleOrden from "./pages/DetalleOrden";
 import Perfil from "./pages/Perfil";
 import Favoritos from "./pages/Favoritos";
 import OrdenConfirmada from "./pages/OrdenConfirmada";
@@ -24,6 +27,7 @@ import Login from "./components/Auth/Login";
 import Registro from "./components/Auth/Registro";
 import RecuperarPassword from "./components/Auth/RecuperarPassword";
 import RestablecerPassword from "./components/Auth/RestablecerPassword";
+
 import Carrito from "./components/Productos/Carrito";
 import DetalleProducto from "./components/Productos/DetalleProducto";
 
@@ -48,8 +52,10 @@ import { useAuth } from "./hooks/useAuth";
 
 function DashboardStaff() {
   const { esAdmin, esEmpleado } = useAuth();
+
   if (esAdmin) return <AdminDashboard />;
   if (esEmpleado) return <EmpleadoDashboard />;
+
   return null;
 }
 
@@ -60,24 +66,55 @@ export default function App() {
         <CarritoProvider>
           <div className="pc-app">
             <Navbar />
+
             <GlobalFeedback />
+
             <div className="pc-app-content">
               <AdminTableTools />
+
               <Routes>
                 <Route path="/" element={<Inicio />} />
-                <Route path="/tienda" element={<Tienda />} />
-                <Route path="/producto/:id" element={<DetalleProducto />} />
-                <Route path="/carrito" element={<Carrito />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/registro" element={<Registro />} />
+
+                <Route
+                  path="/tienda"
+                  element={<Tienda />}
+                />
+
+                <Route
+                  path="/configurador"
+                  element={<Configurador />}
+                />
+
+                <Route
+                  path="/producto/:id"
+                  element={<DetalleProducto />}
+                />
+
+                <Route
+                  path="/carrito"
+                  element={<Carrito />}
+                />
+
+                <Route
+                  path="/login"
+                  element={<Login />}
+                />
+
+                <Route
+                  path="/registro"
+                  element={<Registro />}
+                />
+
                 <Route
                   path="/recuperar-password"
                   element={<RecuperarPassword />}
                 />
+
                 <Route
                   path="/restablecer-password"
                   element={<RestablecerPassword />}
                 />
+
                 <Route
                   path="/checkout"
                   element={
@@ -86,6 +123,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/orden-confirmada/:id"
                   element={
@@ -94,6 +132,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/mis-ordenes"
                   element={
@@ -102,6 +141,16 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
+                <Route
+                  path="/mis-ordenes/:ordenId"
+                  element={
+                    <ProtectedRoute>
+                      <DetalleOrden />
+                    </ProtectedRoute>
+                  }
+                />
+
                 <Route
                   path="/perfil"
                   element={
@@ -110,6 +159,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/favoritos"
                   element={
@@ -118,6 +168,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin"
                   element={
@@ -126,6 +177,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/productos"
                   element={
@@ -134,6 +186,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/inventario"
                   element={
@@ -142,6 +195,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/categorias"
                   element={
@@ -150,6 +204,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/ordenes"
                   element={
@@ -158,6 +213,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/cupones"
                   element={
@@ -166,6 +222,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/resenas"
                   element={
@@ -174,6 +231,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/empleado/comisiones"
                   element={
@@ -182,6 +240,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/usuarios"
                   element={
@@ -190,6 +249,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/empleados"
                   element={
@@ -198,6 +258,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/empleados/nuevo"
                   element={
@@ -206,6 +267,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/ventas"
                   element={
@@ -214,6 +276,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/reportes"
                   element={
@@ -222,6 +285,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/auditoria"
                   element={
@@ -230,9 +294,14 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="*" element={<NotFound />} />
+
+                <Route
+                  path="*"
+                  element={<NotFound />}
+                />
               </Routes>
             </div>
+
             <Footer />
           </div>
         </CarritoProvider>

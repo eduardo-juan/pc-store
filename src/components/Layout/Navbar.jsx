@@ -1,13 +1,13 @@
-import { Link } from 'react-router-dom'
-import { Monitor, ShoppingCart } from 'lucide-react'
-import { useAuth } from '../../hooks/useAuth'
-import { useCarrito } from '../../context/CarritoContext'
+import { Link } from "react-router-dom";
+import { Monitor, ShoppingCart, Settings2 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { useCarrito } from "../../context/CarritoContext";
 
 export default function Navbar() {
-  const { usuario, esStaff } = useAuth()
-  const { cantidadTotal } = useCarrito()
+  const { usuario, esStaff } = useAuth();
+  const { cantidadTotal } = useCarrito();
 
-  const avatarUrl = usuario?.avatar_url
+  const avatarUrl = usuario?.avatar_url;
 
   return (
     <nav className="pc-navbar">
@@ -17,6 +17,7 @@ export default function Navbar() {
           <span className="pc-brand-badge">
             <Monitor size={22} />
           </span>
+
           <span>PC Store</span>
         </Link>
 
@@ -25,6 +26,12 @@ export default function Navbar() {
 
           <Link to="/tienda">
             Tienda
+          </Link>
+
+          {/* NUEVO: CONFIGURADOR */}
+          <Link to="/configurador">
+            <Settings2 size={17} />
+            Configurador
           </Link>
 
           {usuario && (
@@ -41,12 +48,12 @@ export default function Navbar() {
         </div>
 
         <div className="pc-nav-actions">
-
           <Link
             to="/carrito"
             className="pc-cart-button"
           >
             <ShoppingCart size={20} />
+
             <span>Carrito</span>
 
             {cantidadTotal > 0 && (
@@ -59,13 +66,13 @@ export default function Navbar() {
             className="pc-user-link"
             title="Mi perfil"
             style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: "42px",
+              height: "42px",
+              borderRadius: "50%",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               padding: 0,
             }}
           >
@@ -74,22 +81,22 @@ export default function Navbar() {
                 src={avatarUrl}
                 alt="Foto de perfil"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
                 }}
               />
             ) : (
               (
                 usuario?.nombre?.[0] ||
                 usuario?.email?.[0] ||
-                'U'
+                "U"
               ).toUpperCase()
             )}
           </Link>
-
         </div>
+
       </div>
     </nav>
-  )
+  );
 }

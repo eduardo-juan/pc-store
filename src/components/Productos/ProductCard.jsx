@@ -1,18 +1,18 @@
 import { useState } from 'react'
-import { useCarrito } from '../context/CarritoContext'
+import { useCarrito } from '../../context/CarritoContext'
 
 export default function ProductCard({ producto }) {
   const [cantidad, setCantidad] = useState(1)
-  const { agregarAlCarrito } = useCarrito()
+  const { agregarProducto } = useCarrito()
 
   const handleAgregar = () => {
-    agregarAlCarrito(producto, cantidad)
+    agregarProducto(producto, cantidad)
     setCantidad(1)
   }
 
   return (
     <div className="pc-product-card">
-      <img src={producto.imagen_url} alt={producto.nombre} />
+      <img src={producto.imagen_principal || producto.imagen_url || ""} alt={producto.nombre} />
       <h3>{producto.nombre}</h3>
       <p>{producto.marca}</p>
       <div className="pc-price">
