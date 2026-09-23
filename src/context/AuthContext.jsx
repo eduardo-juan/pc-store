@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data: perfil, error: perfilError } = await supabase
         .from("usuarios")
-        .select("*")
+        .select("id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at")
         .eq("id", authUser.id)
         .maybeSingle();
       if (perfilError) {
@@ -163,7 +163,7 @@ export const AuthProvider = ({ children }) => {
       if (!user || !nuevaSesion) throw new Error("No se pudo iniciar sesión");
       const { data: perfil, error: perfilError } = await supabase
         .from("usuarios")
-        .select("*")
+        .select("id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at")
         .eq("id", user.id)
         .maybeSingle();
       if (perfilError) {
