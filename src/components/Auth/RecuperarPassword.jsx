@@ -26,16 +26,6 @@ export default function RecuperarPassword() {
     setCargando(true);
 
     try {
-      const { data: puedeRecuperar, error: validacionError } = await supabase.rpc(
-        "puede_recuperar_password",
-        { p_correo: email }
-      );
-
-      if (validacionError || !puedeRecuperar) {
-        setError(MENSAJE_CUENTA);
-        return;
-      }
-
       const { error: solicitudError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/restablecer-password`,
       });
