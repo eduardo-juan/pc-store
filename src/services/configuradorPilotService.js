@@ -8,11 +8,23 @@ export const TIPOS_PILOTO = [
   { key: 'storage', label: 'Almacenamiento' },
   { key: 'psu', label: 'Fuente de poder' },
   { key: 'case', label: 'Gabinete' },
+  { key: 'cooler', label: 'Cooler' },
+]
+
+const COOLERS_PC_STORE = [
+  { tipo: 'cooler', id: 'pc-store-cooler-16', marca: 'DeepCool', modelo: 'AG400', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 220, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-17', marca: 'Cooler Master', modelo: 'Hyper 212', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 180, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-36', marca: 'Arctic', modelo: 'Freezer 7 X', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-37', marca: 'be quiet!', modelo: 'Pure Rock 2', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-38', marca: 'Noctua', modelo: 'NH-U12S', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-39', marca: 'DeepCool', modelo: 'AK620', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-40', marca: 'Cooler Master', modelo: 'ML240L', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-41', marca: 'Arctic', modelo: 'Liquid Freezer III 240', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
 ]
 
 export function obtenerCatalogoPiloto() {
   return TIPOS_PILOTO.reduce((resultado, item) => {
-    resultado[item.key] = Array.isArray(catalogo.categorias?.[item.key]) ? catalogo.categorias[item.key] : []
+    resultado[item.key] = item.key === 'cooler' ? COOLERS_PC_STORE : (Array.isArray(catalogo.categorias?.[item.key]) ? catalogo.categorias[item.key] : [])
     return resultado
   }, {})
 }
@@ -206,6 +218,32 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
 
   if (storage && motherboard) {
     analizarAlmacenamiento(storage, motherboard, detalles, errores, advertencias)
+  }
+
+  if (cpu && configuracion.cooler) {
+    const cooler = configuracion.cooler
+    const sockets = listaNormalizada(cooler.socket_compatibles ?? cooler.socket)
+    if (cpu.socket && sockets.length) {
+      if (sockets.includes(texto(cpu.socket))) {
+        agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Cooler', 'compatible', 'El cooler soporta el socket ' + cpu.socket + '.')
+      } else {
+        agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Cooler', 'incompatible', 'El cooler no declara soporte para el socket ' + cpu.socket + '.')
+      }
+    } else {
+      agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Cooler', 'pendiente', 'Falta información suficiente de socket del cooler.')
+    }
+
+    const cpuW = numero(cpu.tdp_w ?? cpu.consumo_w)
+    const coolerW = numero(cooler.consumo_max_w)
+    if (cpuW != null && coolerW != null) {
+      if (coolerW < cpuW) {
+        agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Capacidad térmica', 'incompatible', 'El cooler declara una capacidad de ' + coolerW + ' W y la CPU consume ' + cpuW + ' W.')
+      } else {
+        agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Capacidad térmica', 'compatible', 'El cooler declara ' + coolerW + ' W para una CPU de ' + cpuW + ' W.')
+      }
+    } else {
+      agregar(detalles, errores, advertencias, 'cooler', 'CPU ↔ Capacidad térmica', 'pendiente', 'No hay datos suficientes para comparar capacidad térmica.')
+    }
   }
 
   return { compatible: errores.length === 0, errores, advertencias, detalles }
