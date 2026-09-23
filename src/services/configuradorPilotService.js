@@ -14,12 +14,12 @@ export const TIPOS_PILOTO = [
 const COOLERS_PC_STORE = [
   { tipo: 'cooler', id: 'pc-store-cooler-16', marca: 'DeepCool', modelo: 'AG400', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 220, fuente: 'PC Store' },
   { tipo: 'cooler', id: 'pc-store-cooler-17', marca: 'Cooler Master', modelo: 'Hyper 212', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 180, fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-36', marca: 'Arctic', modelo: 'Freezer 7 X', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-37', marca: 'be quiet!', modelo: 'Pure Rock 2', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-38', marca: 'Noctua', modelo: 'NH-U12S', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-39', marca: 'DeepCool', modelo: 'AK620', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-40', marca: 'Cooler Master', modelo: 'ML240L', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
-  { tipo: 'cooler', id: 'pc-store-cooler-41', marca: 'Arctic', modelo: 'Liquid Freezer III 240', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-36', marca: null, modelo: null, nombre: 'Arctic Freezer 7 X', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-37', marca: null, modelo: null, nombre: 'be quiet! Pure Rock 2', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-38', marca: null, modelo: null, nombre: 'Noctua NH-U12S', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-39', marca: null, modelo: null, nombre: 'DeepCool AK620', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-40', marca: null, modelo: null, nombre: 'Cooler Master ML240L', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
+  { tipo: 'cooler', id: 'pc-store-cooler-41', marca: null, modelo: null, nombre: 'Arctic Liquid Freezer III 240', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
 ]
 
 export function obtenerCatalogoPiloto() {
