@@ -133,11 +133,13 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
   }
 
   if (ram && motherboard) {
-    if (ram.ram_type && motherboard.ram_type) {
-      if (texto(ram.ram_type) === texto(motherboard.ram_type)) {
-        agregar(detalles, errores, advertencias, 'ram', 'RAM ↔ Placa madre', 'compatible', 'Tipo ' + ram.ram_type + ' compatible.')
+    const ramTipo = ram.ram_tipo ?? ram.ram_type
+    const motherboardRamTipo = motherboard.ram_tipo ?? motherboard.ram_type
+    if (ramTipo && motherboardRamTipo) {
+      if (texto(ramTipo) === texto(motherboardRamTipo)) {
+        agregar(detalles, errores, advertencias, 'ram', 'RAM ↔ Placa madre', 'compatible', 'Tipo ' + ramTipo + ' compatible.')
       } else {
-        agregar(detalles, errores, advertencias, 'ram', 'RAM ↔ Placa madre', 'incompatible', 'RAM ' + ram.ram_type + ' y placa ' + motherboard.ram_type + ': tipos incompatibles.')
+        agregar(detalles, errores, advertencias, 'ram', 'RAM ↔ Placa madre', 'incompatible', 'RAM ' + ramTipo + ' y placa ' + motherboardRamTipo + ': tipos incompatibles.')
       }
     } else {
       agregar(detalles, errores, advertencias, 'ram', 'RAM ↔ Placa madre', 'pendiente', 'Falta información del tipo de memoria.')
@@ -184,7 +186,7 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
 
   if (gpu && caseItem) {
     const gpuLength = numero(gpu.length_mm)
-    const maxLength = numero(caseItem.max_gpu_length_mm)
+    const maxLength = numero(caseItem.max_gpu_length_mm ?? caseItem.longitud_gpu_max_mm)
     if (gpuLength != null && maxLength != null) {
       if (gpuLength <= maxLength) {
         agregar(detalles, errores, advertencias, 'gpu', 'GPU ↔ Gabinete', 'compatible', gpuLength + ' mm dentro del máximo de ' + maxLength + ' mm.')
