@@ -1,0 +1,1232 @@
+{
+  "version": "pilot-1.0",
+  "fuente": "TechFuel HQ",
+  "version_fuente": "2.1.0",
+  "licencia": "CC BY 4.0",
+  "reglas_fuente": [
+    "CPU and motherboard must share socket (AM5, LGA1851, LGA1700)",
+    "Motherboard chipset must be in cpu.supported_chipsets (e.g. AM5 X870E supports Ryzen 7000+9000; B650 supports Ryzen 7000+9000 with BIOS update)",
+    "Motherboard ram_type must match RAM ram_type (DDR5 only at this generation)",
+    "PSU wattage must exceed sum of CPU TDP + GPU TGP + 150W system overhead, with 20% margin",
+    "Case form_factor must accept motherboard form_factor (ATX > mATX > ITX)",
+    "Case max_gpu_length_mm must exceed GPU length_mm",
+    "Storage interface (NVMe Gen5 / Gen4 / SATA) must match a free motherboard slot"
+  ],
+  "categorias": {
+    "cpu": [
+      {
+        "tipo": "cpu",
+        "id": "cpu-r5-9600x",
+        "marca": "AMD",
+        "modelo": "Ryzen 5 9600X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-r7-9700x",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 9700X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-r7-9800x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 9800X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-r9-9900x",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 9900X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-i5-14600k",
+        "marca": "Intel",
+        "modelo": "Core i5-14600K",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z790",
+          "B760"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-cu7-265k",
+        "marca": "Intel",
+        "modelo": "Core Ultra 7 265K",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-9950x3d2-dual-edition",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 9950X3D2 Dual Edition",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 200,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-9950x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 9950X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 170,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-9950x",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 9950X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 170,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-9900x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 9900X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-7-9850x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 9850X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-ultra-9-285k",
+        "marca": "Intel",
+        "modelo": "Core Ultra 9 285K",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-ultra-7-265kf",
+        "marca": "Intel",
+        "modelo": "Core Ultra 7 265KF",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-ultra-5-245kf",
+        "marca": "Intel",
+        "modelo": "Core Ultra 5 245KF",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-ultra-5-225f",
+        "marca": "Intel",
+        "modelo": "Core Ultra 5 225F",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-ultra-5-225",
+        "marca": "Intel",
+        "modelo": "Core Ultra 5 225",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "Z890",
+          "B860"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-i7-14700k",
+        "marca": "Intel",
+        "modelo": "Core i7-14700K",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z790",
+          "B760"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-i7-14700kf",
+        "marca": "Intel",
+        "modelo": "Core i7-14700KF",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z790",
+          "B760"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-i9-14900k",
+        "marca": "Intel",
+        "modelo": "Core i9-14900K",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z790",
+          "B760"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "cpu-intel-core-i9-14900kf",
+        "marca": "Intel",
+        "modelo": "Core i9-14900KF",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "consumo_w": 125,
+        "chipsets": [
+          "Z790",
+          "B760"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-7950x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 7950X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-7950x",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 7950X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 170,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-7900x",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 7900X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 170,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-9-7900",
+        "marca": "AMD",
+        "modelo": "Ryzen 9 7900",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-7-7800x3d",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 7800X3D",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 120,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-7-7700x",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 7700X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 105,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-5-7600x",
+        "marca": "AMD",
+        "modelo": "Ryzen 5 7600X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 105,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-5-7600",
+        "marca": "AMD",
+        "modelo": "Ryzen 5 7600",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-7-8700g",
+        "marca": "AMD",
+        "modelo": "Ryzen 7 8700G",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      },
+      {
+        "tipo": "cpu",
+        "id": "amd-ryzen-5-8600g",
+        "marca": "AMD",
+        "modelo": "Ryzen 5 8600G",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "consumo_w": 65,
+        "chipsets": [
+          "X870E",
+          "X870",
+          "B850",
+          "B650"
+        ]
+      }
+    ],
+    "motherboard": [
+      {
+        "tipo": "motherboard",
+        "id": "mb-b650-tomahawk",
+        "marca": "MSI",
+        "modelo": "B650 Tomahawk WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-b850-edge",
+        "marca": "MSI",
+        "modelo": "B850 Edge WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-x870e-hero",
+        "marca": "ASUS",
+        "modelo": "ROG Crosshair X870E Hero",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-z890-tomahawk",
+        "marca": "MSI",
+        "modelo": "Z890 Tomahawk WiFi",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-z790-tomahawk",
+        "marca": "MSI",
+        "modelo": "Z790 Tomahawk WiFi",
+        "socket": "LGA1700",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asrock-a620am-x",
+        "marca": "ASRock",
+        "modelo": "A620AM-X",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "Micro-ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asrock-b860-pro-rs",
+        "marca": "ASRock",
+        "modelo": "B860 Pro RS",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asrock-b860m-x-gen5-wifi",
+        "marca": "ASRock",
+        "modelo": "B860M-X Gen5 WiFi",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "Micro-ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asrock-b860i-wifi",
+        "marca": "ASRock",
+        "modelo": "B860I WiFi",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "Mini-ITX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-rog-strix-b860-i-gaming-wifi",
+        "marca": "ASUS",
+        "modelo": "ROG Strix B860-I Gaming WiFi",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "Mini-ITX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-prime-b860-plus-wifi-csm",
+        "marca": "ASUS",
+        "modelo": "Prime B860-PLUS WiFi-CSM",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-prime-z890-p-wifi",
+        "marca": "ASUS",
+        "modelo": "Prime Z890-P WiFi",
+        "socket": "LGA1851",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-tuf-gaming-x870-plus-wifi",
+        "marca": "ASUS",
+        "modelo": "TUF Gaming X870-PLUS WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-tuf-gaming-b850-plus-wifi",
+        "marca": "ASUS",
+        "modelo": "TUF Gaming B850-PLUS WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-rog-strix-b850-i-gaming-wifi",
+        "marca": "ASUS",
+        "modelo": "ROG Strix B850-I Gaming WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "Mini-ITX"
+      },
+      {
+        "tipo": "motherboard",
+        "id": "mb-asus-rog-strix-b650-a-gaming-wifi",
+        "marca": "ASUS",
+        "modelo": "ROG Strix B650-A Gaming WiFi",
+        "socket": "AM5",
+        "ram_tipo": "DDR5",
+        "form_factor": "ATX"
+      }
+    ],
+    "ram": [
+      {
+        "tipo": "ram",
+        "id": "ram-ddr5-32gb-6000",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 32
+      },
+      {
+        "tipo": "ram",
+        "id": "ram-ddr5-64gb-6000",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 Neo 64GB (2x32GB) DDR5-6000 CL30",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 64
+      },
+      {
+        "tipo": "ram",
+        "id": "corsair-vengeance-ddr5-6000-cl36-16gb",
+        "marca": "Corsair",
+        "modelo": "Vengeance DDR5 16GB (2x8GB) 6000MT/s CL36 (CMK16GX5M2E6000Z36)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 16
+      },
+      {
+        "tipo": "ram",
+        "id": "corsair-vengeance-ddr5-6000-cl36-32gb",
+        "marca": "Corsair",
+        "modelo": "Vengeance DDR5 32GB (2x16GB) 6000MT/s CL36 (CMK32GX5M2E6000Z36)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 32
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-flare-x5-ddr5-6000-cl36-32gb",
+        "marca": "G.Skill",
+        "modelo": "Flare X5 DDR5 32GB (2x16GB) 6000MT/s CL36 (F5-6000J3636F16GX2-FX5)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 32
+      },
+      {
+        "tipo": "ram",
+        "id": "teamgroup-tforce-delta-rgb-ddr5-6000-cl30-32gb",
+        "marca": "TeamGroup",
+        "modelo": "T-Force Delta RGB DDR5 32GB (2x16GB) 6000MT/s CL30 (FF3D532G6000HC30DC01)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 32
+      },
+      {
+        "tipo": "ram",
+        "id": "corsair-vengeance-rgb-rs-ddr5-6000-cl40-64gb",
+        "marca": "Corsair",
+        "modelo": "Vengeance RGB RS DDR5 64GB (2x32GB) 6000MT/s CL40 (CMG64GX5M2D6000Z40)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 64
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-trident-z5-ck-rgb-ddr5-8200-cl40-48gb",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 CK RGB DDR5 48GB (2x24GB) 8200MT/s CL40 CU-DIMM (F5-8200C4052G24GX2-TZ5CRK)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 48
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-trident-z5-neo-rgb-ddr5-6000-cl36-64gb",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 Neo RGB DDR5 64GB (2x32GB) 6000MT/s CL36 (F5-6000J3636F32GX2-TZ5NR)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 64
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-flare-x5-ddr5-6000-cl30-64gb",
+        "marca": "G.Skill",
+        "modelo": "Flare X5 DDR5 64GB (2x32GB) 6000MT/s CL30 (F5-6000J3040G32GX2-FX5)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 64
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-trident-z5-rgb-ddr5-6400-cl32-96gb",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 RGB DDR5 96GB (2x48GB) 6400MT/s CL32 (F5-6400J3239F48GX2-TZ5RK)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 96
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-trident-z5-neo-rgb-ddr5-6000-cl28-96gb",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 Neo RGB DDR5 96GB (2x48GB) 6000MT/s CL28 (F5-6000J2836F48GX2-TZ5NR)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 96
+      },
+      {
+        "tipo": "ram",
+        "id": "gskill-trident-z5-neo-rgb-ddr5-6000-cl36-128gb",
+        "marca": "G.Skill",
+        "modelo": "Trident Z5 Neo RGB DDR5 128GB (2x64GB) 6000MT/s CL36 (F5-6000J3644D64GX2-TZ5NR)",
+        "ram_tipo": "DDR5",
+        "capacidad_gb": 128
+      }
+    ],
+    "gpu": [
+      {
+        "tipo": "gpu",
+        "id": "gpu-rtx-5060-ti-16gb",
+        "marca": "NVIDIA AIB",
+        "modelo": "RTX 5060 Ti 16GB",
+        "consumo_max_w": 180,
+        "longitud_mm": 280
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-rx-9060-xt-16gb",
+        "marca": "AMD AIB",
+        "modelo": "RX 9060 XT 16GB",
+        "consumo_max_w": 150,
+        "longitud_mm": 270
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-rtx-5070",
+        "marca": "NVIDIA AIB",
+        "modelo": "RTX 5070",
+        "consumo_max_w": 250,
+        "longitud_mm": 300
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-rtx-5070-ti-16gb",
+        "marca": "NVIDIA AIB",
+        "modelo": "RTX 5070 Ti 16GB",
+        "consumo_max_w": 300,
+        "longitud_mm": 320
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-rtx-5080-fe",
+        "marca": "NVIDIA FE",
+        "modelo": "RTX 5080 Founders Edition",
+        "consumo_max_w": 360,
+        "longitud_mm": 304
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-rog-astral-5080-oc",
+        "marca": "ASUS",
+        "modelo": "ROG Astral RTX 5080 OC",
+        "consumo_max_w": 360,
+        "longitud_mm": 358
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-rog-astral-rtx5090-o32g",
+        "marca": "ASUS",
+        "modelo": "ROG Astral GeForce RTX 5090 32GB GDDR7 OC Edition",
+        "consumo_max_w": 575,
+        "longitud_mm": 357.6
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-tuf-rtx5080-o16g",
+        "marca": "ASUS",
+        "modelo": "TUF Gaming GeForce RTX 5080 16GB GDDR7 OC Edition",
+        "consumo_max_w": 360,
+        "longitud_mm": 348
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-prime-rtx5070-o12g",
+        "marca": "ASUS",
+        "modelo": "Prime GeForce RTX 5070 12GB GDDR7 OC Edition (SFF-Ready)",
+        "consumo_max_w": 250,
+        "longitud_mm": 304
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-tuf-rtx5060ti-o8g",
+        "marca": "ASUS",
+        "modelo": "TUF Gaming GeForce RTX 5060 Ti 8GB GDDR7 OC Edition",
+        "consumo_max_w": 180,
+        "longitud_mm": 302
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-dual-rtx5060ti-o8g",
+        "marca": "ASUS",
+        "modelo": "Dual GeForce RTX 5060 Ti 8GB GDDR7 OC Edition",
+        "consumo_max_w": 180,
+        "longitud_mm": 229
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-dual-rtx5060-o8g",
+        "marca": "ASUS",
+        "modelo": "Dual GeForce RTX 5060 8GB GDDR7 OC Edition",
+        "consumo_max_w": 145,
+        "longitud_mm": 228
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-dual-rtx5050-8g",
+        "marca": "ASUS",
+        "modelo": "Dual GeForce RTX 5050 8GB GDDR6",
+        "consumo_max_w": 130,
+        "longitud_mm": 203
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-nvidia-asus-prime-rtx5050-o8g",
+        "marca": "ASUS",
+        "modelo": "Prime GeForce RTX 5050 8GB GDDR6 OC Edition (SFF-Ready)",
+        "consumo_max_w": 130,
+        "longitud_mm": 268.3
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-9070-xt-16gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 9070 XT 16GB",
+        "consumo_max_w": 304,
+        "longitud_mm": 320
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-9070-16gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 9070 16GB",
+        "consumo_max_w": 220,
+        "longitud_mm": 290
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-9070-gre-12gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 9070 GRE 12GB",
+        "consumo_max_w": 240,
+        "longitud_mm": 280
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-9060-xt-8gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 9060 XT 8GB",
+        "consumo_max_w": 170,
+        "longitud_mm": 244
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-7900-xtx-24gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 7900 XTX 24GB",
+        "consumo_max_w": 327,
+        "longitud_mm": 344
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-7900-gre-16gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 7900 GRE 16GB",
+        "consumo_max_w": 250,
+        "longitud_mm": 303
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-7800-xt-16gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 7800 XT 16GB",
+        "consumo_max_w": 263,
+        "longitud_mm": 280
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-7700-xt-12gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 7700 XT 12GB",
+        "consumo_max_w": 245,
+        "longitud_mm": 266
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-amd-radeon-rx-7600-8gb",
+        "marca": "AMD",
+        "modelo": "Radeon RX 7600 8GB",
+        "consumo_max_w": 165,
+        "longitud_mm": 269
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-intel-arc-b580-12gb",
+        "marca": "Intel",
+        "modelo": "Arc B580 12GB",
+        "consumo_max_w": 190,
+        "longitud_mm": 249
+      },
+      {
+        "tipo": "gpu",
+        "id": "gpu-intel-arc-b570-10gb",
+        "marca": "Intel",
+        "modelo": "Arc B570 10GB",
+        "consumo_max_w": 150,
+        "longitud_mm": 249
+      }
+    ],
+    "storage": [
+      {
+        "tipo": "storage",
+        "id": "ssd-sn850x-2tb",
+        "marca": "WD",
+        "modelo": "Black SN850X 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "ssd-t705-2tb",
+        "marca": "Crucial",
+        "modelo": "T705 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "ssd-sn850x-4tb",
+        "marca": "WD",
+        "modelo": "Black SN850X 4TB",
+        "capacidad_gb": 4000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-9100-pro-1tb",
+        "marca": "Samsung",
+        "modelo": "9100 PRO 1TB",
+        "capacidad_gb": 1000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-9100-pro-2tb",
+        "marca": "Samsung",
+        "modelo": "9100 PRO 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-9100-pro-4tb",
+        "marca": "Samsung",
+        "modelo": "9100 PRO 4TB",
+        "capacidad_gb": 4000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-990-pro-1tb",
+        "marca": "Samsung",
+        "modelo": "990 PRO 1TB",
+        "capacidad_gb": 1000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-990-pro-4tb",
+        "marca": "Samsung",
+        "modelo": "990 PRO 4TB",
+        "capacidad_gb": 4000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-990-evo-plus-4tb",
+        "marca": "Samsung",
+        "modelo": "990 EVO Plus 4TB",
+        "capacidad_gb": 4000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "samsung-870-evo-2tb",
+        "marca": "Samsung",
+        "modelo": "870 EVO 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "SATA III 6Gb/s"
+      },
+      {
+        "tipo": "storage",
+        "id": "wd-blue-sa510-2tb",
+        "marca": "Western Digital",
+        "modelo": "WD Blue SA510 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "SATA III 6Gb/s"
+      },
+      {
+        "tipo": "storage",
+        "id": "wd-black-sn8100-2tb",
+        "marca": "Western Digital",
+        "modelo": "WD_BLACK SN8100 2TB",
+        "capacidad_gb": 2000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "wd-black-sn8100-4tb",
+        "marca": "Western Digital",
+        "modelo": "WD_BLACK SN8100 4TB",
+        "capacidad_gb": 4000,
+        "interfaz": "NVMe Gen5 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "wd-black-sn850x-8tb",
+        "marca": "Western Digital",
+        "modelo": "WD_BLACK SN850X 8TB",
+        "capacidad_gb": 8000,
+        "interfaz": "NVMe Gen4 x4"
+      },
+      {
+        "tipo": "storage",
+        "id": "wd-black-sn7100-1tb",
+        "marca": "Western Digital",
+        "modelo": "WD_BLACK SN7100 1TB",
+        "capacidad_gb": 1000,
+        "interfaz": "NVMe Gen4 x4"
+      }
+    ],
+    "psu": [
+      {
+        "tipo": "psu",
+        "id": "psu-750w-gold",
+        "marca": "Corsair",
+        "modelo": "RM750x (2024) 750W 80+ Gold",
+        "capacidad_w": 750
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-850w-gold",
+        "marca": "Corsair",
+        "modelo": "RM850x (2024) 850W 80+ Gold",
+        "capacidad_w": 850
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-1000w-plat",
+        "marca": "Corsair",
+        "modelo": "HX1000i 1000W 80+ Platinum",
+        "capacidad_w": 1000
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-bequiet-dark-power-13-750w",
+        "marca": "be quiet!",
+        "modelo": "Dark Power 13 750W",
+        "capacidad_w": 750
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-bequiet-power-zone-2-1000w",
+        "marca": "be quiet!",
+        "modelo": "Power Zone 2 1000W",
+        "capacidad_w": 1000
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-thermaltake-toughpower-gt-850w",
+        "marca": "Thermaltake",
+        "modelo": "Toughpower GT 850W",
+        "capacidad_w": 850
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-coolermaster-mwe-gold-850-v3",
+        "marca": "Cooler Master",
+        "modelo": "MWE Gold 850 V3 (ATX 3.1)",
+        "capacidad_w": 850
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-nzxt-c1000-gold-atx31",
+        "marca": "NZXT",
+        "modelo": "C1000 Gold ATX 3.1",
+        "capacidad_w": 1000
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-asus-rog-strix-1000w-platinum",
+        "marca": "ASUS",
+        "modelo": "ROG Strix 1000W Platinum",
+        "capacidad_w": 1000
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-lianli-sp750-v2-gold",
+        "marca": "Lian Li",
+        "modelo": "SP750 V2 Gold (SP750G.B)",
+        "capacidad_w": 750
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-asrock-pg-1600g",
+        "marca": "ASRock",
+        "modelo": "Phantom Gaming PG-1600G",
+        "capacidad_w": 1600
+      },
+      {
+        "tipo": "psu",
+        "id": "psu-msi-mpg-a850gs-pcie5",
+        "marca": "MSI",
+        "modelo": "MPG A850GS PCIE5",
+        "capacidad_w": 850
+      }
+    ],
+    "case": [
+      {
+        "tipo": "case",
+        "id": "case-h7-flow",
+        "marca": "NZXT",
+        "modelo": "H7 Flow (2024)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 410
+      },
+      {
+        "tipo": "case",
+        "id": "case-meshify-2",
+        "marca": "Fractal",
+        "modelo": "Meshify 2 Compact",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 341
+      },
+      {
+        "tipo": "case",
+        "id": "case-pop-air-mini",
+        "marca": "Fractal",
+        "modelo": "Pop Air Mini",
+        "form_factor": "mATX",
+        "longitud_gpu_max_mm": 365
+      },
+      {
+        "tipo": "case",
+        "id": "case-o11-d-evo",
+        "marca": "Lian Li",
+        "modelo": "O11 Dynamic EVO RGB",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 422
+      },
+      {
+        "tipo": "case",
+        "id": "case-corsair-frame-4000d-rs-argb",
+        "marca": "Corsair",
+        "modelo": "FRAME 4000D RS ARGB",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 430
+      },
+      {
+        "tipo": "case",
+        "id": "case-nzxt-h5-flow-2024",
+        "marca": "NZXT",
+        "modelo": "H5 Flow (2024 Edition, CC-H52FB-01)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 410
+      },
+      {
+        "tipo": "case",
+        "id": "case-lian-li-vector-v100rx",
+        "marca": "Lian Li",
+        "modelo": "Vector V100RX (Black)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 420
+      },
+      {
+        "tipo": "case",
+        "id": "case-thermaltake-view-270-plus-tg-argb",
+        "marca": "Thermaltake",
+        "modelo": "View 270 Plus TG ARGB (CA-1Y7-00M1WN-01)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 420
+      },
+      {
+        "tipo": "case",
+        "id": "case-montech-xr-black",
+        "marca": "Montech",
+        "modelo": "XR (Black)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 420
+      },
+      {
+        "tipo": "case",
+        "id": "case-bequiet-pure-base-501-black",
+        "marca": "be quiet!",
+        "modelo": "Pure Base 501 Black (BG073)",
+        "form_factor": "ATX",
+        "longitud_gpu_max_mm": 368
+      },
+      {
+        "tipo": "case",
+        "id": "case-cooler-master-q300l",
+        "marca": "Cooler Master",
+        "modelo": "MasterBox Q300L (MCB-Q300L-KANN-S00)",
+        "form_factor": "mATX",
+        "longitud_gpu_max_mm": 360
+      },
+      {
+        "tipo": "case",
+        "id": "case-lian-li-a3-matx-black",
+        "marca": "Lian Li",
+        "modelo": "A3-mATX (Black, A3X.US)",
+        "form_factor": "mATX",
+        "longitud_gpu_max_mm": 415
+      },
+      {
+        "tipo": "case",
+        "id": "case-cooler-master-nr200",
+        "marca": "Cooler Master",
+        "modelo": "NR200 (MCB-NR200-KNNN-S00)",
+        "form_factor": "ITX",
+        "longitud_gpu_max_mm": 330
+      },
+      {
+        "tipo": "case",
+        "id": "case-fractal-design-ridge-black",
+        "marca": "Fractal Design",
+        "modelo": "Ridge (Black)",
+        "form_factor": "ITX",
+        "longitud_gpu_max_mm": 325
+      },
+      {
+        "tipo": "case",
+        "id": "case-fractal-design-terra-jade",
+        "marca": "Fractal Design",
+        "modelo": "Terra (Jade)",
+        "form_factor": "ITX",
+        "longitud_gpu_max_mm": 322
+      }
+    ],
+    "cooler": []
+  }
+}
