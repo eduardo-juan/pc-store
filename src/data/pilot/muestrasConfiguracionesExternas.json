@@ -1,0 +1,134 @@
+[
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "H7 Flow (2024)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "Meshify 2 Compact",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "O11 Dynamic EVO RGB",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "FRAME 4000D RS ARGB",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "H5 Flow (2024 Edition, CC-H52FB-01)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "Vector V100RX (Black)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "View 270 Plus TG ARGB (CA-1Y7-00M1WN-01)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "XR (Black)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM750x (2024) 750W 80+ Gold",
+    "case": "Pure Base 501 Black (BG073)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM850x (2024) 850W 80+ Gold",
+    "case": "H7 Flow (2024)",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM850x (2024) 850W 80+ Gold",
+    "case": "Meshify 2 Compact",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  },
+  {
+    "cpu": "Ryzen 5 9600X",
+    "motherboard": "B650 Tomahawk WiFi",
+    "ram": "Trident Z5 Neo 32GB (2x16GB) DDR5-6000 CL30",
+    "gpu": "RTX 5060 Ti 16GB",
+    "storage": "Black SN850X 2TB",
+    "psu": "RM850x (2024) 850W 80+ Gold",
+    "case": "O11 Dynamic EVO RGB",
+    "consumo_estimado_w": 395,
+    "requisito_psu_w": 474
+  }
+]
