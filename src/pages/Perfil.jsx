@@ -65,7 +65,7 @@ export default function Perfil() {
   const cargarPerfil = async () => {
     const { data, error } = await supabase
       .from('usuarios')
-      .select('*')
+      .select('id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at')
       .eq('id', usuario.id)
       .single()
 
