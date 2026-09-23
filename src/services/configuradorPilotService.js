@@ -185,7 +185,7 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
   }
 
   if (gpu && caseItem) {
-    const gpuLength = numero(gpu.length_mm)
+    const gpuLength = numero(gpu.length_mm ?? gpu.longitud_mm)
     const maxLength = numero(caseItem.max_gpu_length_mm ?? caseItem.longitud_gpu_max_mm)
     if (gpuLength != null && maxLength != null) {
       if (gpuLength <= maxLength) {
