@@ -345,7 +345,7 @@ export default function Registro() {
                   fontWeight: 600
                 }}
               >
-                {etiqueta('Correo electrónico')}
+                {etiqueta('Correo electrónico', true)}
               </label>
 
               <input
@@ -372,7 +372,7 @@ export default function Registro() {
                   fontWeight: 600
                 }}
               >
-                {etiqueta('Contraseña')}
+                {etiqueta('Contraseña', true)}
               </label>
 
               <div style={{ position: 'relative' }}>
