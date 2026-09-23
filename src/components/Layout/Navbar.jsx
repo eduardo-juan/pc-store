@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Monitor, ShoppingCart, Settings2 } from "lucide-react";
+import { ShoppingCart, Settings2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useCarrito } from "../../context/CarritoContext";
 
@@ -14,8 +14,8 @@ export default function Navbar() {
       <div className="pc-container pc-navbar-inner">
 
         <Link to="/" className="pc-brand">
-          <span className="pc-brand-badge">
-            <Monitor size={22} />
+          <span className="pc-brand-badge pc-brand-logo" aria-hidden="true">
+            <img src="/favicon.svg" alt="" />
           </span>
 
           <span>PC Store</span>
@@ -28,11 +28,12 @@ export default function Navbar() {
             Tienda
           </Link>
 
-          {/* NUEVO: CONFIGURADOR */}
-          <Link to="/configurador">
-            <Settings2 size={17} />
-            Configurador
-          </Link>
+          {usuario && (
+            <Link to="/configurador" className="pc-nav-configurador">
+              <Settings2 size={17} />
+              Configurador
+            </Link>
+          )}
 
           {usuario && (
             <Link to="/mis-ordenes">

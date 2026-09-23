@@ -12,7 +12,8 @@ export const AuthProvider = ({ children }) => {
   const registrarAcceso = async () => {
     try {
       const { error } = await supabase.rpc("registrar_acceso_auditoria");
-      if (error) console.error("[AUDITORIA] Error registrando acceso:", error);
+      if (error)
+      console.error("[AUDITORIA] Error registrando acceso:", error);
     } catch (err) {
       console.error("[AUDITORIA] Error inesperado:", err);
     }
@@ -26,11 +27,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data: perfil, error: perfilError } = await supabase
         .from("usuarios")
-        .select("*")
+        .select("id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at")
         .eq("id", authUser.id)
         .maybeSingle();
       if (perfilError) {
-        console.error("[AUTH] Error cargando perfil:", perfilError);
+      console.error("[AUTH] Error cargando perfil:", perfilError);
         setUsuario({ ...authUser });
         return authUser;
       }
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         } = await supabase.auth.getSession();
         if (!activo) return;
         if (sessionError) {
-          console.error("[AUTH] Error obteniendo sesión:", sessionError);
+      console.error("[AUTH] Error obteniendo sesión:", sessionError);
           setError(sessionError.message);
         }
         if (sesionActual?.user) {
@@ -74,7 +75,7 @@ export const AuthProvider = ({ children }) => {
           setUsuario(null);
         }
       } catch (err) {
-        console.error("[AUTH] Error inicializando autenticación:", err);
+      console.error("[AUTH] Error inicializando autenticación:", err);
         if (activo) setError(err.message);
       } finally {
         if (activo) setCargando(false);
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, nuevaSesion) => {
       if (!activo) return;
-      console.log("[AUTH]", event, "sesión:", !!nuevaSesion);
+      
       if (event === "SIGNED_OUT" || event === "USER_DELETED") {
         setSession(null);
         setUsuario(null);
@@ -163,11 +164,11 @@ export const AuthProvider = ({ children }) => {
       if (!user || !nuevaSesion) throw new Error("No se pudo iniciar sesión");
       const { data: perfil, error: perfilError } = await supabase
         .from("usuarios")
-        .select("*")
+        .select("id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at")
         .eq("id", user.id)
         .maybeSingle();
       if (perfilError) {
-        console.error(
+      console.error(
           "[AUTH] Error cargando perfil después del login:",
           perfilError,
         );

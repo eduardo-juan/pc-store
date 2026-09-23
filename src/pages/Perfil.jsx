@@ -65,7 +65,7 @@ export default function Perfil() {
   const cargarPerfil = async () => {
     const { data, error } = await supabase
       .from('usuarios')
-      .select('*')
+      .select('id,email,nombre,apellido,teléfono,dirección,ciudad,país,avatar_url,rol,activo,bloqueado,dni,created_at,updated_at')
       .eq('id', usuario.id)
       .single()
 
@@ -450,6 +450,7 @@ export default function Perfil() {
                 className="pc-input"
                 maxLength={50}
                 value={form.nombre}
+                required
                 onChange={(e) => cambiarCampo('nombre', e.target.value)}
                 style={estiloCampo('nombre')}
               />
@@ -461,6 +462,7 @@ export default function Perfil() {
                 className="pc-input"
                 maxLength={50}
                 value={form.apellido}
+                required
                 onChange={(e) => cambiarCampo('apellido', e.target.value)}
                 style={estiloCampo('apellido')}
               />
@@ -488,6 +490,7 @@ export default function Perfil() {
                 maxLength={9}
                 placeholder="9439-4343"
                 value={form.teléfono}
+                required
                 onChange={(e) => cambiarCampo('teléfono', e.target.value)}
                 style={estiloCampo('teléfono')}
               />

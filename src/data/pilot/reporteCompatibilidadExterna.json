@@ -1,0 +1,83 @@
+{
+  "fuente": "TechFuel HQ",
+  "dataset_version": "2.1.0",
+  "componentes": {
+    "cpu": 30,
+    "motherboard": 16,
+    "ram": 13,
+    "gpu": 25,
+    "storage": 15,
+    "psu": 12,
+    "case": 15
+  },
+  "combinaciones_teoricas": 421200000,
+  "combinaciones_validas_sin_cooler": 33386340,
+  "detalle_por_motherboard": {
+    "mb-b650-tomahawk": {
+      "modelo": "B650 Tomahawk WiFi",
+      "combinaciones_validas": 9335235
+    },
+    "mb-b850-edge": {
+      "modelo": "B850 Edge WiFi",
+      "combinaciones_validas": 9335235
+    },
+    "mb-x870e-hero": {
+      "modelo": "ROG Crosshair X870E Hero",
+      "combinaciones_validas": 9335235
+    },
+    "mb-z890-tomahawk": {
+      "modelo": "Z890 Tomahawk WiFi",
+      "combinaciones_validas": 2953860
+    },
+    "mb-z790-tomahawk": {
+      "modelo": "Z790 Tomahawk WiFi",
+      "combinaciones_validas": 2426775
+    },
+    "mb-asrock-a620am-x": {
+      "modelo": "A620AM-X",
+      "combinaciones_validas": 0
+    },
+    "mb-asrock-b860-pro-rs": {
+      "modelo": "B860 Pro RS",
+      "combinaciones_validas": 0
+    },
+    "mb-asrock-b860m-x-gen5-wifi": {
+      "modelo": "B860M-X Gen5 WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asrock-b860i-wifi": {
+      "modelo": "B860I WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-rog-strix-b860-i-gaming-wifi": {
+      "modelo": "ROG Strix B860-I Gaming WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-prime-b860-plus-wifi-csm": {
+      "modelo": "Prime B860-PLUS WiFi-CSM",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-prime-z890-p-wifi": {
+      "modelo": "Prime Z890-P WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-tuf-gaming-x870-plus-wifi": {
+      "modelo": "TUF Gaming X870-PLUS WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-tuf-gaming-b850-plus-wifi": {
+      "modelo": "TUF Gaming B850-PLUS WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-rog-strix-b850-i-gaming-wifi": {
+      "modelo": "ROG Strix B850-I Gaming WiFi",
+      "combinaciones_validas": 0
+    },
+    "mb-asus-rog-strix-b650-a-gaming-wifi": {
+      "modelo": "ROG Strix B650-A Gaming WiFi",
+      "combinaciones_validas": 0
+    }
+  },
+  "regla_psu": "(CPU TDP + GPU TGP + 150W) × 1.20",
+  "nota": "Conteo piloto; no modifica Supabase ni producción."
+}

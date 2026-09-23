@@ -173,7 +173,7 @@ export default function Login() {
                   fontWeight: 600,
                 }}
               >
-                Correo electrónico
+                <span className="pc-field-label">Correo electrónico <span className="pc-required-mark">*</span></span>
               </label>
 
               <input
@@ -201,7 +201,7 @@ export default function Login() {
                   fontWeight: 600,
                 }}
               >
-                Contraseña
+                <span className="pc-field-label">Contraseña <span className="pc-required-mark">*</span></span>
               </label>
 
               <div

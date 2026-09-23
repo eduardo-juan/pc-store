@@ -1,4 +1,8 @@
 const estilosResponsive = `
+.pc-brand-logo{overflow:hidden}.pc-brand-logo img{width:28px;height:28px;object-fit:contain}.pc-nav-links a{display:inline-flex;align-items:center;gap:6px}.pc-pilot-page{width:min(1400px,100%);margin:0 auto;padding:24px}.pc-pilot-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}.pc-pilot-options{display:flex;flex-direction:column;gap:16px}.pc-pilot-summary{position:sticky;top:20px}.pc-pilot-page select{min-height:46px}
+@media(max-width:900px){.pc-pilot-page{padding:18px 0}.pc-pilot-layout{grid-template-columns:1fr}.pc-pilot-summary{position:static}.pc-pilot-page .pc-card{padding:18px}}
+@media(max-width:600px){.pc-pilot-page{padding:14px 0}.pc-pilot-page h1{font-size:clamp(1.6rem,8vw,2.2rem)}.pc-pilot-page h2{font-size:1.15rem}.pc-pilot-page .pc-card{padding:14px}.pc-pilot-page .pc-btn{min-height:44px}}
+
 .pc-product-image img,.pc-detail-image img{width:100%;height:100%;object-fit:contain;padding:14px}.pc-product-image{min-height:190px}.pc-product-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 
 /* TIENDA: sidebar + catálogo */
