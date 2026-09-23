@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Monitor, ShoppingCart, Settings2 } from "lucide-react";
+import { ShoppingCart, Settings2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useCarrito } from "../../context/CarritoContext";
 
