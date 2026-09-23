@@ -1,19 +1,7 @@
-/* Estilos para campos obligatorios */
-
-.required-field::after {
-  content: " *";
-  color: #dc2626;
-}
-
-input:required:invalid,
-select:required:invalid,
-textarea:required:invalid {
-  border-color: #d1d5db;
-}
-
-input:required:focus,
-select:required:focus,
-textarea:required:focus {
-  outline: 2px solid #2563eb;
-  outline-offset: 1px;
-}
+/* Campos obligatorios: etiqueta consistente y asterisco rojo. */
+.pc-field-label{display:inline-block;color:#171717;font-weight:600}
+.pc-required-mark{color:#dc2626;font-weight:800;margin-left:3px}
+.pc-field-label+input,.pc-field-label+select,.pc-field-label+textarea{margin-top:7px}
+input:required:invalid,select:required:invalid,textarea:required:invalid{border-color:#d1d5db}
+input:required:focus,select:required:focus,textarea:required:focus{outline:2px solid #2563eb;outline-offset:1px}
+@media(max-width:480px){.pc-field-label{font-size:.94rem}}
