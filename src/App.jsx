@@ -15,6 +15,7 @@ import "./styles/home-public-fixes.css";
 import Inicio from "./pages/Inicio";
 import Tienda from "./pages/Tienda";
 import Configurador from "./pages/Configurador";
+import ConfiguradorPiloto from "./pages/ConfiguradorPiloto";
 import Checkout from "./pages/Checkout";
 import MisOrdenes from "./pages/MisOrdenes";
 import DetalleOrden from "./pages/DetalleOrden";
