@@ -83,7 +83,20 @@ export default function App() {
 
                 <Route
                   path="/configurador"
-                  element={<Configurador />}
+                  element={
+                    <ProtectedRoute>
+                      <Configurador />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/configurador/piloto"
+                  element={
+                    <ProtectedRoute>
+                      <ConfiguradorPiloto />
+                    </ProtectedRoute>
+                  }
                 />
 
                 <Route
