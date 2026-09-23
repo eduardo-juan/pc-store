@@ -34,6 +34,61 @@ function agregar(detalles, errores, advertencias, componente, relacion, estado, 
   if (estado === 'advertencia' && !advertencias.includes(mensaje)) advertencias.push(mensaje)
 }
 
+function esNvme(interfaz) {
+  return texto(interfaz).includes('nvme')
+}
+
+function esSata(interfaz) {
+  return texto(interfaz).includes('sata')
+}
+
+function ranurasM2(motherboard) {
+  return numero(motherboard?.m2_slots ?? motherboard?.m2Slots)
+}
+
+function ranurasSata(motherboard) {
+  return numero(motherboard?.sata_ports ?? motherboard?.sataPorts)
+}
+
+function analizarAlmacenamiento(storage, motherboard, detalles, errores, advertencias) {
+  const interfaz = storage?.interfaz ?? storage?.interface
+  const m2 = ranurasM2(motherboard)
+  const sata = ranurasSata(motherboard)
+
+  if (!interfaz) {
+    agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'Falta información de interfaz del almacenamiento.')
+    return
+  }
+
+  if (esNvme(interfaz)) {
+    if (m2 != null) {
+      if (m2 > 0) {
+        agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'compatible', 'El almacenamiento NVMe requiere M.2 y la placa declara ' + m2 + ' ranura(s) M.2.')
+      } else {
+        agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'incompatible', 'El almacenamiento es NVMe, pero la placa declara 0 ranuras M.2.')
+      }
+    } else {
+      agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'El almacenamiento es NVMe, pero el catálogo normalizado no conserva el número de ranuras M.2 de esta placa.')
+    }
+    return
+  }
+
+  if (esSata(interfaz)) {
+    if (sata != null) {
+      if (sata > 0) {
+        agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'compatible', 'El almacenamiento SATA tiene puertos SATA declarados en la placa.')
+      } else {
+        agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'incompatible', 'El almacenamiento es SATA, pero la placa declara 0 puertos SATA.')
+      }
+    } else {
+      agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'El almacenamiento es SATA, pero el catálogo normalizado no conserva los puertos SATA de esta placa.')
+    }
+    return
+  }
+
+  agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'Interfaz de almacenamiento no reconocida para una validación segura.')
+}
+
 export function analizarCompatibilidadPiloto(configuracion = {}) {
   const errores = []
   const advertencias = []
@@ -150,7 +205,7 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
   }
 
   if (storage && motherboard) {
-    agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'El catálogo piloto no conserva suficientes datos de ranuras libres de la placa para confirmar esta relación.')
+    analizarAlmacenamiento(storage, motherboard, detalles, errores, advertencias)
   }
 
   return { compatible: errores.length === 0, errores, advertencias, detalles }
