@@ -225,6 +225,20 @@ export default function Registro() {
             >
               Completa tus datos para registrarte.
             </p>
+
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 12px',
+                borderRadius: 8,
+                background: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                color: '#1e40af',
+                fontSize: 14,
+              }}
+            >
+              Solo se pueden usar correos de Gmail (@gmail.com) o iCloud (@icloud.com).
+            </div>
           </div>
 
           {error && (
