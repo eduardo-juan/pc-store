@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Link,
   useNavigate,
@@ -18,6 +18,7 @@ export default function Login() {
   const [mostrarPassword, setMostrarPassword] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
+  const [alertaCorreo, setAlertaCorreo] = useState(false)
 
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -26,15 +27,33 @@ export default function Login() {
   // Página a la que el usuario quería entrar
   const paginaOrigen = location.state?.from || '/tienda'
 
+  useEffect(() => {
+    if (!alertaCorreo) return
+
+    const temporizador = setTimeout(() => {
+      setAlertaCorreo(false)
+    }, 4500)
+
+    return () => clearTimeout(temporizador)
+  }, [alertaCorreo])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     setError('')
+
+    const correo = email.trim().toLowerCase()
+
+    if (!/^[^\s@]+@(gmail|icloud)\.com$/i.test(correo)) {
+      setAlertaCorreo(true)
+      return
+    }
+
     setCargando(true)
 
     try {
       const resultado = await login(
-        email.trim(),
+        correo,
         password
       )
 
@@ -61,7 +80,30 @@ export default function Login() {
     <main className="pc-page">
       <div className="pc-container">
 
-        {/* ENCABEZADO */}
+        {alertaCorreo && (
+          <div
+            role="alert"
+            style={{
+              position: 'fixed',
+              top: 20,
+              right: 20,
+              zIndex: 1000,
+              maxWidth: 380,
+              padding: '14px 18px',
+              borderRadius: 10,
+              background: '#fff7ed',
+              border: '1px solid #fdba74',
+              color: '#9a3412',
+              boxShadow: '0 10px 30px rgba(0,0,0,.15)',
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            Solo puedes iniciar sesión con un correo de Gmail (@gmail.com) o iCloud (@icloud.com).
+          </div>
+        )}
+
+        {/* ENCABEZADO */
 
         <div
           className="pc-admin-header"
@@ -133,19 +175,6 @@ export default function Login() {
               Ingresa tus datos para continuar.
             </p>
 
-            <div
-              style={{
-                marginTop: 12,
-                padding: '10px 12px',
-                borderRadius: 8,
-                background: '#eff6ff',
-                border: '1px solid #bfdbfe',
-                color: '#1e40af',
-                fontSize: 14,
-              }}
-            >
-              Solo se pueden usar correos de Gmail (@gmail.com) o iCloud (@icloud.com).
-            </div>
           </div>
 
           {/* ERROR */}
