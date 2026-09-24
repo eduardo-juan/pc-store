@@ -9,11 +9,11 @@ begin
   email := lower(trim(event->'user'->>'email'));
   dominio := split_part(email, '@', 2);
 
-  if dominio <> 'gmail.com' then
+  if dominio not in ('gmail.com', 'icloud.com') then
     return jsonb_build_object(
       'error', jsonb_build_object(
         'http_code', 400,
-        'message', 'Solo se permiten correos de Gmail (@gmail.com).'
+        'message', 'Solo se permiten correos de Gmail (@gmail.com) o iCloud (@icloud.com).'
       )
     );
   end if;
