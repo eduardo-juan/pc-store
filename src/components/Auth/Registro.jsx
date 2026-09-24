@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Link,
   useNavigate,
@@ -40,12 +40,23 @@ export default function Registro() {
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState('')
   const [errores, setErrores] = useState({})
+  const [alertaCorreo, setAlertaCorreo] = useState(false)
 
   const { registro } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   const paginaOrigen = location.state?.from || '/tienda'
+
+  useEffect(() => {
+    if (!alertaCorreo) return
+
+    const temporizador = setTimeout(() => {
+      setAlertaCorreo(false)
+    }, 4500)
+
+    return () => clearTimeout(temporizador)
+  }, [alertaCorreo])
 
   const cambiar = (campo, valor) => {
     if (campo === 'nombre' || campo === 'apellido') {
@@ -94,9 +105,13 @@ export default function Registro() {
     setErrores(nuevosErrores)
 
     if (Object.keys(nuevosErrores).length) {
+      if (nuevosErrores.email) {
+        setAlertaCorreo(true)
+      }
+
       setError(
         nuevosErrores.email
-          ? 'Solo se permiten correos de Gmail (@gmail.com) o iCloud (@icloud.com).'
+          ? ''
           : 'Completa los campos obligatorios correctamente.'
       )
       return
@@ -166,6 +181,29 @@ export default function Registro() {
   return (
     <main className="pc-page">
       <div className="pc-container">
+        {alertaCorreo && (
+          <div
+            role="alert"
+            style={{
+              position: 'fixed',
+              top: 20,
+              right: 20,
+              zIndex: 1000,
+              maxWidth: 380,
+              padding: '14px 18px',
+              borderRadius: 10,
+              background: '#fff7ed',
+              border: '1px solid #fdba74',
+              color: '#9a3412',
+              boxShadow: '0 10px 30px rgba(0,0,0,.15)',
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            Solo puedes crear una cuenta con un correo de Gmail (@gmail.com) o iCloud (@icloud.com).
+          </div>
+        )}
+
         <div
           className="pc-admin-header"
           style={{
@@ -226,19 +264,6 @@ export default function Registro() {
               Completa tus datos para registrarte.
             </p>
 
-            <div
-              style={{
-                marginTop: 12,
-                padding: '10px 12px',
-                borderRadius: 8,
-                background: '#eff6ff',
-                border: '1px solid #bfdbfe',
-                color: '#1e40af',
-                fontSize: 14,
-              }}
-            >
-              Solo se pueden usar correos de Gmail (@gmail.com) o iCloud (@icloud.com).
-            </div>
           </div>
 
           {error && (
