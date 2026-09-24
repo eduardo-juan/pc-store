@@ -23,18 +23,56 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-
-  // Página a la que el usuario quería entrar
   const paginaOrigen = location.state?.from || '/tienda'
 
   useEffect(() => {
     if (!alertaCorreo) return
-
-    const temporizador = setTimeout(() => {
-      setAlertaCorreo(false)
-    }, 4500)
-
+    const temporizador = setTimeout(() => setAlertaCorreo(false), 4500)
     return () => clearTimeout(temporizador)
+  }, [alertaCorreo])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    const ahora = Date.now()
+    const estado = JSON.parse(localStorage.getItem('pc-store-login-rate') || 'null')
+    if (estado && ahora - estado.inicio < 300000 && estado.bloqueadoHasta > ahora) {
+      setError('Demasiados intentos. Espera unos segundos antes de volver a intentarlo.')
+      return
+    }
+
+    const correo = email.trim().toLowerCase()
+    if (!/^[^\s@]+@(gmail|icloud)\.com$/i.test(correo)) {
+      setAlertaCorreo(true)
+      return
+    }
+
+    setCargando(true)
+    try {
+      const resultado = await login(correo, password)
+      if (resultado.success) {
+        localStorage.removeItem('pc-store-login-rate')
+        navigate(paginaOrigen, { replace: true })
+      } else {
+        const actual = JSON.parse(localStorage.getItem('pc-store-login-rate') || 'null')
+        const base = actual && ahora - actual.inicio < 300000 ? actual : { inicio: ahora, intentos: 0 }
+        const intentos = base.intentos + 1
+        localStorage.setItem('pc-store-login-rate', JSON.stringify({
+          inicio: base.inicio,
+          intentos,
+          bloqueadoHasta: intentos >= 5 ? Date.now() + 60000 : 0,
+        }))
+        setError(intentos >= 5 ? 'Demasiados intentos fallidos. Espera 60 segundos antes de volver a intentarlo.' : (resultado.error || 'No se pudo iniciar sesión.'))
+      }
+    } catch (err) {
+      setError(err.message || 'Ocurrió un error al iniciar sesión.')
+    } finally {
+      setCargando(false)
+    }
+  }
+
+  return () => clearTimeout(temporizador)
   }, [alertaCorreo])
 
   const handleSubmit = async (e) => {
