@@ -81,8 +81,14 @@ export default function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const nuevosErrores = {}
+    const ahora = Date.now()
+    const estado = JSON.parse(localStorage.getItem('pc-store-registro-rate') || 'null')
+    if (estado && ahora - estado.inicio < 300000 && estado.bloqueadoHasta > ahora) {
+      setError('Demasiados intentos de registro. Espera unos segundos antes de volver a intentarlo.')
+      return
+    }
 
+    const nuevosErrores = {}
     const email = form.email.trim().toLowerCase()
 
     if (!/^[^\s@]+@(gmail|icloud)\.com$/i.test(email)) {
@@ -90,30 +96,18 @@ export default function Registro() {
     }
 
     ;['nombre', 'apellido', 'teléfono'].forEach((campo) => {
-      if (!form[campo].trim()) {
-        nuevosErrores[campo] = true
-      }
+      if (!form[campo].trim()) nuevosErrores[campo] = true
     })
 
-    if (
-      form.teléfono &&
-      !/^\d{4}-\d{4}$/.test(form.teléfono)
-    ) {
+    if (form.teléfono && !/^\d{4}-\d{4}$/.test(form.teléfono)) {
       nuevosErrores.teléfono = true
     }
 
     setErrores(nuevosErrores)
 
     if (Object.keys(nuevosErrores).length) {
-      if (nuevosErrores.email) {
-        setAlertaCorreo(true)
-      }
-
-      setError(
-        nuevosErrores.email
-          ? ''
-          : 'Completa los campos obligatorios correctamente.'
-      )
+      if (nuevosErrores.email) setAlertaCorreo(true)
+      setError(nuevosErrores.email ? '' : 'Completa los campos obligatorios correctamente.')
       return
     }
 
@@ -122,7 +116,7 @@ export default function Registro() {
 
     try {
       const resultado = await registro(
-        form.email.trim(),
+        email,
         form.password,
         form.nombre.trim(),
         form.apellido.trim(),
@@ -130,25 +124,22 @@ export default function Registro() {
       )
 
       if (resultado.success) {
-        alert(
-          '¡Registro exitoso! Verifica tu email para confirmar tu cuenta.'
-        )
-
-        navigate('/login', {
-          replace: true,
-          state: {
-            from: paginaOrigen
-          }
-        })
+        localStorage.removeItem('pc-store-registro-rate')
+        alert('¡Registro exitoso! Verifica tu email para confirmar tu cuenta.')
+        navigate('/login', { replace: true, state: { from: paginaOrigen } })
       } else {
-        setError(
-          resultado.error || 'No se pudo crear la cuenta.'
-        )
+        const actual = JSON.parse(localStorage.getItem('pc-store-registro-rate') || 'null')
+        const base = actual && ahora - actual.inicio < 300000 ? actual : { inicio: ahora, intentos: 0 }
+        const intentos = base.intentos + 1
+        localStorage.setItem('pc-store-registro-rate', JSON.stringify({
+          inicio: base.inicio,
+          intentos,
+          bloqueadoHasta: intentos >= 3 ? Date.now() + 60000 : 0,
+        }))
+        setError(intentos >= 3 ? 'Demasiados intentos de registro. Espera 60 segundos antes de volver a intentarlo.' : (resultado.error || 'No se pudo crear la cuenta.'))
       }
     } catch (err) {
-      setError(
-        err.message || 'Ocurrió un error al crear la cuenta.'
-      )
+      setError(err.message || 'Ocurrió un error al crear la cuenta.')
     } finally {
       setCargando(false)
     }
