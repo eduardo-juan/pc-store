@@ -103,7 +103,7 @@ export default function Login() {
           </div>
         )}
 
-        {/* ENCABEZADO */
+        {/* ENCABEZADO */}
 
         <div
           className="pc-admin-header"
