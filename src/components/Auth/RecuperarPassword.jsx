@@ -5,6 +5,8 @@ import { supabase } from "../../supabaseClient";
 import "./AuthRecovery.css";
 
 const MENSAJE_CUENTA = "No se encontró la cuenta. Verifica el correo electrónico e inténtalo nuevamente.";
+const CLAVE_RECUPERACION = "pc-store-password-recovery-rate";
+const COOLDOWN_RECUPERACION = 60 * 1000;
 
 export default function RecuperarPassword() {
   const [correo, setCorreo] = useState("");
@@ -18,7 +20,14 @@ export default function RecuperarPassword() {
     setMensaje("");
     setError("");
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    const ultimoEnvio = Number(localStorage.getItem(CLAVE_RECUPERACION) || 0);
+    const restante = COOLDOWN_RECUPERACION - (Date.now() - ultimoEnvio);
+    if (restante > 0) {
+      setError(`Espera ${Math.ceil(restante / 1000)} segundos antes de solicitar otro enlace.`);
+      return;
+    }
+
+    if (!/^[^\s@]+@(gmail|icloud)\.com$/i.test(email)) {
       setError(MENSAJE_CUENTA);
       return;
     }
@@ -26,6 +35,8 @@ export default function RecuperarPassword() {
     setCargando(true);
 
     try {
+      localStorage.setItem(CLAVE_RECUPERACION, String(Date.now()));
+
       const { error: solicitudError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/restablecer-password`,
       });
