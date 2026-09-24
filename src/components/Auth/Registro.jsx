@@ -72,6 +72,12 @@ export default function Registro() {
 
     const nuevosErrores = {}
 
+    const email = form.email.trim().toLowerCase()
+
+    if (!/^[^\s@]+@gmail\.com$/i.test(email)) {
+      nuevosErrores.email = true
+    }
+
     ;['nombre', 'apellido', 'teléfono'].forEach((campo) => {
       if (!form[campo].trim()) {
         nuevosErrores[campo] = true
@@ -89,7 +95,9 @@ export default function Registro() {
 
     if (Object.keys(nuevosErrores).length) {
       setError(
-        'Completa los campos obligatorios correctamente.'
+        nuevosErrores.email
+          ? 'Solo se permiten correos de Gmail (@gmail.com).'
+          : 'Completa los campos obligatorios correctamente.'
       )
       return
     }
@@ -353,12 +361,14 @@ export default function Registro() {
                 className="pc-input"
                 type="email"
                 maxLength={120}
-                placeholder="correo@ejemplo.com"
+                placeholder="correo@gmail.com"
                 value={form.email}
                 onChange={(e) =>
                   cambiar('email', e.target.value)
                 }
+                style={estiloError('email')}
                 required
+                pattern="^[^\s@]+@gmail\.com$"
                 autoComplete="email"
               />
             </div>
