@@ -1,3 +1,10 @@
+// ============================================================
+// CONTEXTO DEL CARRITO
+// Centraliza el estado y las operaciones del carrito de PC Store.
+// Aquí se controla la persistencia local, productos normales,
+// configuraciones de PC, cantidades y cálculos del subtotal.
+// ============================================================
+
 import {
   createContext,
   useContext,
@@ -6,12 +13,21 @@ import {
   useState,
 } from "react";
 
+// Contexto compartido para que cualquier componente pueda acceder
+// al carrito sin tener que pasar sus datos manualmente por props.
 const CarritoContext = createContext(null);
 
+// Clave utilizada para guardar el carrito en localStorage.
+// Esto permite conservarlo al recargar o cerrar el navegador.
 const CLAVE_STORAGE = "pc-store-carrito";
+
+// Cargo adicional aplicado cuando el cliente solicita el armado
+// de una PC mediante el configurador.
 const COSTO_ARMADO_PC = 1500;
 
 export function CarritoProvider({ children }) {
+  // Carga inicial del carrito desde localStorage.
+  // Si no existe o los datos están dañados, iniciamos con un arreglo vacío.
   const [items, setItems] = useState(() => {
     try {
       const guardado = localStorage.getItem(CLAVE_STORAGE);
@@ -21,10 +37,13 @@ export function CarritoProvider({ children }) {
     }
   });
 
+  // Cada vez que cambia el carrito, guardamos su estado actualizado.
   useEffect(() => {
     localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items));
   }, [items]);
 
+  // Agrega un producto individual al carrito.
+  // También evita cantidades inválidas y cantidades superiores al stock conocido.
   const agregarProducto = (producto, cantidad = 1) => {
     if (!producto || producto.stock <= 0) {
       return {
@@ -42,6 +61,8 @@ export function CarritoProvider({ children }) {
       };
     }
 
+    // El precio utilizado por el carrito es el precio de descuento cuando existe;
+    // de lo contrario utiliza el precio normal.
     const precio = Number(
       producto.precio_descuento ||
         producto.precio ||
@@ -54,6 +75,8 @@ export function CarritoProvider({ children }) {
     };
 
     setItems((actuales) => {
+      // Buscamos únicamente un producto normal con el mismo ID.
+      // Las configuraciones tienen un identificador diferente.
       const existente = actuales.find(
         (item) =>
           item.tipo === "producto" &&
@@ -64,6 +87,7 @@ export function CarritoProvider({ children }) {
         const nuevaCantidad =
           existente.cantidad + cantidadNumero;
 
+        // No permitimos superar el stock disponible conocido.
         if (nuevaCantidad > producto.stock) {
           resultado = {
             success: false,
@@ -73,6 +97,7 @@ export function CarritoProvider({ children }) {
           return actuales;
         }
 
+        // Si ya existe, actualizamos su cantidad y stock conocido.
         return actuales.map((item) =>
           item === existente
             ? {
@@ -84,6 +109,7 @@ export function CarritoProvider({ children }) {
         );
       }
 
+      // Si no existe, creamos una nueva línea de producto en el carrito.
       return [
         ...actuales,
         {
@@ -101,7 +127,9 @@ export function CarritoProvider({ children }) {
     return resultado;
   };
 
+  // Agrega al carrito una PC completa creada mediante el configurador.
   const agregarConfiguracion = (seleccionados) => {
+    // Convertimos las selecciones del configurador en una lista de componentes válidos.
     const componentes = Object.values(
       seleccionados || {}
     ).filter(
@@ -115,6 +143,8 @@ export function CarritoProvider({ children }) {
       };
     }
 
+    // Antes de crear la configuración comprobamos que ningún componente
+    // seleccionado esté agotado.
     const sinStock = componentes.find(
       (componente) =>
         Number(componente.producto.stock) <= 0
@@ -131,6 +161,8 @@ export function CarritoProvider({ children }) {
       (componente) => componente.producto
     );
 
+    // Calculamos el precio total de los componentes usando el descuento
+    // cuando está disponible.
     const precioComponentes = productos.reduce(
       (total, producto) =>
         total +
@@ -142,6 +174,8 @@ export function CarritoProvider({ children }) {
       0
     );
 
+    // Creamos una línea independiente para esta configuración.
+    // Cada configuración recibe un UUID para poder modificarla o eliminarla.
     const configuracion = {
       tipo: "configurador",
       configuracion_id: crypto.randomUUID(),
@@ -180,6 +214,9 @@ export function CarritoProvider({ children }) {
     };
   };
 
+  // Cambia la cantidad de una línea del carrito.
+  // Los productos normales respetan el stock; una configuración
+  // puede manejar su cantidad como una unidad compuesta.
   const cambiarCantidad = (
     identificador,
     cantidad
@@ -193,6 +230,7 @@ export function CarritoProvider({ children }) {
 
     setItems((actuales) =>
       actuales.map((item) => {
+        // Cada tipo de artículo tiene su propio identificador.
         const id =
           item.tipo === "configurador"
             ? item.configuracion_id
@@ -209,6 +247,7 @@ export function CarritoProvider({ children }) {
           };
         }
 
+        // En un producto normal nunca permitimos superar el stock conocido.
         return {
           ...item,
           cantidad: Math.min(
@@ -220,6 +259,7 @@ export function CarritoProvider({ children }) {
     );
   };
 
+  // Elimina una línea completa del carrito por su identificador.
   const eliminarProducto = (identificador) => {
     setItems((actuales) =>
       actuales.filter((item) => {
@@ -233,10 +273,12 @@ export function CarritoProvider({ children }) {
     );
   };
 
+  // Vacía completamente el carrito.
   const vaciarCarrito = () => {
     setItems([]);
   };
 
+  // Cantidad total de unidades mostrada en el carrito.
   const cantidadTotal = useMemo(
     () =>
       items.reduce(
@@ -247,6 +289,7 @@ export function CarritoProvider({ children }) {
     [items]
   );
 
+  // Subtotal calculado a partir del precio y cantidad de cada línea.
   const subtotal = useMemo(
     () =>
       items.reduce(
@@ -259,6 +302,7 @@ export function CarritoProvider({ children }) {
     [items]
   );
 
+  // Exponemos estado, acciones y valores calculados a toda la aplicación.
   return (
     <CarritoContext.Provider
       value={{
@@ -278,6 +322,8 @@ export function CarritoProvider({ children }) {
   );
 }
 
+// Hook personalizado para consumir el contexto del carrito.
+// El error ayuda a detectar si alguien intenta usarlo fuera del Provider.
 export function useCarrito() {
   const context = useContext(CarritoContext);
 
