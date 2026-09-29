@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Auth/ProtectedRoute.jsx
+// Responsabilidad: Implementa autenticación, recuperación de cuenta o protección de acceso.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Protege las rutas que requieren autenticación y controla el acceso por rol.
 // También conserva la URL solicitada para regresar a ella después del inicio de sesión.
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
