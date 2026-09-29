@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/GlobalFeedback.jsx
+// Responsabilidad: Construye un componente reutilizable de PC Store.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, X } from "lucide-react";
 
