@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -14,6 +15,7 @@ import {
   eliminarFavorito,
 } from "../services/favoritosService";
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function Favoritos() {
   const { usuario } = useAuth();
 
@@ -75,7 +77,8 @@ export default function Favoritos() {
   };
 
   if (cargando) {
-    return (
+    // Renderizado principal: muestra la información y acciones disponibles.
+  return (
       <main className="pc-page">
         <div className="pc-container text-center py-5">
           <p className="text-muted">
