@@ -1,4 +1,11 @@
 // ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/context/CarritoContext.jsx
+// Responsabilidad: Forma parte del funcionamiento de PC Store.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
+// ============================================================
 // CONTEXTO DEL CARRITO
 // Centraliza el estado y las operaciones del carrito de PC Store.
 // Aquí se controla la persistencia local, productos normales,
