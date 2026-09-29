@@ -4,6 +4,7 @@ import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,7 +21,8 @@ export default function Login() {
   useEffect(() => {
     if (!alertaCorreo) return
     const temporizador = setTimeout(() => setAlertaCorreo(false), 4500)
-    return () => clearTimeout(temporizador)
+    // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
+  return () => clearTimeout(temporizador)
   }, [alertaCorreo])
 
   const handleSubmit = async (e) => {
