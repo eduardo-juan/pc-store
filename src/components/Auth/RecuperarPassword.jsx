@@ -9,6 +9,7 @@ const CLAVE_RECUPERACION = "pc-store-password-recovery-rate";
 const COOLDOWN_RECUPERACION = 60 * 1000;
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function RecuperarPassword() {
   const [correo, setCorreo] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -55,6 +56,7 @@ export default function RecuperarPassword() {
     }
   };
 
+  // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
   return (
     <main className="pc-auth-modern-page">
       <div className="pc-auth-modern-shell">
