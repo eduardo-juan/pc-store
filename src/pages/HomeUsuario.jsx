@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function HomeUsuario({ usuario }) {
   const [pedidos, setPedidos] = useState([]);
   const [productos, setProductos] = useState([]);
@@ -49,6 +51,7 @@ export default function HomeUsuario({ usuario }) {
     cargar();
   }, [usuario?.id]);
 
+  // Renderizado principal: muestra la información y acciones disponibles.
   return (
     <main className="inicio-usuario-premium">
       <section className="hero-usuario">
