@@ -6,6 +6,8 @@ import { supabase } from "../supabaseClient";
 import { useAuth } from "../hooks/useAuth";
 import BotonAtras from "../components/BotonAtras";
 
+// Define la cantidad de órdenes mostradas por página y los estados disponibles
+// para filtrar el historial del usuario.
 const ORDENES_POR_PAGINA = 8;
 
 const ESTADOS = [
@@ -21,6 +23,8 @@ const limpiarBusqueda = (valor = "") =>
     .replace(/[^\p{L}\p{N}\s@._-]/gu, "")
     .slice(0, 100);
 
+// Página del historial de compras del usuario autenticado. Permite consultar,
+// filtrar, paginar y cancelar órdenes cuando su estado lo permite.
 export default function MisOrdenes() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
@@ -48,6 +52,8 @@ export default function MisOrdenes() {
     setPagina(1);
   }, [filtro, fecha, busqueda]);
 
+  // Consulta las órdenes pertenecientes al usuario actual y prepara los datos
+  // necesarios para aplicar filtros, paginación y acciones sobre cada orden.
   const cargarOrdenes = async () => {
     if (!usuario) return;
 
@@ -284,6 +290,8 @@ export default function MisOrdenes() {
     paginaActual * ORDENES_POR_PAGINA,
   );
 
+  // Renderiza filtros, paginación, estados y acciones del historial de órdenes
+  // junto con el acceso al detalle de cada compra.
   return (
     <main className="pc-page">
       <div className="pc-container">
