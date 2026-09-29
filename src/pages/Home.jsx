@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
@@ -23,6 +24,7 @@ const categorias = [
   ["Fuentes de Alimentación", Zap],
 ];
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function Home() {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -43,6 +45,7 @@ export default function Home() {
 
   const imagenes = productos.filter((p) => p.imagen_principal);
 
+  // Renderizado principal: muestra la información y acciones disponibles.
   return (
     <main className="total-cinema-home">
       <section className="tc-intro">
