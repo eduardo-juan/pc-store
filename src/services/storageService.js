@@ -1,6 +1,12 @@
+// ============================================================
+// SERVICIO DE STORAGE
+// Gestiona la preparación, subida y eliminación de imágenes
+// almacenadas en Supabase Storage.
+// ============================================================
 import { supabase } from '../supabaseClient'
 
-// Convierte una imagen con fondo blanco/claro a PNG con transparencia.
+// Procesa la imagen, elimina fondos claros y la convierte
+// a formato PNG con transparencia cuando corresponde.
 const convertirAPngTransparente = (archivo) => new Promise((resolve, reject) => {
   const lector = new FileReader()
 
@@ -55,6 +61,8 @@ const convertirAPngTransparente = (archivo) => new Promise((resolve, reject) => 
   lector.readAsDataURL(archivo)
 })
 
+// Convierte nombres o valores en segmentos seguros para
+// utilizarlos dentro de las rutas de almacenamiento.
 const limpiarSegmento = (valor) => String(valor || '')
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
@@ -62,20 +70,29 @@ const limpiarSegmento = (valor) => String(valor || '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '') || 'sin-categoria'
 
+// Normaliza cada parte de la carpeta para generar
+// una ruta válida y consistente en Storage.  
 const limpiarCarpeta = (carpeta) => String(carpeta || 'productos')
   .split('/')
   .map(limpiarSegmento)
   .filter(Boolean)
   .join('/')
 
+// Valida, procesa y sube una imagen al bucket indicado.
+// Devuelve la URL pública y la ruta interna del archivo.  
 export const subirImagen = async (bucket, archivo, nombreArchivo, carpeta = 'productos') => {
   try {
+
+// Valida que exista un archivo, que sea una imagen
+// y que no supere el tamaño máximo permitido.    
     if (!archivo) throw new Error('Selecciona una imagen.')
     if (!archivo.type?.startsWith('image/')) throw new Error('El archivo debe ser una imagen.')
     if (archivo.size > 10 * 1024 * 1024) throw new Error('La imagen no puede superar 10 MB.')
 
     const imagenProcesada = await convertirAPngTransparente(archivo)
     const nombreSeguro = limpiarSegmento(nombreArchivo).slice(0, 80)
+
+// Genera una ruta única para evitar conflictos entre archivos.    
     const ruta = `${limpiarCarpeta(carpeta)}/${crypto.randomUUID()}-${nombreSeguro}.png`
 
     const { data, error } = await supabase.storage.from(bucket).upload(ruta, imagenProcesada, {
@@ -102,6 +119,7 @@ export const obtenerRutaStorage = (bucket, url) => {
   return decodeURIComponent(url.slice(prefijo.length + 1).split('?')[0])
 }
 
+// Elimina una imagen del bucket utilizando su ruta interna.
 export const eliminarImagen = async (bucket, ruta) => {
   try {
     if (!ruta) return { success: true }

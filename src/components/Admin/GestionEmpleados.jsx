@@ -15,22 +15,33 @@ import { supabase } from "../../supabaseClient";
 
 export default function GestionEmpleados() {
   const navigate = useNavigate();
+
+  // Usuarios registrados que serán filtrados para mostrar únicamente empleados.
   const [usuarios, setUsuarios] = useState([]);
+
+  // Texto utilizado para buscar empleados por nombre, correo o ciudad.
   const [busqueda, setBusqueda] = useState("");
+
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Configuración global para controlar las órdenes y comisiones de empleados.
   const [maxOrdenes, setMaxOrdenes] = useState(5);
   const [comision, setComision] = useState(5);
   const [guardandoConfig, setGuardandoConfig] = useState(false);
+
+  // Controla el empleado seleccionado para eliminación y su confirmación.
   const [empleadoEliminar, setEmpleadoEliminar] = useState(null);
   const [passwordEliminar, setPasswordEliminar] = useState("");
   const [eliminando, setEliminando] = useState(false);
 
+  // Carga empleados y configuración al abrir el módulo.
   useEffect(() => {
     cargarUsuarios();
     cargarConfig();
   }, []);
 
+  // Obtiene todos los usuarios registrados para identificar los empleados.
   const cargarUsuarios = async () => {
     setCargando(true);
     setError("");
@@ -46,6 +57,7 @@ export default function GestionEmpleados() {
     setCargando(false);
   };
 
+  // Obtiene desde Supabase las reglas globales para los empleados.
   const cargarConfig = async () => {
     const { data, error } = await supabase
       .from("configuracion_empleados")
@@ -62,6 +74,7 @@ export default function GestionEmpleados() {
     setComision(Number(data.comision_porcentaje) || 5);
   };
 
+  // Guarda los límites configurados para órdenes activas y comisiones.
   const guardarConfig = async () => {
     const limite = Math.min(100, Math.max(1, Number(maxOrdenes) || 5));
     const porcentaje = Math.min(100, Math.max(0, Number(comision) || 0));
@@ -87,6 +100,7 @@ export default function GestionEmpleados() {
     setGuardandoConfig(false);
   };
 
+  // Quita el rol de empleado y devuelve la cuenta al rol de cliente.
   const quitarEmpleado = async (id) => {
     if (
       !window.confirm(
@@ -110,6 +124,7 @@ export default function GestionEmpleados() {
     else await cargarUsuarios();
   };
 
+  // Elimina permanentemente la cuenta mediante una función segura de Supabase.
   const eliminarEmpleado = async () => {
     if (!empleadoEliminar || !passwordEliminar.trim() || eliminando) {
       setError("Introduce la contraseña del administrador.");
@@ -151,6 +166,7 @@ export default function GestionEmpleados() {
     }
   };
 
+  // Filtra los usuarios para mostrar únicamente empleados que coincidan con la búsqueda.
   const empleados = usuarios
     .filter((usuario) => usuario.rol === "empleado")
     .filter((usuario) => {
@@ -162,10 +178,13 @@ export default function GestionEmpleados() {
         .includes(texto);
     });
 
+  // Calcula los totales utilizados en las tarjetas de resumen.
   const totalEmpleados = usuarios.filter((u) => u.rol === "empleado").length;
+
   const totalActivos = usuarios.filter(
     (u) => u.rol === "empleado" && u.activo === true && u.bloqueado !== true,
   ).length;
+
   const totalFuera = usuarios.filter(
     (u) => u.rol === "empleado" && (u.activo === false || u.bloqueado === true),
   ).length;
@@ -189,23 +208,28 @@ export default function GestionEmpleados() {
           </div>
         )}
 
+        {/* Resumen de empleados registrados y su estado actual. */}
         <div className="pc-metrics-grid" style={{ marginBottom: 30 }}>
           <article className="pc-card pc-metric">
             <span>Empleados</span>
             <strong>{totalEmpleados}</strong>
           </article>
+
           <article className="pc-card pc-metric">
             <span>Activos</span>
             <strong style={{ color: "#16a34a" }}>{totalActivos}</strong>
           </article>
+
           <article className="pc-card pc-metric">
             <span>Fuera de servicio</span>
             <strong style={{ color: "#6b7280" }}>{totalFuera}</strong>
           </article>
         </div>
 
+        {/* Configuración global utilizada para asignación y pago de entregas. */}
         <section className="pc-card" style={{ padding: 20, marginBottom: 30 }}>
           <h2 style={{ marginTop: 0 }}>Reglas de entregas</h2>
+
           <p className="pc-muted">
             Estos valores se aplican globalmente y se validan en el servidor.
           </p>
@@ -254,6 +278,7 @@ export default function GestionEmpleados() {
           </div>
         ) : (
           <>
+            {/* Buscador de empleados por nombre, apellido, email o ciudad. */}
             <div className="pc-card" style={{ padding: 16, marginBottom: 30 }}>
               <div
                 style={{
@@ -264,6 +289,7 @@ export default function GestionEmpleados() {
                 }}
               >
                 <Search size={20} style={{ color: "#666" }} />
+
                 <input
                   type="text"
                   className="pc-input"
@@ -298,6 +324,7 @@ export default function GestionEmpleados() {
               )}
             </div>
 
+            {/* Encabezado y acceso para registrar un nuevo empleado. */}
             <div
               style={{
                 display: "flex",
@@ -323,6 +350,7 @@ export default function GestionEmpleados() {
               </button>
             </div>
 
+            {/* Tabla principal con los empleados y sus acciones administrativas. */}
             <div
               className="pc-card pc-table-wrapper"
               style={{ marginBottom: 40 }}
@@ -350,11 +378,14 @@ export default function GestionEmpleados() {
                         <td>
                           <strong>{indice + 1}</strong>
                         </td>
+
                         <td>
                           {empleado.nombre || ""} {empleado.apellido || ""}
                         </td>
+
                         <td>{empleado.email}</td>
                         <td>{empleado.ciudad || "-"}</td>
+
                         <td>
                           <span
                             style={{
@@ -374,6 +405,7 @@ export default function GestionEmpleados() {
                             ) : (
                               <CircleX size={16} />
                             )}
+
                             {empleado.bloqueado
                               ? "Bloqueado"
                               : activo
@@ -381,6 +413,7 @@ export default function GestionEmpleados() {
                                 : "Fuera de servicio"}
                           </span>
                         </td>
+
                         <td>
                           <span
                             style={{
@@ -394,6 +427,7 @@ export default function GestionEmpleados() {
                             Empleado
                           </span>
                         </td>
+
                         <td>
                           <div
                             style={{
@@ -441,10 +475,12 @@ export default function GestionEmpleados() {
           </>
         )}
 
+        {/* Modal para confirmar la eliminación permanente de un empleado. */}
         {empleadoEliminar && (
           <div className="pc-modal-backdrop">
             <div className="pc-card pc-modal" style={{ padding: 24 }}>
               <h2>Eliminar empleado</h2>
+
               <p>
                 Vas a eliminar permanentemente la cuenta de{" "}
                 <strong>{empleadoEliminar.email}</strong>.

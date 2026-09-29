@@ -16,10 +16,13 @@ import { supabase } from "../../supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
+// Estados de órdenes que se consideran ventas realizadas.
 const ESTADOS_VENTA_VALIDOS = ["pagada", "enviada", "entregada", "completada"];
 
 export default function AdminDashboard() {
   const { perfil } = useAuth();
+ 
+// Métricas mostradas en el resumen principal del administrador.  
   const [metricas, setMetricas] = useState({
     productos: 0,
     usuarios: 0,
@@ -27,10 +30,13 @@ export default function AdminDashboard() {
     ventas: 0,
     bajoStock: 0,
   });
+
+// Carga las métricas automáticamente al abrir el dashboard.  
   useEffect(() => {
     cargarMetricas();
   }, []);
 
+// Obtiene desde Supabase los datos necesarios para el resumen administrativo.  
   const cargarMetricas = async () => {
     const [productosResult, usuariosResult, ordenesResult, bajoStockResult] =
       await Promise.all([
@@ -59,6 +65,8 @@ export default function AdminDashboard() {
       hoy.getMonth(),
       hoy.getDate() + 1,
     );
+
+// Filtra las ventas realizadas durante el día actual y suma sus totales.    
     const ventasHoy = (ordenesResult.data || [])
       .filter((orden) => {
         const fecha = orden.created_at ? new Date(orden.created_at) : null;
@@ -81,6 +89,7 @@ export default function AdminDashboard() {
     });
   };
 
+// Módulos disponibles para gestionar las diferentes áreas de la tienda.  
   const opciones = [
     { icono: Package, titulo: "Productos", ruta: "/admin/productos" },
     { icono: BarChart3, titulo: "Inventario", ruta: "/admin/inventario" },
@@ -94,7 +103,8 @@ export default function AdminDashboard() {
     { icono: FileText, titulo: "Reportes", ruta: "/admin/reportes" },
     { icono: ClipboardList, titulo: "Auditoría", ruta: "/admin/auditoria" },
   ];
-
+  
+// Presenta las métricas principales del sistema en tarjetas.
   return (
     <main className="pc-page">
       <div className="pc-container">
@@ -109,8 +119,8 @@ export default function AdminDashboard() {
             </h1>
             <p style={{ color: "#171717" }}>Resumen general de PC Store.</p>
           </div>
-        </div>
-        <div className="pc-metrics-grid">
+        </div>         
+        <div className="pc-metrics-grid">         
           {[
             ["Productos", metricas.productos],
             ["Usuarios", metricas.usuarios],

@@ -1,6 +1,16 @@
+// ============================================================
+// SERVICIO DE FAVORITOS
+// Centraliza las operaciones para consultar, agregar
+// y eliminar productos de los favoritos del usuario.
+// ============================================================
 import { supabase } from '../supabaseClient'
 
+// Obtiene los productos favoritos del usuario junto
+// con la información necesaria para mostrarlos en la tienda.
 export async function obtenerFavoritos(usuarioId) {
+
+// Consulta los favoritos asociados al usuario y los ordena
+// desde el más reciente hasta el más antiguo.  
   return await supabase
     .from('favoritos')
     .select(`
@@ -23,7 +33,12 @@ export async function obtenerFavoritos(usuarioId) {
     .order('created_at', { ascending: false })
 }
 
+// Guarda la relación entre el usuario y el producto seleccionado
+// como un nuevo favorito.  
 export async function agregarFavorito(usuarioId, productoId) {
+
+// Consulta los favoritos asociados al usuario y los ordena
+// desde el más reciente hasta el más antiguo.  
   return await supabase
     .from('favoritos')
     .insert({
@@ -34,6 +49,7 @@ export async function agregarFavorito(usuarioId, productoId) {
     .single()
 }
 
+// Elimina el producto de los favoritos del usuario.
 export async function eliminarFavorito(usuarioId, productoId) {
   return await supabase
     .from('favoritos')

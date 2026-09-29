@@ -5,17 +5,22 @@ import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
 export default function GestionUsuarios() {
+  // Obtiene los datos del usuario actualmente autenticado.
   const { usuario } = useAuth();
+
+  // Usuarios registrados y estados utilizados por el módulo.
   const [usuarios, setUsuarios] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [procesando, setProcesando] = useState(null);
 
+  // Carga los usuarios automáticamente al abrir el módulo.
   useEffect(() => {
     cargarUsuarios();
   }, []);
 
+  // Obtiene todos los usuarios desde Supabase y los ordena por fecha de registro.
   const cargarUsuarios = async () => {
     setCargando(true);
     setError("");
@@ -26,16 +31,20 @@ export default function GestionUsuarios() {
       .order("created_at", { ascending: false });
 
     if (error) setError(error.message);
+
     setUsuarios(data || []);
     setCargando(false);
   };
 
+  // Bloquea o desbloquea una cuenta de cliente después de validar permisos.
   const cambiarBloqueo = async (seleccionado) => {
+    // Impide que un administrador bloquee su propia cuenta.
     if (seleccionado.id === usuario?.id) {
       setError("No puedes bloquear tu propia cuenta.");
       return;
     }
 
+    // Empleados y administradores se gestionan desde módulos específicos.
     if (seleccionado.rol === "empleado" || seleccionado.rol === "admin") {
       setError(
         "Las cuentas de empleados y administradores se gestionan desde sus módulos correspondientes.",
@@ -43,6 +52,7 @@ export default function GestionUsuarios() {
       return;
     }
 
+    // Solicita confirmación antes de cambiar el estado de la cuenta.
     if (
       !window.confirm(
         seleccionado.bloqueado
@@ -53,6 +63,8 @@ export default function GestionUsuarios() {
       return;
 
     setProcesando(seleccionado.id);
+
+    // Actualiza el estado de bloqueo del usuario en Supabase.
     const { error } = await supabase
       .from("usuarios")
       .update({
@@ -62,13 +74,18 @@ export default function GestionUsuarios() {
       .eq("id", seleccionado.id);
 
     if (error) setError(error.message);
+
     await cargarUsuarios();
     setProcesando(null);
   };
 
+  // Normaliza el texto introducido para realizar la búsqueda.
   const texto = busqueda.trim().toLowerCase();
+
+  // Filtra usuarios por nombre, correo, ciudad o rol.
   const filtrados = usuarios.filter((item) => {
     if (!texto) return true;
+
     return [item.nombre, item.apellido, item.email, item.ciudad, item.rol]
       .filter(Boolean)
       .join(" ")
@@ -76,9 +93,11 @@ export default function GestionUsuarios() {
       .includes(texto);
   });
 
+  // Construye el nombre completo del usuario.
   const nombre = (item) =>
     [item.nombre, item.apellido].filter(Boolean).join(" ") || "Sin nombre";
 
+  // Convierte los valores internos de rol en nombres visibles.
   const rol = (valor) =>
     valor === "admin"
       ? "Administrador"
@@ -105,9 +124,11 @@ export default function GestionUsuarios() {
           </div>
         )}
 
+        {/* Campo de búsqueda para localizar usuarios rápidamente. */}
         <div className="pc-card" style={{ padding: 16, marginBottom: 30 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Search size={20} />
+
             <input
               className="pc-input"
               value={busqueda}
@@ -115,6 +136,7 @@ export default function GestionUsuarios() {
               placeholder="Buscar por nombre, email, ciudad o rol..."
               style={{ width: "100%" }}
             />
+
             {busqueda && (
               <button type="button" onClick={() => setBusqueda("")}>
                 <X size={18} />
@@ -142,26 +164,39 @@ export default function GestionUsuarios() {
                   <th>Acciones</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filtrados.map((item, index) => {
+                  // Identifica la cuenta del administrador actual.
                   const actual = item.id === usuario?.id;
+
+                  // Identifica cuentas que no pueden gestionarse desde este módulo.
                   const protegido =
                     item.rol === "admin" || item.rol === "empleado";
+
+                  // Determina si el cliente está bloqueado.
                   const bloqueado = item.bloqueado === true;
+
+                  // Evita repetir acciones mientras se procesa una solicitud.
                   const ocupado = procesando === item.id;
 
                   return (
                     <tr key={item.id}>
                       <td>{index + 1}</td>
+
                       <td>
                         <strong>{nombre(item)}</strong>
                         {actual && <small> Tu cuenta</small>}
                       </td>
+
                       <td>{item.email || "-"}</td>
+
                       <td>{item.ciudad || "-"}</td>
+
                       <td>
                         <UserCog size={16} /> {rol(item.rol)}
                       </td>
+
                       <td>
                         {bloqueado ? (
                           <span style={{ color: "#dc2626" }}>
@@ -173,6 +208,7 @@ export default function GestionUsuarios() {
                           </span>
                         )}
                       </td>
+
                       <td>
                         {actual ? (
                           "Cuenta actual"
@@ -191,6 +227,7 @@ export default function GestionUsuarios() {
                     </tr>
                   );
                 })}
+
                 {!filtrados.length && (
                   <tr>
                     <td colSpan="7">No se encontraron usuarios.</td>

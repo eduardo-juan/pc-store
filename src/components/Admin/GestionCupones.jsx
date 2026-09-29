@@ -1,405 +1,202 @@
-import { useEffect, useState, useRef } from "react";
-import { Plus, Pencil, X, Power, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  UserRound,
+  UserCheck,
+  Search,
+  X,
+  CircleCheck,
+  CircleX,
+  Trash2,
+} from "lucide-react";
+import BotonAtras from "../../components/BotonAtras";
 import { supabase } from "../../supabaseClient";
-import { useAuth } from "../../hooks/useAuth";
-import BotonAtras from "../BotonAtras";
 
-const inicial = {
-  codigo: "",
-  descripcion: "",
-  tipo: "porcentaje",
-  valor: "",
-  compra_minima: "0",
-  limite_usos: "",
-  fecha_inicio: "",
-  fecha_fin: "",
-  activo: true,
-};
+export default function GestionEmpleados() {
+  const navigate = useNavigate();
 
-export default function GestionCupones() {
-  const { esAdmin } = useAuth();
-  const [cupones, setCupones] = useState([]);
-  const [form, setForm] = useState(inicial);
-  const [editandoId, setEditandoId] = useState(null);
+  // Usuarios registrados que serán filtrados para mostrar únicamente empleados.
+  const [usuarios, setUsuarios] = useState([]);
+
+  // Texto utilizado para buscar empleados por nombre, correo o ciudad.
+  const [busqueda, setBusqueda] = useState("");
+
   const [error, setError] = useState("");
-  const [guardando, setGuardando] = useState(false);
-  const [eliminandoId, setEliminandoId] = useState(null);
-  const formularioRef = useRef(null);
+  const [cargando, setCargando] = useState(true);
 
+  // Configuración global para controlar las órdenes y comisiones de empleados.
+  const [maxOrdenes, setMaxOrdenes] = useState(5);
+  const [comision, setComision] = useState(5);
+  const [guardandoConfig, setGuardandoConfig] = useState(false);
+
+  // Controla el empleado seleccionado para eliminación y su confirmación.
+  const [empleadoEliminar, setEmpleadoEliminar] = useState(null);
+  const [passwordEliminar, setPasswordEliminar] = useState("");
+  const [eliminando, setEliminando] = useState(false);
+
+  // Carga empleados y configuración al abrir el módulo.
   useEffect(() => {
-    cargarCupones();
+    cargarUsuarios();
+    cargarConfig();
   }, []);
 
-  const cargarCupones = async () => {
+  // Obtiene todos los usuarios registrados para identificar los empleados.
+  const cargarUsuarios = async () => {
+    setCargando(true);
     setError("");
+
     const { data, error } = await supabase
-      .from("cupones")
+      .from("usuarios")
       .select("*")
       .order("created_at", { ascending: false });
+
+    if (error) setError(error.message);
+    else setUsuarios(data || []);
+
+    setCargando(false);
+  };
+
+  // Obtiene desde Supabase las reglas globales para los empleados.
+  const cargarConfig = async () => {
+    const { data, error } = await supabase
+      .from("configuracion_empleados")
+      .select("max_ordenes_activas,comision_porcentaje")
+      .eq("id", true)
+      .single();
+
     if (error) {
       setError(error.message);
       return;
     }
-    setCupones(data || []);
+
+    setMaxOrdenes(Number(data.max_ordenes_activas) || 5);
+    setComision(Number(data.comision_porcentaje) || 5);
   };
 
-  const cambiar = (campo, valor) =>
-    setForm((actual) => ({ ...actual, [campo]: valor }));
-  const desplazarAlFormulario = () =>
-    window.requestAnimationFrame(() =>
-      formularioRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      }),
-    );
+  // Guarda los límites configurados para órdenes activas y comisiones.
+  const guardarConfig = async () => {
+    const limite = Math.min(100, Math.max(1, Number(maxOrdenes) || 5));
+    const porcentaje = Math.min(100, Math.max(0, Number(comision) || 0));
 
-  const guardar = async (e) => {
-    e.preventDefault();
+    setGuardandoConfig(true);
     setError("");
-    if (!esAdmin) {
-      setError("No tienes permiso para gestionar cupones.");
-      return;
-    }
-    const codigo = form.codigo.trim().toUpperCase();
-    const valor = Number(form.valor);
-    const compraMinima = Number(form.compra_minima || 0);
-    const limiteUsos =
-      form.limite_usos === "" ? null : Number(form.limite_usos);
-    if (!/^[A-Z0-9_-]{3,30}$/.test(codigo)) {
-      setError(
-        "El código debe tener entre 3 y 30 caracteres: letras, números, guion o guion bajo.",
-      );
-      return;
-    }
-    if (!Number.isFinite(valor) || valor <= 0) {
-      setError("El valor del descuento debe ser mayor que 0.");
-      return;
-    }
-    if (form.tipo === "porcentaje" && valor > 100) {
-      setError("El porcentaje no puede superar 100%.");
-      return;
-    }
-    if (!Number.isFinite(compraMinima) || compraMinima < 0) {
-      setError("La compra mínima no puede ser negativa.");
-      return;
-    }
-    if (
-      limiteUsos !== null &&
-      (!Number.isInteger(limiteUsos) || limiteUsos <= 0)
-    ) {
-      setError("El límite de usos debe ser un número entero mayor que 0.");
-      return;
-    }
-    if (
-      form.fecha_inicio &&
-      form.fecha_fin &&
-      new Date(form.fecha_fin) < new Date(form.fecha_inicio)
-    ) {
-      setError("La fecha final no puede ser anterior a la fecha inicial.");
-      return;
-    }
-    const datos = {
-      codigo,
-      descripcion: form.descripcion.trim(),
-      tipo: form.tipo,
-      valor,
-      compra_minima: compraMinima,
-      limite_usos: limiteUsos,
-      fecha_inicio: form.fecha_inicio
-        ? new Date(form.fecha_inicio).toISOString()
-        : null,
-      fecha_fin: form.fecha_fin ? new Date(form.fecha_fin).toISOString() : null,
-      activo: form.activo,
-    };
-    setGuardando(true);
-    const resultado = editandoId
-      ? await supabase.from("cupones").update(datos).eq("id", editandoId)
-      : await supabase.from("cupones").insert([datos]);
-    setGuardando(false);
-    if (resultado.error) {
-      setError(resultado.error.message);
-      return;
-    }
-    limpiar();
-    await cargarCupones();
-  };
 
-  const editar = (cupon) => {
-    const formatoFecha = (fecha) =>
-      fecha ? new Date(fecha).toISOString().slice(0, 16) : "";
-    setEditandoId(cupon.id);
-    setForm({
-      codigo: cupon.codigo || "",
-      descripcion: cupon.descripcion || "",
-      tipo: cupon.tipo || "porcentaje",
-      valor: cupon.valor ?? "",
-      compra_minima: cupon.compra_minima ?? "0",
-      limite_usos: cupon.limite_usos ?? "",
-      fecha_inicio: formatoFecha(cupon.fecha_inicio),
-      fecha_fin: formatoFecha(cupon.fecha_fin),
-      activo: Boolean(cupon.activo),
-    });
-    setError("");
-    desplazarAlFormulario();
-  };
-
-  const cambiarEstado = async (cupon) => {
-    if (!esAdmin) {
-      setError("No tienes permiso para gestionar cupones.");
-      return;
-    }
-    setError("");
     const { error } = await supabase
-      .from("cupones")
-      .update({ activo: !cupon.activo })
-      .eq("id", cupon.id);
-    if (error) {
-      setError(error.message);
-      return;
+      .from("configuracion_empleados")
+      .update({
+        max_ordenes_activas: limite,
+        comision_porcentaje: porcentaje,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", true);
+
+    if (error) setError(error.message);
+    else {
+      setMaxOrdenes(limite);
+      setComision(porcentaje);
     }
-    await cargarCupones();
+
+    setGuardandoConfig(false);
   };
 
-  const eliminarCupon = async (cupon) => {
-    if (!esAdmin) {
-      setError("No tienes permiso para eliminar cupones.");
-      return;
-    }
+  // Quita el rol de empleado y devuelve la cuenta al rol de cliente.
+  const quitarEmpleado = async (id) => {
     if (
       !window.confirm(
-        `¿Seguro que quieres eliminar el cupón "${cupon.codigo}"? Esta acción no se puede deshacer.`,
+        "¿Quitar el rol de empleado y devolver esta cuenta a cliente?",
       )
-    )
+    ) {
       return;
+    }
+
     setError("");
-    setEliminandoId(cupon.id);
-    const { data, error } = await supabase.rpc("eliminar_cupon_admin", {
-      p_id: cupon.id,
-    });
-    setEliminandoId(null);
-    if (error) {
-      setError(error.message);
-      return;
-    }
-    if (!data) {
-      setError("No se encontró el cupón para eliminar.");
-      return;
-    }
-    if (editandoId === cupon.id) limpiar();
-    await cargarCupones();
+
+    const { error } = await supabase
+      .from("usuarios")
+      .update({
+        rol: "user",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (error) setError(error.message);
+    else await cargarUsuarios();
   };
 
-  const limpiar = () => {
-    setForm(inicial);
-    setEditandoId(null);
+  // Elimina permanentemente la cuenta mediante una función segura de Supabase.
+  const eliminarEmpleado = async () => {
+    if (!empleadoEliminar || !passwordEliminar.trim() || eliminando) {
+      setError("Introduce la contraseña del administrador.");
+      return;
+    }
+
+    if (
+      !window.confirm(
+        `Esta acción eliminará permanentemente a ${empleadoEliminar.email}. ¿Continuar?`,
+      )
+    ) {
+      return;
+    }
+
+    setEliminando(true);
     setError("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "eliminar_cuenta_pc_store",
+        {
+          body: {
+            password: passwordEliminar,
+            target_user_id: empleadoEliminar.id,
+          },
+        },
+      );
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setEmpleadoEliminar(null);
+      setPasswordEliminar("");
+      await cargarUsuarios();
+    } catch (err) {
+      setError(err.message || "No se pudo eliminar el empleado.");
+    } finally {
+      setEliminando(false);
+    }
   };
+
+  // Filtra los usuarios para mostrar únicamente empleados que coincidan con la búsqueda.
+  const empleados = usuarios
+    .filter((usuario) => usuario.rol === "empleado")
+    .filter((usuario) => {
+      const texto = busqueda.trim().toLowerCase();
+      if (!texto) return true;
+
+      return `${usuario.nombre || ""} ${usuario.apellido || ""} ${usuario.email || ""} ${usuario.ciudad || ""}`
+        .toLowerCase()
+        .includes(texto);
+    });
+
+  // Calcula los totales utilizados en las tarjetas de resumen.
+  const totalEmpleados = usuarios.filter((u) => u.rol === "empleado").length;
+
+  const totalActivos = usuarios.filter(
+    (u) => u.rol === "empleado" && u.activo === true && u.bloqueado !== true,
+  ).length;
+
+  const totalFuera = usuarios.filter(
+    (u) => u.rol === "empleado" && (u.activo === false || u.bloqueado === true),
+  ).length;
 
   return (
     <main className="pc-page">
       <div className="pc-container">
         <BotonAtras />
-        <div className="pc-admin-header">
-          <h1>Gestión de Cupones</h1>
-          <p>Crea, modifica y activa promociones con código.</p>
-        </div>
 
-        <div
-          ref={formularioRef}
-          className="pc-card"
-          style={{ padding: 22, marginBottom: 24, scrollMarginTop: 24 }}
-        >
-          <form className="pc-form-grid" onSubmit={guardar}>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Código del cupón <span style={{ color: "#dc2626" }}>*</span>
-              </label>
-              <input
-                className="pc-input"
-                placeholder="Ejemplo: VERANO20"
-                maxLength={30}
-                value={form.codigo}
-                onChange={(e) =>
-                  cambiar(
-                    "codigo",
-                    e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, ""),
-                  )
-                }
-                required
-              />
-              <small style={{ color: "#666" }}>
-                Código que escribirá el cliente.
-              </small>
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Descripción
-              </label>
-              <input
-                className="pc-input"
-                placeholder="Ejemplo: Descuento de verano"
-                maxLength={250}
-                value={form.descripcion}
-                onChange={(e) => cambiar("descripcion", e.target.value)}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Tipo de descuento
-              </label>
-              <select
-                className="pc-input"
-                value={form.tipo}
-                onChange={(e) => cambiar("tipo", e.target.value)}
-              >
-                <option value="porcentaje">Porcentaje (%)</option>
-                <option value="fijo">Cantidad fija (L)</option>
-              </select>
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Valor del descuento <span style={{ color: "#dc2626" }}>*</span>
-              </label>
-              <input
-                className="pc-input"
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={form.valor}
-                onChange={(e) => cambiar("valor", e.target.value)}
-                required
-              />
-              <small style={{ color: "#666" }}>
-                {form.tipo === "porcentaje"
-                  ? "Porcentaje que se descontará al cliente."
-                  : "Cantidad en lempiras que se descontará al cliente."}
-              </small>
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Compra mínima para usar el cupón
-              </label>
-              <input
-                className="pc-input"
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.compra_minima}
-                onChange={(e) => cambiar("compra_minima", e.target.value)}
-              />
-              <small style={{ color: "#666" }}>Usa 0 si no hay mínimo.</small>
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 6,
-                  fontWeight: 600,
-                  color: "#171717",
-                }}
-              >
-                Límite de usos
-              </label>
-              <input
-                className="pc-input"
-                type="number"
-                min="1"
-                step="1"
-                value={form.limite_usos}
-                onChange={(e) => cambiar("limite_usos", e.target.value)}
-              />
-              <small style={{ color: "#666" }}>
-                Déjalo vacío para usos ilimitados.
-              </small>
-            </div>
-            <label>
-              Inicio
-              <input
-                className="pc-input"
-                type="datetime-local"
-                value={form.fecha_inicio}
-                onChange={(e) => cambiar("fecha_inicio", e.target.value)}
-              />
-            </label>
-            <label>
-              Fin
-              <input
-                className="pc-input"
-                type="datetime-local"
-                value={form.fecha_fin}
-                onChange={(e) => cambiar("fecha_fin", e.target.value)}
-              />
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input
-                type="checkbox"
-                checked={form.activo}
-                onChange={(e) => cambiar("activo", e.target.checked)}
-              />
-              Cupón activo
-            </label>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button
-                className="pc-btn pc-btn-primary"
-                type="submit"
-                disabled={guardando}
-                style={{ display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <Plus size={17} />
-                {guardando
-                  ? "Guardando..."
-                  : editandoId
-                    ? "Actualizar"
-                    : "Crear cupón"}
-              </button>
-              {editandoId && (
-                <button
-                  className="pc-btn pc-btn-light"
-                  type="button"
-                  onClick={limpiar}
-                  style={{ display: "flex", alignItems: "center", gap: 8 }}
-                >
-                  <X size={17} />
-                  Cancelar
-                </button>
-              )}
-            </div>
-          </form>
+        <div className="pc-admin-header">
+          <h1>Gestión de Empleados</h1>
+          <p>Administra las cuentas y el sistema de asignación de entregas.</p>
         </div>
 
         {error && (
@@ -411,99 +208,329 @@ export default function GestionCupones() {
           </div>
         )}
 
-        <div className="pc-card pc-table-wrapper">
-          <table className="pc-table">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Descuento</th>
-                <th>Mínimo</th>
-                <th>Usos</th>
-                <th>Vigencia</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cupones.map((cupon) => (
-                <tr key={cupon.id}>
-                  <td>
-                    <strong>{cupon.codigo}</strong>
-                    <br />
-                    <small>{cupon.descripcion}</small>
-                  </td>
-                  <td>
-                    {cupon.tipo === "porcentaje"
-                      ? `${cupon.valor}%`
-                      : `L ${Number(cupon.valor).toFixed(2)}`}
-                  </td>
-                  <td>L {Number(cupon.compra_minima).toFixed(2)}</td>
-                  <td>
-                    {cupon.usos_actuales} / {cupon.limite_usos ?? "∞"}
-                  </td>
-                  <td>
-                    {cupon.fecha_inicio
-                      ? new Date(cupon.fecha_inicio).toLocaleDateString()
-                      : "Ahora"}{" "}
-                    –{" "}
-                    {cupon.fecha_fin
-                      ? new Date(cupon.fecha_fin).toLocaleDateString()
-                      : "Sin fin"}
-                  </td>
-                  <td>{cupon.activo ? "Activo" : "Inactivo"}</td>
-                  <td style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    <button
-                      className="pc-btn pc-btn-light"
-                      onClick={() => editar(cupon)}
-                      type="button"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                      }}
-                    >
-                      <Pencil size={16} />
-                      Editar
-                    </button>
-                    <button
-                      className="pc-btn pc-btn-light"
-                      onClick={() => cambiarEstado(cupon)}
-                      type="button"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                      }}
-                    >
-                      <Power size={16} />
-                      {cupon.activo ? "Desactivar" : "Activar"}
-                    </button>
-                    <button
-                      className="pc-btn pc-btn-light"
-                      onClick={() => eliminarCupon(cupon)}
-                      type="button"
-                      disabled={eliminandoId === cupon.id}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                        color: "#dc2626",
-                      }}
-                    >
-                      <Trash2 size={16} />
-                      {eliminandoId === cupon.id ? "Eliminando..." : "Eliminar"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {cupones.length === 0 && (
-                <tr>
-                  <td colSpan="7">No existen cupones.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Resumen de empleados registrados y su estado actual. */}
+        <div className="pc-metrics-grid" style={{ marginBottom: 30 }}>
+          <article className="pc-card pc-metric">
+            <span>Empleados</span>
+            <strong>{totalEmpleados}</strong>
+          </article>
+
+          <article className="pc-card pc-metric">
+            <span>Activos</span>
+            <strong style={{ color: "#16a34a" }}>{totalActivos}</strong>
+          </article>
+
+          <article className="pc-card pc-metric">
+            <span>Fuera de servicio</span>
+            <strong style={{ color: "#6b7280" }}>{totalFuera}</strong>
+          </article>
         </div>
+
+        {/* Configuración global utilizada para asignación y pago de entregas. */}
+        <section className="pc-card" style={{ padding: 20, marginBottom: 30 }}>
+          <h2 style={{ marginTop: 0 }}>Reglas de entregas</h2>
+
+          <p className="pc-muted">
+            Estos valores se aplican globalmente y se validan en el servidor.
+          </p>
+
+          <div className="pc-form-grid">
+            <label>
+              Máximo de órdenes activas por empleado
+              <input
+                className="pc-input"
+                type="number"
+                min="1"
+                max="100"
+                value={maxOrdenes}
+                onChange={(e) => setMaxOrdenes(e.target.value)}
+              />
+            </label>
+
+            <label>
+              Comisión por entrega (%)
+              <input
+                className="pc-input"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={comision}
+                onChange={(e) => setComision(e.target.value)}
+              />
+            </label>
+          </div>
+
+          <button
+            type="button"
+            className="pc-btn pc-btn-primary"
+            onClick={guardarConfig}
+            disabled={guardandoConfig}
+          >
+            {guardandoConfig ? "Guardando..." : "Guardar configuración"}
+          </button>
+        </section>
+
+        {cargando ? (
+          <div className="pc-loading">
+            <div className="pc-loader" />
+            <p>Cargando empleados...</p>
+          </div>
+        ) : (
+          <>
+            {/* Buscador de empleados por nombre, apellido, email o ciudad. */}
+            <div className="pc-card" style={{ padding: 16, marginBottom: 30 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  position: "relative",
+                }}
+              >
+                <Search size={20} style={{ color: "#666" }} />
+
+                <input
+                  type="text"
+                  className="pc-input"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  placeholder="Buscar por nombre, apellido, email o ciudad..."
+                  style={{ width: "100%", paddingRight: busqueda ? 42 : 12 }}
+                />
+
+                {busqueda && (
+                  <button
+                    type="button"
+                    onClick={() => setBusqueda("")}
+                    aria-label="Limpiar búsqueda"
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      border: "none",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+
+              {busqueda && (
+                <p>{empleados.length} resultado(s) encontrado(s).</p>
+              )}
+            </div>
+
+            {/* Encabezado y acceso para registrar un nuevo empleado. */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                marginBottom: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <h2 className="pc-section-title" style={{ margin: 0 }}>
+                Empleados actuales
+              </h2>
+
+              <button
+                type="button"
+                className="pc-btn pc-btn-primary"
+                onClick={() => navigate("/admin/empleados/nuevo")}
+                title="Crear cuenta de empleado"
+                style={{ width: 44, height: 44, padding: 0, borderRadius: 12 }}
+              >
+                <Plus size={23} />
+              </button>
+            </div>
+
+            {/* Tabla principal con los empleados y sus acciones administrativas. */}
+            <div
+              className="pc-card pc-table-wrapper"
+              style={{ marginBottom: 40 }}
+            >
+              <table className="pc-table">
+                <thead>
+                  <tr>
+                    <th>N.º</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Ciudad</th>
+                    <th>Estado</th>
+                    <th>Rol</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {empleados.map((empleado, indice) => {
+                    const activo =
+                      empleado.activo === true && empleado.bloqueado !== true;
+
+                    return (
+                      <tr key={empleado.id}>
+                        <td>
+                          <strong>{indice + 1}</strong>
+                        </td>
+
+                        <td>
+                          {empleado.nombre || ""} {empleado.apellido || ""}
+                        </td>
+
+                        <td>{empleado.email}</td>
+                        <td>{empleado.ciudad || "-"}</td>
+
+                        <td>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              fontWeight: 700,
+                              color: empleado.bloqueado
+                                ? "#dc2626"
+                                : activo
+                                  ? "#16a34a"
+                                  : "#6b7280",
+                            }}
+                          >
+                            {activo ? (
+                              <CircleCheck size={16} />
+                            ) : (
+                              <CircleX size={16} />
+                            )}
+
+                            {empleado.bloqueado
+                              ? "Bloqueado"
+                              : activo
+                                ? "Activo"
+                                : "Fuera de servicio"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              fontWeight: 700,
+                            }}
+                          >
+                            <UserCheck size={16} />
+                            Empleado
+                          </span>
+                        </td>
+
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 8,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <button
+                              className="pc-btn pc-btn-light"
+                              onClick={() => quitarEmpleado(empleado.id)}
+                            >
+                              <UserRound size={16} />
+                              Quitar rol
+                            </button>
+
+                            <button
+                              className="pc-btn pc-btn-danger"
+                              onClick={() => setEmpleadoEliminar(empleado)}
+                            >
+                              <Trash2 size={16} />
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {empleados.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        style={{ textAlign: "center", padding: 30 }}
+                      >
+                        {busqueda
+                          ? "No se encontraron empleados con esa búsqueda."
+                          : "No hay empleados registrados."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* Modal para confirmar la eliminación permanente de un empleado. */}
+        {empleadoEliminar && (
+          <div className="pc-modal-backdrop">
+            <div className="pc-card pc-modal" style={{ padding: 24 }}>
+              <h2>Eliminar empleado</h2>
+
+              <p>
+                Vas a eliminar permanentemente la cuenta de{" "}
+                <strong>{empleadoEliminar.email}</strong>.
+              </p>
+
+              <label>
+                Contraseña del administrador
+                <input
+                  className="pc-input"
+                  type="password"
+                  autoComplete="current-password"
+                  value={passwordEliminar}
+                  onChange={(e) => setPasswordEliminar(e.target.value)}
+                  placeholder="Contraseña actual"
+                />
+              </label>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  marginTop: 16,
+                  flexWrap: "wrap",
+                }}
+              >
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-danger"
+                  onClick={eliminarEmpleado}
+                  disabled={eliminando}
+                >
+                  <Trash2 size={17} />
+                  {eliminando ? "Eliminando..." : "Confirmar eliminación"}
+                </button>
+
+                <button
+                  type="button"
+                  className="pc-btn pc-btn-light"
+                  onClick={() => {
+                    setEmpleadoEliminar(null);
+                    setPasswordEliminar("");
+                  }}
+                  disabled={eliminando}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

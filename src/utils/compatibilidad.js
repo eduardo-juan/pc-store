@@ -1,9 +1,19 @@
+// ============================================================
+// UTILIDADES DE COMPATIBILIDAD
+// Contiene las reglas utilizadas por el configurador para
+// determinar compatibilidades, advertencias y errores.
+// ============================================================
+
+// Obtiene las especificaciones técnicas almacenadas dentro
+// del producto seleccionado.
 function obtenerEspecificaciones(componente) {
   if (!componente) return {}
 
   return componente.producto?.especificaciones || {}
 }
 
+// Busca primero el valor dentro de las especificaciones
+// y después directamente en el componente como respaldo.
 function obtenerValor(componente, campo, valorAlternativo = null) {
   const specs = obtenerEspecificaciones(componente)
 
@@ -32,6 +42,8 @@ function normalizarTexto(valor) {
     .toLowerCase()
 }
 
+// Obtiene un valor numérico válido para realizar
+// comparaciones de capacidad, consumo o dimensiones.
 function obtenerNumero(componente, campo) {
   const valor = obtenerValor(componente, campo)
 
@@ -78,6 +90,8 @@ function agregarAdvertencia(advertencias, mensaje) {
   }
 }
 
+// Añade al resultado el detalle de una relación entre
+// componentes y su estado de compatibilidad.
 function agregarDetalle(
   detalles,
   componente,
@@ -159,6 +173,8 @@ function agregarIncompatibilidad(
   )
 }
 
+// Analiza la configuración completa y devuelve errores,
+// advertencias y detalles de compatibilidad entre componentes.
 export function esCompatible(configuracion = {}) {
   /*
    * El Configurador.jsx utiliza estas claves:

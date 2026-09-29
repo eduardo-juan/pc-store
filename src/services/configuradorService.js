@@ -1,5 +1,11 @@
+// ============================================================
+// SERVICIO DEL CONFIGURADOR
+// Obtiene los componentes compatibles desde Supabase y
+// transforma sus datos al formato utilizado por el configurador.
+// ============================================================
 import { supabase } from "../supabaseClient";
 
+// Campos necesarios de la vista de componentes del configurador.
 const CAMPOS_COMPONENTES = `
   id,
   producto_id,
@@ -27,6 +33,8 @@ const CAMPOS_COMPONENTES = `
   especificaciones
 `;
 
+// Convierte los datos recibidos de Supabase al formato
+// utilizado por los componentes del configurador.
 function transformarComponente(item) {
   return {
     id: item.id,
@@ -52,6 +60,8 @@ function transformarComponente(item) {
     socket_compatibles:
       item.socket_compatibles || [],
 
+// Agrupa la información comercial del producto dentro
+// del componente para facilitar su uso en la interfaz.      
     producto: {
       id: item.producto_id,
       nombre: item.nombre,
@@ -67,7 +77,12 @@ function transformarComponente(item) {
   };
 }
 
+// Obtiene únicamente los componentes activos de un tipo específico,
+// por ejemplo procesadores, memorias o tarjetas gráficas.
 export async function obtenerComponentesPorTipo(tipo) {
+
+// Consulta la vista del configurador filtrando por tipo
+// y devuelve los componentes ordenados por identificador.  
   const { data, error } = await supabase
     .from("v_configurador_componentes")
     .select(CAMPOS_COMPONENTES)
@@ -84,9 +99,13 @@ export async function obtenerComponentesPorTipo(tipo) {
     throw error;
   }
 
+// Transformamos cada registro antes de entregarlo
+// al resto de la aplicación.  
   return (data || []).map(transformarComponente);
 }
 
+// Obtiene todos los componentes activos disponibles
+// para construir una configuración completa.
 export async function obtenerTodosLosComponentes() {
   const { data, error } = await supabase
     .from("v_configurador_componentes")
@@ -104,5 +123,7 @@ export async function obtenerTodosLosComponentes() {
     throw error;
   }
 
+// Transformamos cada registro antes de entregarlo
+// al resto de la aplicación.  
   return (data || []).map(transformarComponente);
 }

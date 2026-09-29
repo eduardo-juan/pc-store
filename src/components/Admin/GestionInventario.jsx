@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 
+// Obtiene la fecha local en formato YYYY-MM-DD para filtros y consultas.
 const obtenerFechaLocal = (fecha = new Date()) => {
   const year = fecha.getFullYear()
   const month = String(fecha.getMonth() + 1).padStart(2, '0')
@@ -22,22 +23,30 @@ const obtenerFechaLocal = (fecha = new Date()) => {
 }
 
 export default function GestionInventario() {
+  // Productos y movimientos registrados en el inventario.
   const [productos, setProductos] = useState([])
   const [historial, setHistorial] = useState([])
+
   const [cargando, setCargando] = useState(true)
+
+  // Datos utilizados para realizar un ajuste de inventario.
   const [productoSeleccionado, setProductoSeleccionado] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [razon, setRazon] = useState('ajuste')
   const [operacion, setOperacion] = useState('entrada')
+
+  // Filtro y paginación del historial de movimientos.
   const [fechaFiltro, setFechaFiltro] = useState('')
   const [pagina, setPagina] = useState(1)
 
   const registrosPorPagina = 10
 
+  // Carga productos e historial al abrir el módulo.
   useEffect(() => {
     cargarDatos()
   }, [])
 
+  // Obtiene los productos y los últimos movimientos del inventario desde Supabase.
   const cargarDatos = async () => {
     setCargando(true)
 
@@ -74,6 +83,7 @@ export default function GestionInventario() {
     setCargando(false)
   }
 
+  // Valida el ajuste, calcula el nuevo stock y registra el movimiento.
   const handleAjustarInventario = async (e) => {
     e.preventDefault()
 
@@ -97,6 +107,7 @@ export default function GestionInventario() {
       return
     }
 
+    // Calcula el nuevo stock según la razón y operación seleccionadas.
     let nuevoStock
 
     if (razon === 'venta') {
@@ -117,6 +128,7 @@ export default function GestionInventario() {
       return
     }
 
+    // Registra primero el cambio en el historial para conservar trazabilidad.
     const { error: historialError } = await supabase
       .from('inventario_historial')
       .insert([
@@ -134,6 +146,7 @@ export default function GestionInventario() {
       return
     }
 
+    // Actualiza el stock actual del producto.
     const { error: updateError } = await supabase
       .from('productos')
       .update({ stock: nuevoStock })
@@ -154,6 +167,7 @@ export default function GestionInventario() {
     setPagina(1)
   }
 
+  // Restablece todos los campos del formulario de inventario.
   const resetFormulario = () => {
     setProductoSeleccionado('')
     setCantidad('')
@@ -161,6 +175,7 @@ export default function GestionInventario() {
     setOperacion('entrada')
   }
 
+  // Filtra el historial según la fecha seleccionada.
   const historialFiltrado = useMemo(() => {
     if (!fechaFiltro) return historial
 
@@ -171,11 +186,13 @@ export default function GestionInventario() {
     })
   }, [historial, fechaFiltro])
 
+  // Calcula la cantidad de páginas necesarias para mostrar el historial.
   const totalPaginas = Math.max(
     1,
     Math.ceil(historialFiltrado.length / registrosPorPagina),
   )
 
+  // Obtiene únicamente los registros correspondientes a la página actual.
   const historialPaginado = useMemo(() => {
     const inicio = (pagina - 1) * registrosPorPagina
 
@@ -185,12 +202,14 @@ export default function GestionInventario() {
     )
   }, [historialFiltrado, pagina])
 
+  // Corrige la página actual si el filtro reduce el número de páginas disponibles.
   useEffect(() => {
     setPagina((paginaActual) =>
       Math.min(paginaActual, totalPaginas),
     )
   }, [totalPaginas])
 
+  // Cambia el filtro de fecha y reinicia la paginación.
   const cambiarFechaFiltro = (valor) => {
     setFechaFiltro(valor)
     setPagina(1)
@@ -225,6 +244,7 @@ export default function GestionInventario() {
             alignItems: 'start',
           }}
         >
+          {/* Formulario para modificar el stock de un producto. */}
           <div className="pc-card" style={{ padding: 22 }}>
             <h2 style={{ marginBottom: 16 }}>Ajustar Stock</h2>
 
@@ -288,6 +308,7 @@ export default function GestionInventario() {
                 </select>
               )}
 
+              {/* Explica visualmente cómo afectará la operación al stock. */}
               <div
                 className="pc-card"
                 style={{
@@ -370,6 +391,7 @@ export default function GestionInventario() {
             </form>
           </div>
 
+          {/* Historial de cambios con filtro por fecha y paginación. */}
           <div className="pc-card" style={{ padding: 22 }}>
             <div
               style={{
@@ -487,6 +509,7 @@ export default function GestionInventario() {
               ))}
             </div>
 
+            {/* Controles para navegar entre las páginas del historial. */}
             {historialFiltrado.length > 0 && (
               <div
                 style={{
