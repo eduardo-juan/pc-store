@@ -8,6 +8,7 @@ const MENSAJE_CUENTA = "No se encontró la cuenta. Verifica el correo electróni
 const CLAVE_RECUPERACION = "pc-store-password-recovery-rate";
 const COOLDOWN_RECUPERACION = 60 * 1000;
 
+// Componente principal de este módulo.
 export default function RecuperarPassword() {
   const [correo, setCorreo] = useState("");
   const [cargando, setCargando] = useState(false);
