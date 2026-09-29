@@ -1,9 +1,12 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { Link, useParams } from 'react-router-dom'
 import BotonAtras from '../components/BotonAtras'
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function OrdenConfirmada() {
   const { id } = useParams()
 
+  // Renderizado principal: muestra la información y acciones disponibles.
   return (
     <main className="pc-page">
       <div className="pc-container">
