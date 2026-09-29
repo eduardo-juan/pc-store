@@ -1,3 +1,4 @@
+// Módulo encargado de gestionar la lógica principal de esta funcionalidad y sus dependencias.
 import { useAuth } from "../hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import Sidebar from "../components/Layout/Sidebar";
@@ -5,6 +6,7 @@ import GestionProductos from "../components/Admin/GestionProductos";
 import GestionOrdenes from "../components/Admin/GestionOrdenes";
 import GestionInventario from "../components/Admin/GestionInventario";
 
+// Componente principal: coordina el estado, las operaciones y la interfaz de este módulo.
 export default function AdminPanel() {
   const { usuario, esAdmin } = useAuth();
 
@@ -12,6 +14,7 @@ export default function AdminPanel() {
     return <Navigate to="/" />;
   }
 
+  // Renderizado principal: presenta los datos y acciones disponibles al usuario.
   return (
     <div className="pc-admin-layout">
       <Sidebar />
