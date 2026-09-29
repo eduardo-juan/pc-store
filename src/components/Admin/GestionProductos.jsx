@@ -33,6 +33,7 @@ const BUCKET_PRODUCTOS = "productos-imagenes";
 const limpiarTextoProducto = (valor, max = 120) =>
   valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ _-]/g, "").slice(0, max);
 
+// Función obtenerRutasImagenesPropias: ejecuta una operación principal del módulo.
 const obtenerRutasImagenesPropias = (producto) => {
   const urls = [producto?.imagen_principal];
   if (Array.isArray(producto?.imágenes_adicionales))
@@ -51,6 +52,7 @@ const limpiarImagenes = async (producto) => {
     await eliminarImagen(BUCKET_PRODUCTOS, ruta);
 };
 
+// Componente principal del módulo GestionProductos.
 export default function GestionProductos() {
   const { esAdmin } = useAuth();
   const [productos, setProductos] = useState([]);
