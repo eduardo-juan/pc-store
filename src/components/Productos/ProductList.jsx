@@ -1,7 +1,9 @@
+// Módulo reutilizable que concentra la lógica y presentación de esta funcionalidad.
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import ProductCard from "./ProductCard";
 
+// Propósito del componente: centraliza la lógica principal de este módulo.
 export default function ProductList({ categoria = null }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -25,6 +27,7 @@ export default function ProductList({ categoria = null }) {
 
   if (cargando) return <div>Cargando...</div>;
 
+  // Renderizado principal: muestra la información y acciones disponibles para el usuario.
   return (
     <div className="pc-product-grid">
       {productos.map((p) => (
