@@ -1,3 +1,5 @@
+// Importa navegación, íconos y los contextos necesarios para consultar
+// y modificar los productos actualmente almacenados en el carrito.
 import { Link } from "react-router-dom";
 import {
   Monitor,
@@ -10,7 +12,11 @@ import {
 import { useCarrito } from "../../context/CarritoContext";
 import BotonAtras from "../../components/BotonAtras";
 
+// Vista del carrito de compras. Muestra los productos seleccionados,
+// permite modificar cantidades y prepara el acceso al checkout.
 export default function Carrito() {
+  // Obtiene los artículos y acciones del contexto para actualizar cantidades,
+  // eliminar productos, vaciar el carrito y calcular sus importes.
   const {
     items,
     subtotal,
@@ -19,6 +25,8 @@ export default function Carrito() {
     vaciarCarrito,
   } = useCarrito();
 
+  // Cuando no hay productos muestra una vista alternativa; de lo contrario
+  // presenta el listado, los controles de cantidad y el resumen de compra.
   if (items.length === 0) {
     return (
       <main className="pc-page">
