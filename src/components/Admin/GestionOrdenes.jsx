@@ -49,6 +49,7 @@ const limpiarBusqueda = (valor = '') =>
     .replace(/[^\p{L}\p{N}\s@._-]/gu, '')
     .slice(0, 100)
 
+// Componente principal del módulo GestionOrdenes.
 export default function GestionOrdenes() {
   const { usuario, esAdmin, esEmpleado } = useAuth()
 
