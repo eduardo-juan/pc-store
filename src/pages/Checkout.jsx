@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/pages/Checkout.jsx
+// Responsabilidad: Representa una vista completa asociada a una ruta y coordina su flujo de usuario.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Tag, Check, Cpu } from "lucide-react";
