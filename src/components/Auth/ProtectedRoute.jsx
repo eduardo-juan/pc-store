@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import Loading from '../Shared/Loading'
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function ProtectedRoute({ children, requiereAdmin = false, requiereStaff = false, requiereEmpleado = false }) {
   const { usuario, cargando } = useAuth()
   const navigate = useNavigate()
@@ -13,7 +14,8 @@ export default function ProtectedRoute({ children, requiereAdmin = false, requie
 
   if (!usuario) {
     const paginaOrigen = location.pathname + location.search
-    return (
+    // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
+  return (
       <main className="pc-access-page">
         <div className="pc-access-glow pc-access-glow-one" />
         <div className="pc-access-glow pc-access-glow-two" />
