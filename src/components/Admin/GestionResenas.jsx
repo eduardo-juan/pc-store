@@ -3,6 +3,7 @@ import { Star, Trash2 } from "lucide-react";
 import { supabase } from "../../supabaseClient";
 import BotonAtras from "../BotonAtras";
 
+// Componente principal del módulo GestionResenas.
 export default function GestionResenas() {
   // Reseñas obtenidas desde Supabase para mostrarlas en la tabla administrativa.
   const [resenas, setResenas] = useState([]);
