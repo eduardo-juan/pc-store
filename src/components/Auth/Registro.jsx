@@ -27,6 +27,7 @@ const formatearTelefono = (v) => {
     : n
 }
 
+// Componente principal de este módulo.
 export default function Registro() {
   const [form, setForm] = useState({
     email: '',
