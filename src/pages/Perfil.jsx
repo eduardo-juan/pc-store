@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -31,6 +32,7 @@ const formatearDni = (v) => {
   return `${n.slice(0, 4)}-${n.slice(4, 8)}-${n.slice(8)}`
 }
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function Perfil() {
   const { usuario, logout } = useAuth()
   const navigate = useNavigate()
@@ -297,6 +299,7 @@ export default function Perfil() {
       : undefined,
   })
 
+  // Renderizado principal: muestra la información y acciones disponibles.
   return (
     <main className="pc-page">
       <div className="pc-container">
