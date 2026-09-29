@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Layout/Sidebar.jsx
+// Responsabilidad: Construye navegación o estructura visual reutilizable.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { Link } from 'react-router-dom'
 import {
   Package,
