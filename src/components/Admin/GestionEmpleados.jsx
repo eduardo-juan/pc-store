@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Admin/GestionEmpleados.jsx
+// Responsabilidad: Gestiona una función del panel administrativo, con su interfaz, estado, validaciones y operaciones de datos.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
