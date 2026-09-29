@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 
+// Define las categorías principales que se presentan en la página pública
+// para orientar al visitante hacia los diferentes tipos de componentes.
 const categorias = [
   ['Procesadores', Cpu],
   ['Tarjetas gráficas', CircuitBoard],
@@ -23,10 +25,14 @@ const categorias = [
   ['Fuentes de alimentación', Zap],
 ]
 
+// Página de inicio para visitantes sin sesión. Muestra productos activos,
+// categorías y accesos principales a la tienda sin requerir autenticación.
 export default function HomePublico() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
 
+  // Carga los productos activos al entrar en la página para mantener el catálogo público
+  // actualizado con la información disponible en Supabase.
   useEffect(() => {
     const cargarProductos = async () => {
       const { data } = await supabase
@@ -47,6 +53,8 @@ export default function HomePublico() {
     (producto) => producto.imagen_principal
   )
 
+  // Renderiza la experiencia pública de PC Store con presentación, categorías,
+  // productos destacados y accesos para continuar navegando por la tienda.
   return (
     <main className="total-cinema-home">
       <section className="tc-intro">
