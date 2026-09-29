@@ -1,4 +1,11 @@
 // ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/hooks/useOrdenes.js
+// Responsabilidad: Encapsula lógica reutilizable de estado.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
+// ============================================================
 // HOOK DE ÓRDENES
 // Obtiene las órdenes del usuario autenticado desde Supabase
 // y permite volver a cargar la información cuando sea necesario.
