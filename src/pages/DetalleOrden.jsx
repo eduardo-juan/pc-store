@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
@@ -28,6 +29,7 @@ const TIPOS_ORDEN = {
   mixta: 'Compra mixta'
 }
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function DetalleOrden() {
   const { ordenId } = useParams()
   const navigate = useNavigate()
@@ -76,7 +78,8 @@ export default function DetalleOrden() {
   }
 
   if (cargando) {
-    return (
+    // Renderizado principal: muestra la información y acciones disponibles.
+  return (
       <main className="pc-page">
         <div className="pc-container">
           <div className="pc-loader" />
