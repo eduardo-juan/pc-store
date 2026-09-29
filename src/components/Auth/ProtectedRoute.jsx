@@ -3,6 +3,7 @@ import { LogIn, UserPlus, ShieldCheck, ArrowLeft, ShoppingBag, Sparkles } from '
 import { useAuth } from '../../context/AuthContext'
 import Loading from '../Shared/Loading'
 
+// Componente principal de este módulo.
 export default function ProtectedRoute({ children, requiereAdmin = false, requiereStaff = false, requiereEmpleado = false }) {
   const { usuario, cargando } = useAuth()
   const navigate = useNavigate()
