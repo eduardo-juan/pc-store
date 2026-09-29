@@ -28,6 +28,8 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
+// Define el bucket de almacenamiento utilizado para las imágenes de productos
+// y las funciones auxiliares que limpian los datos antes de guardarlos.
 const BUCKET_PRODUCTOS = "productos-imagenes";
 
 const limpiarTextoProducto = (valor, max = 120) =>
@@ -53,6 +55,8 @@ const limpiarImagenes = async (producto) => {
 };
 
 // Componente principal del módulo GestionProductos.
+// Módulo administrativo para crear, editar, eliminar y consultar productos,
+// incluyendo categorías, proveedores, imágenes y datos comerciales.
 export default function GestionProductos() {
   const { esAdmin } = useAuth();
   const [productos, setProductos] = useState([]);
@@ -85,6 +89,8 @@ export default function GestionProductos() {
     cargarCategorias();
   }, []);
 
+  // Obtiene el catálogo administrativo y sincroniza la lista mostrada en pantalla
+  // con los productos disponibles en Supabase.
   const cargarProductos = async () => {
     setCargando(true);
     const resultado = await obtenerProductos();
@@ -368,7 +374,9 @@ export default function GestionProductos() {
   };
 
   if (cargando && !mostrarFormulario)
-    return (
+    // Renderiza el formulario y la tabla de productos con sus acciones administrativas,
+  // controles de imágenes, proveedor, categoría y estado del producto.
+  return (
       <main className="pc-page">
         <div className="pc-container">
           <BotonAtras />
