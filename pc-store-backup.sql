@@ -1,8 +1,7 @@
-// ============================================================
-// DOCUMENTACIÓN AMPLIADA
-// Archivo: pc-store-backup.sql
-// Responsabilidad: Forma parte de la configuración o funcionamiento de PC Store.
-// Criterio de modificación: cambiar aquí la lógica solo cuando corresponda a esta responsabilidad;
-// las operaciones compartidas deben mantenerse en sus contextos, hooks o servicios correspondientes.
-// ============================================================
+-- ============================================================
+-- DOCUMENTACIÓN AMPLIADA
+-- Archivo: pc-store-backup.sql
+-- Responsabilidad: archivo reservado para respaldo SQL de la base de datos.
+-- Criterio de modificación: no colocar aquí código de aplicación; los cambios estructurales deben registrarse como migraciones de Supabase.
+-- ============================================================
 
