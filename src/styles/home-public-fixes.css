@@ -1,3 +1,5 @@
+/* Ajusta la estructura y las imágenes de la página pública para evitar desbordamientos
+   y conservar una presentación correcta en diferentes tamaños de pantalla. */
 .pc-home-public {
   width: 100%;
 }
