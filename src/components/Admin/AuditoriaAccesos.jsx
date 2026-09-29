@@ -9,8 +9,10 @@ import {
 import { supabase } from "../../supabaseClient";
 import BotonAtras from "../../components/BotonAtras";
 
+// Zona horaria utilizada para mostrar y consultar los accesos de Honduras.
 const ZONA_HONDURAS = "America/Tegucigalpa";
 
+// Obtiene la fecha actual tomando como referencia la zona horaria de Honduras.
 const obtenerFechaLocal = (fecha = new Date()) => {
   const partes = new Intl.DateTimeFormat("en-CA", {
     timeZone: ZONA_HONDURAS,
@@ -24,12 +26,14 @@ const obtenerFechaLocal = (fecha = new Date()) => {
   return `${valores.year}-${valores.month}-${valores.day}`;
 };
 
+// Avanza o retrocede la fecha seleccionada para navegar entre días.
 const cambiarDia = (fecha, cantidad) => {
   const [year, month, day] = fecha.split("-").map(Number);
   const nuevaFecha = new Date(Date.UTC(year, month - 1, day + cantidad, 12));
   return nuevaFecha.toISOString().slice(0, 10);
 };
 
+// Convierte la fecha seleccionada a un formato legible para mostrarla en pantalla.
 const formatearDia = (fecha) => {
   const [year, month, day] = fecha.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day, 12)).toLocaleDateString(
@@ -44,6 +48,7 @@ const formatearDia = (fecha) => {
   );
 };
 
+// Convierte el día seleccionado al rango UTC necesario para consultar Supabase.
 const obtenerRangoUTC = (fecha) => {
   const [year, month, day] = fecha.split("-").map(Number);
   const inicio = new Date(Date.UTC(year, month - 1, day, 6, 0, 0));
@@ -53,11 +58,14 @@ const obtenerRangoUTC = (fecha) => {
 
 export default function AuditoriaAccesos() {
   const hoy = obtenerFechaLocal();
+
+// Controla la fecha cuyos accesos se están consultando.  
   const [fechaSeleccionada, setFechaSeleccionada] = useState(hoy);
   const [registros, setRegistros] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
+// Consulta en Supabase los accesos registrados durante el día seleccionado.  
   const cargarRegistros = async (fecha = fechaSeleccionada) => {
     setCargando(true);
     setError("");
@@ -80,10 +88,12 @@ export default function AuditoriaAccesos() {
     setCargando(false);
   };
 
+// Recarga el historial automáticamente cuando cambia la fecha.  
   useEffect(() => {
     cargarRegistros();
   }, [fechaSeleccionada]);
 
+// Ordena los accesos desde el más reciente hasta el más antiguo.  
   const registrosOrdenados = useMemo(
     () =>
       [...registros].sort(
@@ -92,10 +102,12 @@ export default function AuditoriaAccesos() {
     [registros],
   );
 
+// Cambia el día consultado mediante los botones anterior y siguiente.  
   const irAlDia = (cantidad) => {
     setFechaSeleccionada(cambiarDia(fechaSeleccionada, cantidad));
   };
 
+// Convierte la fecha del acceso a una hora legible en horario de Honduras.  
   const formatearHora = (fecha) =>
     new Date(fecha).toLocaleTimeString("es-HN", {
       timeZone: ZONA_HONDURAS,
@@ -205,6 +217,8 @@ export default function AuditoriaAccesos() {
                   : "accesos registrados"}
               </p>
             </div>
+
+// Muestra e l historial de accesos registrados para el día seleccionado.            
             <table className="pc-table">
               <thead>
                 <tr>

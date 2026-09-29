@@ -14,8 +14,11 @@ import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
 export default function EmpleadoDashboard() {
+
+// Obtiene la sesión y el perfil del empleado autenticado.  
   const { usuario, perfil } = useAuth();
 
+// Métricas utilizadas para mostrar el resumen de actividad del empleado.  
   const [metricas, setMetricas] = useState({
     ordenes: 0,
     ventas: 0,
@@ -27,17 +30,20 @@ export default function EmpleadoDashboard() {
     comisiones: 0,
   });
 
+// Órdenes nuevas que pueden ser aceptadas por el empleado.  
   const [ordenesDisponibles, setOrdenesDisponibles] = useState([]);
   const [maxOrdenes, setMaxOrdenes] = useState(5);
   const [cargando, setCargando] = useState(true);
   const [aceptando, setAceptando] = useState(null);
   const [error, setError] = useState("");
 
+// Consulta órdenes, órdenes disponibles, comisiones y configuración del empleado.  
   const cargarDatos = useCallback(async () => {
     if (!usuario?.id) return;
 
     setError("");
 
+// Ejecuta las consultas principales en paralelo para reducir el tiempo de carga.    
     const [ordenesResult, disponiblesResult, comisionesResult, configResult] =
       await Promise.all([
         supabase
@@ -78,6 +84,7 @@ export default function EmpleadoDashboard() {
 
     setOrdenesDisponibles(disponiblesResult.data || []);
 
+// Calcula las cantidades y totales que se muestran en el panel del empleado.    
     setMetricas({
       ordenes: ordenes.length,
 
@@ -108,6 +115,7 @@ export default function EmpleadoDashboard() {
     setCargando(false);
   }, [usuario?.id]);
 
+// Actualiza el panel periódicamente para detectar nuevas órdenes disponibles.  
   useEffect(() => {
     cargarDatos();
 
@@ -116,6 +124,7 @@ export default function EmpleadoDashboard() {
     return () => window.clearInterval(intervalo);
   }, [cargarDatos]);
 
+// Solicita a Supabase asignar la orden al empleado actual.  
   const aceptarOrden = async (ordenId) => {
     setAceptando(ordenId);
     setError("");
@@ -132,6 +141,7 @@ export default function EmpleadoDashboard() {
     setAceptando(null);
   };
 
+// Módulos administrativos disponibles para el empleado.  
   const opciones = [
     {
       icono: FileText,
@@ -145,6 +155,7 @@ export default function EmpleadoDashboard() {
     },
   ];
 
+// Muestra un indicador mientras se cargan los datos iniciales.  
   if (cargando) {
     return (
       <main className="pc-page">
@@ -281,6 +292,8 @@ export default function EmpleadoDashboard() {
                 gap: 12,
               }}
             >
+
+// Presenta cada orden disponible para que el empleado pueda aceptarla.              
               {ordenesDisponibles.map((orden) => (
                 <article
                   key={orden.id}
@@ -347,6 +360,8 @@ export default function EmpleadoDashboard() {
                         disabled={
                           aceptando !== null || metricas.activas >= maxOrdenes
                         }
+
+// Asigna la orden al empleado mediante la función de Supabase.                        
                         onClick={() => aceptarOrden(orden.id)}
                         style={{
                           display: "inline-flex",
@@ -375,6 +390,8 @@ export default function EmpleadoDashboard() {
         </h2>
 
         <div className="pc-admin-grid">
+
+// Genera los accesos a los módulos disponibles para el empleado.
           {opciones.map(({ icono: Icono, titulo, ruta }) => (
             <Link key={ruta} to={ruta} className="pc-card pc-admin-option">
               <div className="pc-admin-option-icon">

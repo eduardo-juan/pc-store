@@ -1,3 +1,4 @@
+// Imágenes de respaldo utilizadas cuando un producto no tiene imagen propia.
 const imagenesPorCategoria = {
   procesadores: 'https://placehold.co/900x700/111111/d4af37?text=Procesador',
   graficas: 'https://placehold.co/900x700/111111/d4af37?text=Tarjeta+grafica',
@@ -6,9 +7,11 @@ const imagenesPorCategoria = {
   perifericos: 'https://placehold.co/900x700/111111/d4af37?text=Periferico',
 }
 
+// Obtiene la imagen principal del producto o una imagen según su categoría.
 export function obtenerImagenProducto(producto) {
   if (producto?.imagen_principal) return producto.imagen_principal
 
+// Normaliza el nombre de la categoría para identificar la imagen correspondiente.  
   const categoria = String(producto?.categorias?.nombre || producto?.categoria?.nombre || '').toLowerCase()
 
   if (categoria.includes('proces')) return imagenesPorCategoria.procesadores

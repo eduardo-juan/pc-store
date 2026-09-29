@@ -1,3 +1,8 @@
+// ============================================================
+// SERVICIO DE PRODUCTOS
+// Centraliza las operaciones para consultar y administrar
+// productos, categorías y proveedores.
+// ============================================================
 import { supabase } from '../supabaseClient'
 
 // ==========================================
@@ -5,23 +10,29 @@ import { supabase } from '../supabaseClient'
 // ==========================================
 export const obtenerProductos = async (filtros = {}) => {
   try {
+
+// Construye la consulta base y solo incluye productos activos.    
     let query = supabase
       .from('productos')
       .select('*, categorias(nombre)')
       .eq('activo', true)
 
+// Filtra los productos por la categoría seleccionada.      
     if (filtros.categoria_id) {
       query = query.eq('categoria_id', filtros.categoria_id)
     }
 
+// Filtra los productos según la marca seleccionada.    
     if (filtros.marca) {
       query = query.eq('marca', filtros.marca)
     }
 
+// Busca productos cuyo nombre contenga el texto ingresado.    
     if (filtros.busqueda) {
       query = query.ilike('nombre', `%${filtros.busqueda}%`)
     }
 
+// Ejecuta la consulta después de aplicar todos los filtros.    
     const { data, error } = await query
     if (error) throw error
 
@@ -67,6 +78,8 @@ export const obtenerProveedorProducto = async (productoId) => {
   }
 }
 
+// Guarda o actualiza la información del proveedor asociado
+// al producto mediante una operación upsert.
 export const guardarProveedorProducto = async (productoId, proveedor) => {
   try {
     const { data, error } = await supabase
@@ -151,9 +164,7 @@ export const eliminarProducto = async (id) => {
   }
 }
 
-// ==========================================
-// OBTENER CATEGORÍAS
-// ==========================================
+// Obtiene todas las categorías ordenadas alfabéticamente.
 export const obtenerCategorias = async () => {
   try {
     const { data, error } = await supabase

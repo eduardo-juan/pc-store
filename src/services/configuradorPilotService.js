@@ -1,5 +1,11 @@
+// ============================================================
+// SERVICIO DEL CONFIGURADOR PILOTO
+// Administra el catálogo piloto y valida la compatibilidad
+// entre los componentes seleccionados para una PC.
+// ============================================================
 import catalogo from '../data/pilot/catalogoExternoNormalizado.json'
 
+// Tipos de componentes disponibles en el configurador piloto.
 export const TIPOS_PILOTO = [
   { key: 'cpu', label: 'Procesador' },
   { key: 'motherboard', label: 'Placa madre' },
@@ -11,6 +17,8 @@ export const TIPOS_PILOTO = [
   { key: 'cooler', label: 'Cooler' },
 ]
 
+// Coolers definidos directamente por PC Store para complementar
+// el catálogo externo utilizado por el configurador piloto.
 const COOLERS_PC_STORE = [
   { tipo: 'cooler', id: 'pc-store-cooler-16', marca: 'DeepCool', modelo: 'AG400', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 220, fuente: 'PC Store' },
   { tipo: 'cooler', id: 'pc-store-cooler-17', marca: 'Cooler Master', modelo: 'Hyper 212', socket_compatibles: ['AM5', 'LGA1700'], consumo_max_w: 180, fuente: 'PC Store' },
@@ -22,6 +30,8 @@ const COOLERS_PC_STORE = [
   { tipo: 'cooler', id: 'pc-store-cooler-41', marca: null, modelo: null, nombre: 'Arctic Liquid Freezer III 240', socket_compatibles: ['AM4', 'AM5', 'LGA1700'], consumo_max_w: null, fuente: 'PC Store' },
 ]
 
+// Construye el catálogo utilizado por el configurador,
+// combinando el catálogo externo con los componentes propios de PC Store.
 export function obtenerCatalogoPiloto() {
   return TIPOS_PILOTO.reduce((resultado, item) => {
     resultado[item.key] = item.key === 'cooler' ? COOLERS_PC_STORE : (Array.isArray(catalogo.categorias?.[item.key]) ? catalogo.categorias[item.key] : [])
@@ -29,17 +39,23 @@ export function obtenerCatalogoPiloto() {
   }, {})
 }
 
+// Normalizan valores para realizar comparaciones seguras
+// entre textos y números provenientes del catálogo.
 const texto = (valor) => String(valor ?? '').trim().toLowerCase()
 const numero = (valor) => {
   const n = Number(valor)
   return Number.isFinite(n) ? n : null
 }
 
+// Convierte listas de compatibilidad a texto normalizado
+// para facilitar las comparaciones.
 function listaNormalizada(valor) {
   if (!Array.isArray(valor)) return []
   return valor.map(texto).filter(Boolean)
 }
 
+// Registra el resultado de cada validación y separa
+// incompatibilidades de advertencias.
 function agregar(detalles, errores, advertencias, componente, relacion, estado, mensaje) {
   detalles.push({ componente, relacion, estado, mensaje })
   if (estado === 'incompatible' && !errores.includes(mensaje)) errores.push(mensaje)
@@ -62,6 +78,8 @@ function ranurasSata(motherboard) {
   return numero(motherboard?.sata_ports ?? motherboard?.sataPorts)
 }
 
+// Verifica si el almacenamiento seleccionado es compatible
+// con las interfaces disponibles en la placa madre.
 function analizarAlmacenamiento(storage, motherboard, detalles, errores, advertencias) {
   const interfaz = storage?.interfaz ?? storage?.interface
   const m2 = ranurasM2(motherboard)
@@ -101,12 +119,15 @@ function analizarAlmacenamiento(storage, motherboard, detalles, errores, adverte
   agregar(detalles, errores, advertencias, 'storage', 'Almacenamiento ↔ Placa madre', 'pendiente', 'Interfaz de almacenamiento no reconocida para una validación segura.')
 }
 
+// Analiza la compatibilidad entre los componentes seleccionados
+// y devuelve errores, advertencias y detalles de cada validación.
 export function analizarCompatibilidadPiloto(configuracion = {}) {
   const errores = []
   const advertencias = []
   const detalles = []
   const { cpu, motherboard, ram, gpu, storage, psu, case: caseItem } = configuracion
 
+// Comprueba compatibilidad de socket y chipset entre CPU y placa madre.  
   if (cpu && motherboard) {
     if (cpu.socket && motherboard.socket) {
       if (texto(cpu.socket) === texto(motherboard.socket)) {
@@ -132,6 +153,8 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// Comprueba el tipo de memoria y la capacidad máxima soportada
+// por la placa madre.  
   if (ram && motherboard) {
     const ramTipo = ram.ram_tipo ?? ram.ram_type
     const motherboardRamTipo = motherboard.ram_tipo ?? motherboard.ram_type
@@ -154,6 +177,8 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// Verifica que el formato de la placa madre sea compatible
+// con el gabinete seleccionado.  
   if (motherboard && caseItem) {
     const placa = texto(motherboard.form_factor)
     const acepta = listaNormalizada(caseItem.supports_form_factors ?? caseItem.form_factors)
@@ -184,6 +209,8 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// Comprueba que la longitud de la tarjeta gráfica
+// pueda ser instalada físicamente en el gabinete.  
   if (gpu && caseItem) {
     const gpuLength = numero(gpu.length_mm ?? gpu.longitud_mm)
     const maxLength = numero(caseItem.max_gpu_length_mm ?? caseItem.longitud_gpu_max_mm)
@@ -198,6 +225,8 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// Calcula el consumo estimado de CPU y GPU y verifica
+// si la fuente proporciona suficiente capacidad.  
   if (psu && (cpu || gpu)) {
     const cpuW = numero(cpu?.tdp_w ?? cpu?.consumo_w) ?? 0
     const gpuW = numero(gpu?.tgp_w ?? gpu?.consumo_max_w ?? gpu?.consumo_w) ?? 0
@@ -218,10 +247,14 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// Ejecuta la validación específica de almacenamiento
+// cuando existen unidad y placa madre seleccionadas.  
   if (storage && motherboard) {
     analizarAlmacenamiento(storage, motherboard, detalles, errores, advertencias)
   }
 
+// Comprueba que el cooler sea compatible con el socket
+// y la capacidad térmica de la CPU.  
   if (cpu && configuracion.cooler) {
     const cooler = configuracion.cooler
     const sockets = listaNormalizada(cooler.socket_compatibles ?? cooler.socket)
@@ -248,14 +281,20 @@ export function analizarCompatibilidadPiloto(configuracion = {}) {
     }
   }
 
+// La configuración es compatible cuando no existen errores.
+// También devolvemos advertencias y el detalle de las validaciones.  
   return { compatible: errores.length === 0, errores, advertencias, detalles }
 }
 
+// Determina si una opción debe bloquearse debido a
+// incompatibilidades con la configuración actual.
 export function opcionBloqueada(tipo, item, configuracion = {}) {
   const resultado = analizarCompatibilidadPiloto({ ...configuracion, [tipo]: item })
   return resultado.errores.length > 0
 }
 
+// Obtiene las opciones de un tipo de componente indicando
+// cuáles están bloqueadas por incompatibilidad.
 export function obtenerOpciones(tipo, configuracion = {}) {
   const catalogo = obtenerCatalogoPiloto()
   return (catalogo[tipo] || []).map((item) => ({
@@ -264,6 +303,8 @@ export function obtenerOpciones(tipo, configuracion = {}) {
   }))
 }
 
+// Genera un resumen de la configuración, incluyendo componentes,
+// consumo estimado y capacidad recomendada de la fuente.
 export function obtenerResumenPiloto(configuracion = {}) {
   const componentes = TIPOS_PILOTO
     .filter(({ key }) => configuracion[key])
@@ -295,6 +336,8 @@ export function obtenerResumenPiloto(configuracion = {}) {
   }
 }
 
+// Obtiene un nombre legible utilizando marca y modelo;
+// si no existen, utiliza el identificador del componente.
 export function nombreComponente(item) {
   return item ? ([item.marca, item.modelo].filter(Boolean).join(' ') || item.id) : 'Componente'
 }

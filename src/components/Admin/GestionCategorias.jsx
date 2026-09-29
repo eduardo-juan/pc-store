@@ -4,15 +4,19 @@ import { supabase } from "../../supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
+// Limpia el nombre de la categoría y limita su longitud.
 const limpiarNombreCategoria = (valor = "") =>
   String(valor)
     .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ\s_-]/g, "")
     .slice(0, 80);
 
+// Limita la descripción para evitar textos demasiado extensos.    
 const limpiarDescripcion = (valor = "") => String(valor).slice(0, 250);
 
 export default function GestionCategorias() {
   const { esAdmin } = useAuth();
+
+// Almacena las categorías disponibles en el catálogo.  
   const [categorias, setCategorias] = useState([]);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
@@ -20,10 +24,12 @@ export default function GestionCategorias() {
   const [error, setError] = useState("");
   const formularioRef = useRef(null);
 
+// Carga las categorías automáticamente al abrir el módulo.  
   useEffect(() => {
     cargarCategorias();
   }, []);
 
+// Obtiene desde Supabase todas las categorías ordenadas por nombre.  
   const cargarCategorias = async () => {
     setError("");
     const { data, error } = await supabase
@@ -37,6 +43,7 @@ export default function GestionCategorias() {
     setCategorias(data || []);
   };
 
+// Lleva el formulario a la vista cuando se selecciona una categoría para editar.  
   const desplazarAlFormulario = () => {
     window.requestAnimationFrame(() =>
       formularioRef.current?.scrollIntoView({
@@ -46,6 +53,7 @@ export default function GestionCategorias() {
     );
   };
 
+// Crea una nueva categoría o actualiza la categoría que se encuentra en edición.  
   const guardarCategoria = async (e) => {
     e.preventDefault();
     setError("");
@@ -67,6 +75,7 @@ export default function GestionCategorias() {
     await cargarCategorias();
   };
 
+// Carga los datos de la categoría seleccionada dentro del formulario.  
   const editarCategoria = (categoria) => {
     setEditandoId(categoria.id);
     setNombre(limpiarNombreCategoria(categoria.nombre || ""));
@@ -75,6 +84,7 @@ export default function GestionCategorias() {
     desplazarAlFormulario();
   };
 
+// Elimina una categoría después de verificar permisos y confirmar la acción.  
   const eliminarCategoria = async (id) => {
     if (!esAdmin) {
       setError("No tienes permiso para eliminar categorías.");
@@ -90,6 +100,7 @@ export default function GestionCategorias() {
     await cargarCategorias();
   };
 
+// Restablece el formulario y finaliza el modo de edición.  
   const limpiarFormulario = () => {
     setNombre("");
     setDescripcion("");
@@ -180,12 +191,16 @@ export default function GestionCategorias() {
               </tr>
             </thead>
             <tbody>
+
+// Muestra las categorías registradas junto con sus acciones administrativas.
               {categorias.map((categoria) => (
                 <tr key={categoria.id}>
                   <td>{categoria.id}</td>
                   <td>{categoria.nombre}</td>
                   <td>{categoria.descripción}</td>
                   <td>
+
+// Permite cargar la categoría seleccionada para modificar sus datos.
                     <button
                       type="button"
                       className="pc-btn pc-btn-light"
@@ -199,6 +214,8 @@ export default function GestionCategorias() {
                       <Pencil size={16} />
                       Editar
                     </button>
+
+// La eliminación está disponible únicamente para usuarios administradores.
                     {esAdmin && (
                       <button
                         type="button"

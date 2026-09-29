@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { supabase } from "../../supabaseClient";
 
+// Rutas donde se habilitan las herramientas adicionales de tablas administrativas.
 const ADMIN_PATHS = [
   "/admin/productos",
   "/admin/inventario",
@@ -13,8 +14,10 @@ const ADMIN_PATHS = [
   "/admin/auditoria",
 ];
 
+// Cantidad máxima de registros mostrados por página.
 const PAGE_SIZE = 10;
 
+// Limpia caracteres no permitidos y limita la longitud del texto de búsqueda.
 const limpiarBusqueda = (valor = "", max = 100) =>
   String(valor)
     .replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9\s_@.\-]/g, "")
@@ -23,6 +26,7 @@ const limpiarBusqueda = (valor = "", max = 100) =>
 const esRutaAdmin = () =>
   ADMIN_PATHS.some((ruta) => window.location.pathname === ruta);
 
+// Normaliza diferentes formatos de fecha para permitir comparaciones.
 const textoFecha = (valor) => {
   if (!valor) return null;
 
@@ -48,6 +52,7 @@ const tieneColumnaFecha = (table) =>
     /fecha|hora|cread|actualiz/i.test(th.textContent || ""),
   );
 
+// Consulta los registros necesarios para relacionar las filas visibles con sus IDs reales.  
 const obtenerMapaIds = async () => {
   const ruta = window.location.pathname;
 
@@ -91,6 +96,7 @@ const obtenerMapaIds = async () => {
   return null;
 };
 
+// Inserta el ID real de cada registro directamente en la tabla administrativa.
 const aplicarIdsTabla = (table, mapa) => {
   if (!mapa || table.dataset.idsReales === "true") return;
 
@@ -144,6 +150,7 @@ const aplicarIdsTabla = (table, mapa) => {
   table.dataset.idsReales = "true";
 };
 
+// Añade el ID del movimiento correspondiente a las tarjetas del historial de inventario.
 const aplicarIdsInventario = (mapa) => {
   if (!mapa || mapa.tipo !== "inventario") return;
 
@@ -183,6 +190,7 @@ const aplicarIdsInventario = (mapa) => {
   });
 };
 
+// Construye e instala búsqueda, filtros y paginación en cada tabla administrativa.
 const instalar = (wrapper, mapa) => {
   if (wrapper.dataset.adminTools === "true") return;
 
@@ -363,6 +371,7 @@ const instalar = (wrapper, mapa) => {
   aplicar();
 };
 
+// Supervisa los módulos administrativos y aplica automáticamente las herramientas a sus tablas.
 export default function AdminTableTools() {
   useEffect(() => {
     let mapa = null;

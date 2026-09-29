@@ -1,10 +1,20 @@
+/* Marca visualmente un campo de entrada cuando contiene un error de validación. */
 .pc-empleado-input-error { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important; }
+/* Marca visualmente un área de texto cuando contiene un error de validación. */
 .pc-empleado-textarea-error { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important; }
+/* Estilo utilizado para resaltar que un dato del formulario es obligatorio. */
 .pc-required { color: #dc2626 !important; font-weight: 700; }
+/* Da formato a las etiquetas de los campos obligatorios del formulario. */
 .pc-required-label { display: block; margin-bottom: 7px; font-weight: 600; color: #171717; }
+/* Muestra debajo del campo los mensajes pequeños de error o validación. */
 .pc-empleado-field small { display: block; margin-top: 5px; color: #dc2626; }
+/* Contenedor relativo utilizado para posicionar los elementos dentro del campo de contraseña. */
 .pc-password-wrap { position: relative; }
+/* Reserva espacio a la derecha del campo para el botón de mostrar u ocultar contraseña. */
 .pc-password-wrap .pc-input { padding-right: 48px; }
+/* Botón que permite mostrar u ocultar la contraseña dentro del campo. */
 .pc-password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 7px; background: transparent; color: #6b7280; cursor: pointer; padding: 0; }
+/* Cambia el aspecto del botón de contraseña cuando el usuario pasa el cursor sobre él. */
 .pc-password-toggle:hover { background: #f3f4f6; color: #171717; }
+/* Muestra un contorno visible cuando el botón recibe el foco mediante teclado. */
 .pc-password-toggle:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
