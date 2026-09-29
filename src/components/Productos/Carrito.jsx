@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Productos/Carrito.jsx
+// Responsabilidad: Gestiona presentación, detalle, carrito o reseñas de productos.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Importa navegación, íconos y los contextos necesarios para consultar
 // y modificar los productos actualmente almacenados en el carrito.
 import { Link } from "react-router-dom";
