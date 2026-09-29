@@ -1,3 +1,4 @@
+// Módulo reutilizable que concentra la lógica y presentación de esta funcionalidad.
 import { useEffect, useMemo, useState } from 'react'
 import { Star, ThumbsUp, Trash2, Pencil } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
@@ -5,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 const estrellas = [5, 4, 3, 2, 1]
 
+// Propósito del componente: centraliza la lógica principal de este módulo.
 export default function SeccionResenas({ productoId }) {
   const { usuario } = useAuth()
   const [resenas, setResenas] = useState([])
@@ -78,6 +80,7 @@ export default function SeccionResenas({ productoId }) {
     await cargar()
   }
 
+  // Renderizado principal: muestra la información y acciones disponibles para el usuario.
   return (
     <section className="pc-section pc-reviews-store">
       <div className="pc-reviews-header">
