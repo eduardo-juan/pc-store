@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import BotonAtras from '../../components/BotonAtras'
 
+// Define los nombres de los meses utilizados para navegar por el historial de ventas.
 const NOMBRES_MES = [
   'Enero',
   'Febrero',
@@ -36,6 +37,7 @@ export default function HistorialVentas() {
   const [anio, setAnio] = useState(hoy.getFullYear())
   const [mes, setMes] = useState(hoy.getMonth())
 
+  // Mantiene las órdenes consultadas, el estado de carga, errores y el día expandido.
   const [ordenes, setOrdenes] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -45,6 +47,8 @@ export default function HistorialVentas() {
     cargarVentasDelMes()
   }, [anio, mes])
 
+  // Consulta las ventas confirmadas del mes seleccionado y guarda las órdenes
+  // para después agruparlas por día y mostrar sus productos.
   const cargarVentasDelMes = async () => {
     setCargando(true)
     setError('')
@@ -175,6 +179,8 @@ export default function HistorialVentas() {
     anio === hoy.getFullYear() &&
     mes === hoy.getMonth()
 
+  // Renderiza el historial mensual con navegación, métricas y detalle expandible
+  // de las órdenes y productos vendidos durante cada día.
   return (
     <main className="pc-page">
       <div className="pc-container">
