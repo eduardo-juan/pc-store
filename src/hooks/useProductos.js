@@ -1,4 +1,11 @@
 // ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/hooks/useProductos.js
+// Responsabilidad: Encapsula lógica reutilizable de estado.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
+// ============================================================
 // HOOK DE PRODUCTOS
 // Obtiene los productos desde Supabase y permite filtrarlos
 // por categoría.
