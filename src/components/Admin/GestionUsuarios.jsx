@@ -4,6 +4,7 @@ import { UserCog, UserCheck, UserX, Search, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import BotonAtras from "../../components/BotonAtras";
 
+// Componente principal del módulo GestionUsuarios.
 export default function GestionUsuarios() {
   // Obtiene los datos del usuario actualmente autenticado.
   const { usuario } = useAuth();
