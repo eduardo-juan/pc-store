@@ -28,6 +28,7 @@ const formatearTelefono = (v) => {
 }
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function Registro() {
   const [form, setForm] = useState({
     email: '',
@@ -56,7 +57,8 @@ export default function Registro() {
       setAlertaCorreo(false)
     }, 4500)
 
-    return () => clearTimeout(temporizador)
+    // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
+  return () => clearTimeout(temporizador)
   }, [alertaCorreo])
 
   const cambiar = (campo, valor) => {
