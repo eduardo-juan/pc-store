@@ -1,3 +1,5 @@
+// Componente raíz de PC Store: configura proveedores, navegación, rutas y elementos globales
+// que deben permanecer disponibles durante toda la sesión de la aplicación.
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
