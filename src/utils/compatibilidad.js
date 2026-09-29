@@ -36,6 +36,8 @@ function obtenerValor(componente, campo, valorAlternativo = null) {
   return valorAlternativo
 }
 
+// Normaliza textos y valores técnicos para que las comparaciones de compatibilidad
+// no dependan de mayúsculas, espacios o formatos diferentes.
 function normalizarTexto(valor) {
   return String(valor || '')
     .trim()
@@ -175,6 +177,8 @@ function agregarIncompatibilidad(
 
 // Analiza la configuración completa y devuelve errores,
 // advertencias y detalles de compatibilidad entre componentes.
+// Evalúa la configuración completa aplicando las reglas de CPU, placa, RAM,
+// GPU, almacenamiento, fuente, gabinete y refrigeración.
 export function esCompatible(configuracion = {}) {
   /*
    * El Configurador.jsx utiliza estas claves:
