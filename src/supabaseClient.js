@@ -1,3 +1,5 @@
+// Configura el cliente único de Supabase usando las variables de entorno del proyecto.
+// Este cliente se reutiliza en autenticación, consultas y operaciones con la base de datos.
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
