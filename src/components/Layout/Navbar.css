@@ -1,3 +1,10 @@
+/* ============================================================
+ * DOCUMENTACIÓN AMPLIADA
+ * Archivo: src/components/Layout/Navbar.css
+ * Responsabilidad: Construye navegación o estructura visual reutilizable.
+ * Criterio: mantener aquí la presentación visual; la lógica de negocio debe permanecer en JS/JSX.
+ * ============================================================ */
+
 /* Estilos de la barra de navegación: controlan su estructura, enlaces, acciones,
    estados visuales y adaptación a distintos tamaños de pantalla. */
 /* Estilos visuales y de interacción del módulo Navbar.css. */
