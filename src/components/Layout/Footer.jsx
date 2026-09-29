@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Monitor, Headset } from 'lucide-react'
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function Footer() {
   const year = new Date().getFullYear()
 
@@ -19,6 +20,7 @@ export default function Footer() {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
   return (
     <footer className="pc-footer">
       <div className="pc-container pc-footer-grid">
