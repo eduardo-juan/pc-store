@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/BotonAtras.jsx
+// Responsabilidad: Construye un componente reutilizable de PC Store.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
