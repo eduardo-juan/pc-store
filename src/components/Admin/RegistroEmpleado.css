@@ -1,3 +1,5 @@
+/* Estilos del formulario de registro de empleados: errores, campos obligatorios
+   y controles auxiliares como el botón para mostrar u ocultar la contraseña. */
 /* Marca visualmente un campo de entrada cuando contiene un error de validación. */
 .pc-empleado-input-error { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important; }
 /* Marca visualmente un área de texto cuando contiene un error de validación. */
