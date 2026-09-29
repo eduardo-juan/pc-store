@@ -1,4 +1,11 @@
 // ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/context/AuthContext.jsx
+// Responsabilidad: Forma parte del funcionamiento de PC Store.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
+// ============================================================
 // CONTEXTO DE AUTENTICACIÓN
 // Centraliza la sesión, usuario, perfil, registro, login,
 // cierre de sesión y permisos de acceso de PC Store.
