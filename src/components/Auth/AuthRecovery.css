@@ -1,4 +1,5 @@
-/* Estilos visuales y de interacción del módulo AuthRecovery.css. */
+/* Estilos del formulario de recuperación de acceso: estructura, tarjeta, campos,
+   mensajes, navegación y adaptación para pantallas pequeñas. */
 
 .pc-auth-modern-page {
   min-height: 100vh;
