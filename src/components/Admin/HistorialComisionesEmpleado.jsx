@@ -15,6 +15,7 @@ import {
 import { supabase } from '../../supabaseClient'
 import BotonAtras from '../../components/BotonAtras'
 
+// Define los nombres de los meses para mostrar el período seleccionado en el historial.
 const NOMBRES_MES = [
   'Enero',
   'Febrero',
@@ -33,6 +34,7 @@ const NOMBRES_MES = [
 export default function HistorialComisionesEmpleado() {
   const hoy = new Date()
 
+  // Mantiene el mes consultado, las comisiones obtenidas y el estado de la interfaz.
   const [anio, setAnio] = useState(hoy.getFullYear())
   const [mes, setMes] = useState(hoy.getMonth())
   const [comisiones, setComisiones] = useState([])
@@ -95,6 +97,8 @@ export default function HistorialComisionesEmpleado() {
     setDiaExpandido(null)
   }
 
+  // Agrupa las comisiones por día y calcula los totales mensuales que se presentan
+  // en las métricas y en la tabla expandible del historial.
   const diasDelMes = useMemo(() => {
     const totalDias = new Date(anio, mes + 1, 0).getDate()
     const resumen = {}
@@ -147,6 +151,8 @@ export default function HistorialComisionesEmpleado() {
     anio === hoy.getFullYear() &&
     mes === hoy.getMonth()
 
+  // Renderiza el historial mensual con navegación entre meses, totales y detalles
+  // expandibles de las comisiones generadas por cada entrega.
   return (
     <main className="pc-page">
       <div className="pc-container">
