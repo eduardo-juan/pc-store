@@ -1,21 +1,25 @@
+// Protege las rutas que requieren autenticación y controla el acceso por rol.
+// También conserva la URL solicitada para regresar a ella después del inicio de sesión.
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { LogIn, UserPlus, ShieldCheck, ArrowLeft, ShoppingBag, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import Loading from '../Shared/Loading'
 
-// Componente principal de este módulo.
-// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function ProtectedRoute({ children, requiereAdmin = false, requiereStaff = false, requiereEmpleado = false }) {
   const { usuario, cargando } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Mientras se comprueba la sesión no se decide el acceso,
+  // evitando redirecciones antes de conocer el usuario actual.
   if (cargando) return <Loading />
 
+  // Si no hay sesión, mostramos acceso y conservamos la ruta original
+  // para volver al recurso solicitado después de autenticarse.
   if (!usuario) {
     const paginaOrigen = location.pathname + location.search
-    // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
-  return (
+
+    return (
       <main className="pc-access-page">
         <div className="pc-access-glow pc-access-glow-one" />
         <div className="pc-access-glow pc-access-glow-two" />
@@ -36,9 +40,12 @@ export default function ProtectedRoute({ children, requiereAdmin = false, requie
     )
   }
 
+  // Las condiciones separan los permisos por nivel: administrador, empleado
+  // o cualquier usuario perteneciente al personal autorizado.
   if (requiereAdmin && usuario.rol !== 'admin') return <Navigate to="/" replace />
   if (requiereEmpleado && usuario.rol !== 'empleado') return <Navigate to="/admin" replace />
   if (requiereStaff && usuario.rol !== 'admin' && usuario.rol !== 'empleado') return <Navigate to="/" replace />
 
+  // Si la sesión y el rol cumplen las condiciones, se renderiza la página protegida.
   return children
 }
