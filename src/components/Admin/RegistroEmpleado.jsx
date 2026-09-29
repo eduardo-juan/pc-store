@@ -10,6 +10,7 @@ import BotonAtras from '../../components/BotonAtras'
 
 import './RegistroEmpleado.css'
 
+// Define los valores iniciales del formulario y el rol permitido al crear un empleado.
 const inicial = {
   nombre: '',
   apellido: '',
@@ -49,6 +50,8 @@ const dni = (v) => {
   return `${n.slice(0, 4)}-${n.slice(4, 8)}-${n.slice(8)}`
 }
 
+// Componente reutilizable para mantener la presentación y validación visual
+// de los campos obligatorios del formulario de empleado.
 function Campo({
   label,
   value,
@@ -108,6 +111,7 @@ export default function RegistroEmpleado() {
   const [guardando, setGuardando] = useState(false)
   const [mostrarPassword, setMostrarPassword] = useState(false)
 
+  // Actualiza un campo del formulario y limpia su error para permitir una nueva validación.
   const cambiar = (c, v) => {
     setForm((p) => ({
       ...p,
@@ -158,6 +162,8 @@ export default function RegistroEmpleado() {
     return !Object.keys(e).length
   }
 
+  // Valida los datos y solicita a la función segura de Supabase la creación del empleado.
+  // Si termina correctamente, vuelve al listado administrativo.
   const guardar = async (e) => {
     e.preventDefault()
 
