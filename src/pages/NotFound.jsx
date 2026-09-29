@@ -1,6 +1,9 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { Link } from 'react-router-dom'
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function NotFound() {
+  // Renderizado principal: muestra la información y acciones disponibles.
   return (
     <main className="pc-page">
       <div className="pc-container pc-empty">
