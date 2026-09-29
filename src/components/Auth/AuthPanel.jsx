@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
+// Componente principal de este módulo.
 export default function AuthPanel() {
 
   const { login, registro } = useAuth()
