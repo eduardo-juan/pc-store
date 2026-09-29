@@ -1,3 +1,4 @@
+// Módulo encargado de gestionar la lógica principal de esta funcionalidad y sus dependencias.
 import { useMemo, useState } from 'react'
 import BotonAtras from '../components/BotonAtras'
 import {
@@ -8,6 +9,7 @@ import {
   obtenerResumenPiloto,
 } from '../services/configuradorPilotService'
 
+// Componente principal: coordina el estado, las operaciones y la interfaz de este módulo.
 export default function ConfiguradorPiloto() {
   const [seleccionados, setSeleccionados] = useState({})
   const resultado = useMemo(() => analizarCompatibilidadPiloto(seleccionados), [seleccionados])
@@ -26,6 +28,7 @@ export default function ConfiguradorPiloto() {
     })
   }
 
+  // Renderizado principal: presenta los datos y acciones disponibles al usuario.
   return (
     <main className='pc-page pc-pilot-page'>
       <BotonAtras />
