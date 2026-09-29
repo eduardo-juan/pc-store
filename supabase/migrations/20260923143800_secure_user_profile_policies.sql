@@ -1,3 +1,6 @@
+-- Migración 20260923143800_secure_user_profile_policies: aplica cambios de seguridad, permisos o integridad de datos.
+-- Se ejecuta mediante el sistema de migraciones de Supabase y no cambia la lógica de la interfaz.
+
 create or replace function public.usuario_actual_rol()
 returns text
 language sql
