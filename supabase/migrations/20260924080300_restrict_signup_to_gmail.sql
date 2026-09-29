@@ -1,3 +1,6 @@
+-- Migración 20260924080300_restrict_signup_to_gmail: aplica cambios de seguridad, permisos o integridad de datos.
+-- Se ejecuta mediante el sistema de migraciones de Supabase y no cambia la lógica de la interfaz.
+
 create or replace function public.hook_restringir_registro_gmail(event jsonb)
 returns jsonb
 language plpgsql
