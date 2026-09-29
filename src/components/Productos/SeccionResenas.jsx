@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Productos/SeccionResenas.jsx
+// Responsabilidad: Gestiona presentación, detalle, carrito o reseñas de productos.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Módulo reutilizable que concentra la lógica y presentación de esta funcionalidad.
 import { useEffect, useMemo, useState } from 'react'
 import { Star, ThumbsUp, Trash2, Pencil } from 'lucide-react'
