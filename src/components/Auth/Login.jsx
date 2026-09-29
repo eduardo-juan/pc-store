@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
+// Componente principal de este módulo.
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
