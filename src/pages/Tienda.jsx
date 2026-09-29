@@ -1,3 +1,4 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -25,6 +26,7 @@ const limpiarBusqueda = (valor = "", max = 100) =>
     .replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9\s_-]/g, "")
     .slice(0, max);
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function Tienda() {
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -98,7 +100,8 @@ export default function Tienda() {
       const coincideMarca =
         marcas.length === 0 || marcas.includes(producto.marca);
       const precio = Number(producto.precio_descuento || producto.precio || 0);
-      return (
+      // Renderizado principal: muestra la información y acciones disponibles.
+  return (
         coincideTexto &&
         coincideCategoria &&
         coincideMarca &&
