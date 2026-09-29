@@ -1,9 +1,11 @@
+// Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import HomePublico from './HomePublico'
 import HomeUsuario from './HomeUsuario'
 import CuponesPromocion from '../components/CuponesPromocion'
 
+// Componente principal: coordina el estado, operaciones y contenido de la página.
 export default function Inicio() {
   const [usuario, setUsuario] = useState(null)
   const [cargando, setCargando] = useState(true)
@@ -21,7 +23,8 @@ export default function Inicio() {
       (_evento, sesion) => setUsuario(sesion?.user || null)
     )
 
-    return () => listener.subscription.unsubscribe()
+    // Renderizado principal: muestra la información y acciones disponibles.
+  return () => listener.subscription.unsubscribe()
   }, [])
 
   if (cargando) {
