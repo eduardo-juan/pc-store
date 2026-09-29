@@ -1,4 +1,7 @@
+// Módulo reutilizable que concentra la lógica y presentación de esta funcionalidad.
+// Propósito del componente: centraliza la lógica principal de este módulo.
 export default function Error({ mensaje, onClose }) {
+  // Renderizado principal: muestra la información y acciones disponibles para el usuario.
   return (
     <div className="pc-error-modal">
       <div className="pc-error-content">
