@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Monitor, Headset } from 'lucide-react'
 
+// Componente principal de este módulo.
 export default function Footer() {
   const year = new Date().getFullYear()
 
