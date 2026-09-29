@@ -1,3 +1,4 @@
+// Módulo reutilizable que concentra la lógica y presentación de esta funcionalidad.
 import { useContext } from 'react'
 import { CarritoContext } from '../context/CarritoContext'
 
