@@ -1,3 +1,4 @@
+// Importa y prepara las dependencias necesarias para construir esta vista o componente.
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart, Truck, ExternalLink } from "lucide-react";
@@ -10,6 +11,7 @@ import { obtenerImagenProducto } from "../../utils/imagenesProductos";
 import BotonAtras from "../BotonAtras";
 import SeccionResenas from "./SeccionResenas";
 
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function DetalleProducto() {
   const { id } = useParams();
   const { usuario, esAdmin } = useAuth();
@@ -137,7 +139,8 @@ export default function DetalleProducto() {
   }
 
   if (cargando)
-    return (
+    // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
+  return (
       <main className="pc-page">
         <div className="pc-container">
           <div className="pc-loader" />
