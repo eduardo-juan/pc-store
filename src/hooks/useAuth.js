@@ -1,4 +1,11 @@
 // ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/hooks/useAuth.js
+// Responsabilidad: Encapsula lógica reutilizable de estado.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
+// ============================================================
 // HOOK DE AUTENTICACIÓN
 // Complementa AuthContext cargando el perfil y determinando
 // los permisos del usuario actual.
