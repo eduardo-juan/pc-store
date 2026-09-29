@@ -1,3 +1,11 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/App.css
+// Responsabilidad: Define la presentación visual de una sección concreta de la aplicación.
+// Criterio de modificación: cambiar aquí la lógica solo cuando corresponda a esta responsabilidad;
+// las operaciones compartidas deben mantenerse en sus contextos, hooks o servicios correspondientes.
+// ============================================================
+
 #root{min-height:100vh;width:100%}.pc-app{min-height:100vh;display:flex;flex-direction:column}.pc-app-content{flex:1;width:100%}::selection{background:#d4af37;color:#0b0b0b}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #d4af37;outline-offset:2px}button,a,input,select,textarea{transition:.2s ease}.pc-global-feedback{position:fixed;top:82px;right:20px;z-index:99999;max-width:min(460px,calc(100vw - 40px));display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:#111;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.22)}.pc-global-feedback-error{border-left:4px solid #dc2626}.pc-global-feedback button{margin-left:auto;border:0;background:transparent;color:inherit;cursor:pointer}
 
 #root {
