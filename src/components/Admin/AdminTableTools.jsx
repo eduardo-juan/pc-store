@@ -1,3 +1,11 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Admin/AdminTableTools.jsx
+// Responsabilidad: Gestiona una función concreta del panel administrativo, incluyendo interfaz, estado, validaciones y operaciones de datos.
+// Criterio de modificación: cambiar aquí la lógica solo cuando corresponda a esta responsabilidad;
+// las operaciones compartidas deben mantenerse en sus contextos, hooks o servicios correspondientes.
+// ============================================================
+
 import { useEffect } from "react";
 
 import { supabase } from "../../supabaseClient";
