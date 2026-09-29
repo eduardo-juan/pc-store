@@ -17,6 +17,8 @@ import {
 } from 'lucide-react'
 import BotonAtras from '../../components/BotonAtras'
 
+// Define los estados considerados ventas confirmadas y los límites usados
+// para paginar los registros de los reportes.
 const ESTADOS_CONFIRMADOS = [
   'pagada',
   'enviada',
@@ -168,6 +170,8 @@ const ContenedorBusqueda = ({ children }) => (
   </div>
 )
 
+// Módulo administrativo de reportes. Consulta los datos de ventas y actividad,
+// calcula métricas y permite presentar o exportar la información obtenida.
 export default function Reportes() {
   const [mesSeleccionado, setMesSeleccionado] =
     useState(obtenerMesActual())
@@ -196,6 +200,8 @@ export default function Reportes() {
     useState(1)
   const [paginaStock, setPaginaStock] = useState(1)
 
+  // Consulta y procesa la información necesaria para construir las métricas,
+  // tablas y gráficos mostrados en el módulo de reportes.
   const cargarReportes = async () => {
     setCargando(true)
     setError('')
@@ -846,6 +852,8 @@ export default function Reportes() {
     </div>
   )
 
+  // Renderiza filtros, métricas, tablas y controles de exportación de los reportes
+  // generados a partir de la información consultada.
   return (
     <main className="pc-page">
       <div className="pc-container">
