@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Auth/AuthPanel.jsx
+// Responsabilidad: Implementa autenticación, recuperación de cuenta o protección de acceso.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Importa los hooks, navegación, autenticación e íconos necesarios para
 // controlar las distintas vistas y acciones del panel de acceso.
 import { useState } from 'react'
