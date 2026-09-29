@@ -4,12 +4,14 @@ import { useAuth } from "../../hooks/useAuth";
 import { useCarrito } from "../../context/CarritoContext";
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function Navbar() {
   const { usuario, esStaff } = useAuth();
   const { cantidadTotal } = useCarrito();
 
   const avatarUrl = usuario?.avatar_url;
 
+  // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
   return (
     <nav className="pc-navbar">
       <div className="pc-container pc-navbar-inner">
