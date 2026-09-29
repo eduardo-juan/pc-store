@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
+// Componente principal de este módulo.
 export default function Sidebar() {
   const { esStaff } = useAuth()
 
