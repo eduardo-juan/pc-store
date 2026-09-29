@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/pages/ConfiguradorPiloto.jsx
+// Responsabilidad: Representa una vista completa asociada a una ruta y coordina su flujo de usuario.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Módulo encargado de gestionar la lógica principal de esta funcionalidad y sus dependencias.
 import { useMemo, useState } from 'react'
 import BotonAtras from '../components/BotonAtras'
