@@ -11,6 +11,8 @@ import {
   esCompatible,
 } from '../utils/compatibilidad'
 
+// Define los tipos de componentes que el configurador permite seleccionar
+// y el nombre que se mostrará para cada categoría.
 const TIPOS = [
   { key: 'cpu', label: 'Procesador' },
   { key: 'motherboard', label: 'Placa madre' },
@@ -159,6 +161,8 @@ function obtenerEstadoOpcion(tipo, componente, seleccionados) {
   return resultado
 }
 
+// Página del configurador completo. Coordina la selección de componentes,
+// las comprobaciones de compatibilidad, el cálculo del precio y el carrito.
 export default function Configurador() {
   const navigate = useNavigate()
   const { agregarConfiguracion } = useCarrito()
@@ -172,7 +176,9 @@ export default function Configurador() {
   useEffect(() => {
     let activo = true
 
-    async function cargarComponentes() {
+    // Consulta los componentes disponibles y prepara la información necesaria
+  // para que el usuario pueda construir una configuración.
+  async function cargarComponentes() {
       try {
         setCargando(true)
         setError(null)
@@ -270,6 +276,8 @@ export default function Configurador() {
       ? capacidadFuente - consumoEstimado
       : null
 
+  // Cambia el componente seleccionado y vuelve a comprobar las reglas de compatibilidad
+  // antes de incorporarlo a la configuración actual.
   function seleccionar(tipo, componenteId) {
     const componente = componentesPorTipo[tipo]?.find(
       (item) => String(item.id) === String(componenteId)
