@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Auth/RestablecerPassword.jsx
+// Responsabilidad: Implementa autenticación, recuperación de cuenta o protección de acceso.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Importa y prepara las dependencias necesarias para construir esta vista o componente.
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
