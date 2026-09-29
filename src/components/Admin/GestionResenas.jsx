@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Admin/GestionResenas.jsx
+// Responsabilidad: Gestiona una función del panel administrativo, con su interfaz, estado, validaciones y operaciones de datos.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useEffect, useState } from "react";
 import { Star, Trash2 } from "lucide-react";
 import { supabase } from "../../supabaseClient";
