@@ -1,8 +1,10 @@
+// Importa y prepara las dependencias necesarias para construir esta vista o componente.
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import "./AuthRecovery.css";
 
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function RestablecerPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
@@ -23,6 +25,7 @@ export default function RestablecerPassword() {
     setCargando(false);
   };
 
+  // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
   return (
     <main className="pc-auth-modern-page">
       <div className="pc-auth-modern-shell">
