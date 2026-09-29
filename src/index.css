@@ -1,3 +1,10 @@
+/* ============================================================
+ * DOCUMENTACIÓN AMPLIADA
+ * Archivo: src/index.css
+ * Responsabilidad: Define estilos visuales y responsive.
+ * Criterio: mantener aquí la presentación visual; la lógica de negocio debe permanecer en JS/JSX.
+ * ============================================================ */
+
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
