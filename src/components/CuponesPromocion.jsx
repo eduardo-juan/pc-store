@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/CuponesPromocion.jsx
+// Responsabilidad: Construye un componente reutilizable de PC Store.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useEffect, useState } from "react";
 import { Copy, Check, Tag, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
