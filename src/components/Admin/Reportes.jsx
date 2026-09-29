@@ -26,6 +26,7 @@ const ESTADOS_CONFIRMADOS = [
 
 const REGISTROS_POR_PAGINA = 10
 
+// Función obtenerFechaLocal: ejecuta una operación principal del módulo.
 const obtenerFechaLocal = (fecha) => {
   const d = new Date(fecha)
 
@@ -65,6 +66,7 @@ const formatearMes = (fecha) => {
   return `${meses[Number(mes) - 1]} ${anio}`
 }
 
+// Función obtenerMesActual: ejecuta una operación principal del módulo.
 const obtenerMesActual = () => {
   const ahora = new Date()
 
@@ -73,6 +75,7 @@ const obtenerMesActual = () => {
   ).padStart(2, '0')}`
 }
 
+// Función cambiarMes: ejecuta una operación principal del módulo.
 const cambiarMes = (mes, cantidad) => {
   const [anio, numeroMes] = mes.split('-').map(Number)
 
@@ -87,6 +90,7 @@ const cambiarMes = (mes, cantidad) => {
   ).padStart(2, '0')}`
 }
 
+// Función obtenerRangoMes: ejecuta una operación principal del módulo.
 const obtenerRangoMes = (mes) => {
   const [anio, numeroMes] = mes.split('-').map(Number)
 
