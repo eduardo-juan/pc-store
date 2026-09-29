@@ -7,6 +7,8 @@ import { useCarrito } from "../context/CarritoContext";
 import { useAuth } from "../hooks/useAuth";
 import BotonAtras from "../components/BotonAtras";
 
+// Define el costo fijo de envío y las funciones auxiliares usadas para limpiar
+// y formatear los datos introducidos durante el proceso de compra.
 const COSTO_ENVIO = 100;
 
 const limpiarTexto = (valor = "", max = 50) =>
@@ -25,6 +27,8 @@ const formatearTelefono = (valor = "") => {
     : `${numeros.slice(0, 4)}-${numeros.slice(4)}`;
 };
 
+// Página final del proceso de compra. Reúne los datos de entrega, pago y cupón,
+// calcula el total y envía la orden a Supabase para su creación.
 export default function Checkout() {
   const navigate = useNavigate();
 
@@ -73,6 +77,8 @@ export default function Checkout() {
     COSTO_ENVIO -
     descuento;
 
+  // Valida el código introducido mediante la función de Supabase y guarda el descuento
+  // únicamente cuando la base de datos confirma que el cupón puede utilizarse.
   const validarCupon = async () => {
     if (!cupon.trim()) {
       setErrorCupon("Escribe un cupón.");
@@ -282,6 +288,8 @@ export default function Checkout() {
     );
   };
 
+  // Renderiza el formulario de checkout y el resumen de compra, mostrando el total
+  // calculado, los productos configurados y las acciones para confirmar la orden.
   return (
     <main className="pc-page">
       <div className="pc-container">
