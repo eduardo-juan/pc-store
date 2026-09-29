@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Admin/GestionInventario.jsx
+// Responsabilidad: Gestiona una función del panel administrativo, con su interfaz, estado, validaciones y operaciones de datos.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../supabaseClient'
 import BotonAtras from '../../components/BotonAtras'
