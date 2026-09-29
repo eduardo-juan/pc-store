@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/components/Auth/RecuperarPassword.jsx
+// Responsabilidad: Implementa autenticación, recuperación de cuenta o protección de acceso.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Send } from "lucide-react";
