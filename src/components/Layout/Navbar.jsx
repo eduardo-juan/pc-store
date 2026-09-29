@@ -3,6 +3,7 @@ import { ShoppingCart, Settings2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useCarrito } from "../../context/CarritoContext";
 
+// Componente principal de este módulo.
 export default function Navbar() {
   const { usuario, esStaff } = useAuth();
   const { cantidadTotal } = useCarrito();
