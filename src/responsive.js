@@ -1,3 +1,5 @@
+// Define los estilos responsive inyectados dinámicamente para adaptar la interfaz
+// de PC Store a pantallas grandes, tabletas y dispositivos móviles.
 const estilosResponsive = `
 .pc-brand-logo{overflow:hidden}.pc-brand-logo img{width:28px;height:28px;object-fit:contain}.pc-nav-links a{display:inline-flex;align-items:center;gap:6px}.pc-pilot-page{width:min(1400px,100%);margin:0 auto;padding:24px}.pc-pilot-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}.pc-pilot-options{display:flex;flex-direction:column;gap:16px}.pc-pilot-summary{position:sticky;top:20px}.pc-pilot-page select{min-height:46px}
 @media(max-width:900px){.pc-pilot-page{padding:18px 0}.pc-pilot-layout{grid-template-columns:1fr}.pc-pilot-summary{position:static}.pc-pilot-page .pc-card{padding:18px}}
@@ -14,6 +16,8 @@ const estilosResponsive = `
 @media(max-width:480px){.pc-container{width:calc(100% - 16px)}.pc-brand{font-size:1rem}.pc-brand-badge{width:34px;height:34px}.pc-nav-actions .pc-cart-button span{display:none}.pc-product-grid{grid-template-columns:1fr}.pc-product-image{height:210px}.pc-product-actions{grid-template-columns:1fr 1fr}.pc-buy-row{grid-template-columns:1fr}.pc-btn{width:100%}.pc-hero-actions{flex-direction:column}.pc-hero-actions .pc-btn{width:100%}.pc-table-wrapper{margin-left:-8px;margin-right:-8px}.pc-store-product-grid{grid-template-columns:1fr}.pc-store-product-image{height:220px}.pc-store-product-card .pc-product-name{min-height:0}}
 `
 
+// Solo inyecta la hoja de estilos cuando existe un documento del navegador y
+// evita crear el mismo bloque de estilos más de una vez.
 if (typeof document !== 'undefined' && !document.getElementById('pc-store-responsive-styles')) {
   const style = document.createElement('style')
   style.id = 'pc-store-responsive-styles'
