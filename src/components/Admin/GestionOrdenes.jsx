@@ -4,6 +4,7 @@ import { supabase } from '../../supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
 import BotonAtras from '../../components/BotonAtras'
 
+// Define los estados y la cantidad de órdenes visibles por página para el módulo administrativo.
 const ORDENES_POR_PAGINA = 8
 
 const ESTADOS = [
@@ -50,6 +51,8 @@ const limpiarBusqueda = (valor = '') =>
     .slice(0, 100)
 
 // Componente principal del módulo GestionOrdenes.
+// Módulo administrativo para consultar y gestionar las órdenes de la tienda.
+// Permite revisar estados, asignaciones, detalles y acciones autorizadas.
 export default function GestionOrdenes() {
   const { usuario, esAdmin, esEmpleado } = useAuth()
 
@@ -75,6 +78,8 @@ export default function GestionOrdenes() {
     setPagina(1)
   }, [filtro, fecha, busqueda])
 
+  // Consulta las órdenes y prepara la información relacionada con clientes,
+  // empleados y estados que necesita la interfaz administrativa.
   const cargarOrdenes = async () => {
     setError('')
 
@@ -122,7 +127,9 @@ export default function GestionOrdenes() {
           cargadas.flatMap((orden) =>
             (orden.items || []).flatMap((item) => {
               if (item.tipo === 'configurador') {
-                return (item.componentes || [])
+                // Renderiza filtros, listado paginado, información de cada orden y acciones
+  // disponibles según el estado y los permisos del usuario.
+  return (item.componentes || [])
                   .map((componente) => componente.producto_id)
                   .filter(Boolean)
               }
