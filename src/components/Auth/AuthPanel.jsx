@@ -1,13 +1,19 @@
+// Importa los hooks, navegación, autenticación e íconos necesarios para
+// controlar las distintas vistas y acciones del panel de acceso.
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 // Componente principal de este módulo.
+// Panel reutilizable de autenticación que centraliza el flujo de acceso,
+// recuperación y navegación relacionada con la cuenta del usuario.
 export default function AuthPanel() {
 
   const { login, registro } = useAuth()
   const navigate = useNavigate()
 
+  // Mantiene los datos introducidos, el estado de carga y los mensajes
+  // necesarios para controlar el flujo de autenticación.
   const [modo, setModo] = useState('login')
   const [cargando, setCargando] = useState(false)
   const [mensaje, setMensaje] = useState('')
@@ -100,6 +106,8 @@ export default function AuthPanel() {
   }
 
 
+  // Renderiza el formulario y las acciones disponibles para que el usuario
+  // pueda iniciar sesión o continuar con las opciones de recuperación y registro.
   return (
     <div
       className="pc-hero-panel"
