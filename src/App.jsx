@@ -1,3 +1,11 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/App.jsx
+// Responsabilidad: Define el enrutamiento completo, providers globales, layout y restricciones de acceso de PC Store.
+// Criterio de modificación: cambiar aquí la lógica solo cuando corresponda a esta responsabilidad;
+// las operaciones compartidas deben mantenerse en sus contextos, hooks o servicios correspondientes.
+// ============================================================
+
 // Punto central de la aplicación. Aquí se conectan el enrutamiento, la autenticación, el carrito
 // y los elementos globales que deben existir mientras el usuario navega por PC Store.
 import { BrowserRouter, Routes, Route } from "react-router-dom";
