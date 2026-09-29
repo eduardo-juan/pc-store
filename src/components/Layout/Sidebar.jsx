@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../hooks/useAuth'
 
 // Componente principal de este módulo.
+// Propósito del componente: centraliza la lógica y presentación principal de este módulo.
 export default function Sidebar() {
   const { esStaff } = useAuth()
 
@@ -15,6 +16,7 @@ export default function Sidebar() {
     return null
   }
 
+  // Renderizado principal: muestra la información y acciones que corresponden a este módulo.
   return (
     <aside className="pc-sidebar">
       <nav>
