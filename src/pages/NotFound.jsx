@@ -1,3 +1,10 @@
+// ============================================================
+// DOCUMENTACIÓN AMPLIADA
+// Archivo: src/pages/NotFound.jsx
+// Responsabilidad: Representa una vista completa asociada a una ruta y coordina su flujo de usuario.
+// Criterio: mantener aquí solo la responsabilidad de este módulo y delegar operaciones compartidas a la capa correspondiente.
+// ============================================================
+
 // Módulo de página: concentra la lógica y presentación de esta sección de PC Store.
 import { Link } from 'react-router-dom'
 
