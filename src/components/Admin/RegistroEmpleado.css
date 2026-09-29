@@ -1,3 +1,10 @@
+/* ============================================================
+ * DOCUMENTACIÓN AMPLIADA
+ * Archivo: src/components/Admin/RegistroEmpleado.css
+ * Responsabilidad: Gestiona una función del panel administrativo, con su interfaz, estado, validaciones y operaciones de datos.
+ * Criterio: mantener aquí la presentación visual; la lógica de negocio debe permanecer en JS/JSX.
+ * ============================================================ */
+
 /* Estilos del formulario de registro de empleados: errores, campos obligatorios
    y controles auxiliares como el botón para mostrar u ocultar la contraseña. */
 /* Marca visualmente un campo de entrada cuando contiene un error de validación. */
